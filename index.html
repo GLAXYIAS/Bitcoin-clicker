@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bitcoin Clicker</title>
-    <style>
+   <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
         body {
@@ -132,6 +132,7 @@
             align-items: center;
             justify-content: center;
             font-size: 1.2em;
+            box-sizing: border-box; /* Prevents shifting */
         }
 
         #miners-section {
@@ -140,23 +141,38 @@
             padding: 10px;
         }
 
+        /* FIXED MINER ITEM CSS */
         .item {
             display: flex;
             background: #1a1a1a;
-            border: 2px solid #333;
+            border: 2px solid transparent; /* Always exist, but invisible */
             margin-bottom: 8px;
             padding: 10px;
             cursor: pointer;
-            transition: 0.2s;
+            transition: background 0.2s, border-color 0.2s;
+            box-sizing: border-box; /* Keeps size identical regardless of border */
         }
 
-        .item:hover { background: #222; border-color: #00ff9d; }
-        .item.locked { opacity: 0.3; cursor: not-allowed; }
+        /* Solid, flicker-free hover effect for affordable items */
+        .item:not(.locked):hover {
+            background: #2a2a2a;
+            border-color: #ffd700; 
+            box-shadow: inset 0 0 10px rgba(255, 215, 0, 0.2);
+        }
+
+        .item.locked { 
+            opacity: 0.3; 
+            cursor: not-allowed; 
+        }
 
         .item-icon { font-size: 2em; margin-right: 15px; }
         .item-details { flex: 1; }
         .item-name { font-size: 0.8em; color: #ffd700; margin-bottom: 4px; }
-        .item-cost { font-size: 0.7em; color: #00ff9d; }
+        
+        /* Affordability colors */
+        .item-cost.can-afford { color: #00ff9d; }
+        .item-cost.cannot-afford { color: #ff4d4d; }
+
         .item-owned { font-size: 1.2em; color: #333; align-self: center; }
 
         .floating-text {
@@ -172,7 +188,15 @@
             0% { opacity: 1; transform: translateY(0); }
             100% { opacity: 0; transform: translateY(-80px); }
         }
-    </style>
+
+        .tooltip {
+            position: absolute;
+            background: #111;
+            border: 2px solid #ffd700;
+            padding: 10px;
+            color: #fff;
+            font-size: 0.6em;
+            z-index: 1000
 </head>
 <body>
 
@@ -212,8 +236,8 @@
 
         // --- News System ---
         const newsMessages = [
-            'Welcome to Bitcoin Clicker! Start clicking to generate sats...',
-            'Local man becomes millionaire by clicking a golden coin',
+            'Welcome to Bitcoin Clicker! Start clicking to generate Bitcoins',
+            'Local business man becomes trillionare after investing in crypto',
             'Breaking: ASIC miners now louder than actual mining operations',
             'Scientists confirm Bitcoin is digital gold... but needs more clicks',
             'Halving in progress - experts recommend buying more GPUs',
@@ -263,17 +287,20 @@
             const list = document.getElementById('miners-list');
             list.innerHTML = '';
             miners.forEach((m) => {
+                const canAfford = bitcoin >= m.cost;
                 const div = document.createElement('div');
-                div.className = `item ${bitcoin < m.cost ? 'locked' : ''}`;
+                div.className = `item ${!canAfford ? 'locked' : ''}`;
                 div.innerHTML = `
                     <div class="item-icon">${m.emoji}</div>
                     <div class="item-details">
                         <div class="item-name">${m.name}</div>
-                        <div class="item-cost">${Math.floor(m.cost)} BTC</div>
+                        <div class="item-cost ${canAfford ? 'can-afford' : 'cannot-afford'}">
+                            ${Math.floor(m.cost).toLocaleString()} BTC
+                        </div>
                     </div>
                     <div class="item-owned">${m.owned}</div>
                 `;
-                if (bitcoin >= m.cost) {
+                if (canAfford) {
                     div.onclick = () => {
                         bitcoin -= m.cost;
                         m.owned++;
@@ -288,18 +315,38 @@
 
         function renderUpgrades() {
             const grid = document.getElementById('upgrades-grid');
+            const tooltip = document.getElementById('tooltip');
             grid.innerHTML = '';
+
             upgrades.forEach((u, i) => {
                 if (bitcoin > u.cost * 0.6) {
+                    const canAfford = bitcoin >= u.cost;
                     const div = document.createElement('div');
                     div.className = 'upgrade-item';
                     div.innerHTML = u.icon;
-                    div.style.opacity = bitcoin >= u.cost ? '1' : '0.4';
+                    div.style.opacity = canAfford ? '1' : '0.4';
+                    div.style.borderColor = canAfford ? '#ffd700' : '#444';
+
+                    // Tooltip Events
+                    div.onmousemove = (e) => {
+                        tooltip.style.display = 'block';
+                        tooltip.style.left = (e.pageX + 15) + 'px';
+                        tooltip.style.top = (e.pageY + 15) + 'px';
+                        tooltip.innerHTML = `
+                            <div style="color:#ffd700; margin-bottom:5px;">${u.name}</div>
+                            <div style="color:${canAfford ? '#00ff9d' : '#ff4d4d'}">Cost: ${u.cost} BTC</div>
+                            <div style="margin-top:5px; font-size:0.8em; color:#aaa;">Click to buy!</div>
+                        `;
+                    };
+
+                    div.onmouseleave = () => tooltip.style.display = 'none';
+
                     div.onclick = () => {
-                        if (bitcoin >= u.cost) {
+                        if (canAfford) {
                             bitcoin -= u.cost;
                             u.effect();
                             upgrades.splice(i, 1);
+                            tooltip.style.display = 'none';
                             calculateBPS();
                             updateDisplay();
                         }
@@ -338,5 +385,6 @@
         updateNews();
         updateDisplay();
     </script>
+    <div id="tooltip" class="tooltip"></div>
 </body>
 </html>
