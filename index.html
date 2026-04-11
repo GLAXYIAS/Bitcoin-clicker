@@ -13,134 +13,153 @@
             background: linear-gradient(#0a0a0a, #1a1a2e);
             color: #00ff9d;
             font-family: 'Press Start 2P', cursive;
-            text-align: center;
             overflow: hidden;
+            height: 100vh;
         }
 
-        .container {
+        .game-container {
             display: flex;
-            flex-wrap: wrap;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            gap: 20px;
+            height: 100vh;
+            width: 100vw;
+            gap: 10px;
+            padding: 10px;
+            box-sizing: border-box;
         }
 
+        /* LEFT PANEL - The Clicker */
         .left-panel {
-            flex: 1;
-            min-width: 300px;
-        }
-
-        .right-panel {
-            flex: 2;
-            min-width: 400px;
+            flex: 0 0 30%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-right: 2px dashed #00ff9d;
         }
 
         h1 {
             color: #ffd700;
-            text-shadow: 0 0 10px #ffd700;
-            margin: 20px 0;
-            font-size: 2.5em;
+            font-size: 1.2em;
+            text-align: center;
+            margin-bottom: 30px;
         }
 
         #bitcoin {
-            width: 280px;
-            height: 280px;
-            background: radial-gradient(circle, #f2a900, #d97700);
-            border-radius: 50%;
-            margin: 30px auto;
+            width: 250px;
+            height: 250px;
             cursor: pointer;
-            box-shadow: 0 0 40px #f2a900,
-                        inset 0 0 60px rgba(255,255,255,0.6);
-            transition: transform 0.1s;
-            user-select: none;
+            transition: transform 0.05s;
         }
 
-        #bitcoin:active {
-            transform: scale(0.85);
+        #bitcoin:active { transform: scale(0.95); }
+
+        #bitcoin img { width: 100%; height: 100%; }
+
+        /* CENTER PANEL - The News Ticker */
+        .center-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding-top: 20px;
         }
 
-        #click-value {
+        .news-ticker {
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid #ffd700;
+            height: 40px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        #news-text {
+            white-space: nowrap;
             position: absolute;
-            font-size: 1.2em;
+            animation: ticker 15s linear infinite;
+            font-size: 0.7em;
+            color: #fff;
+        }
+
+        @keyframes ticker {
+            0% { left: 100%; }
+            100% { left: -100%; }
+        }
+
+        /* RIGHT PANEL - The Store (Upgrades & Miners) */
+        .right-panel {
+            flex: 0 0 320px;
+            background: rgba(0, 0, 0, 0.4);
+            border-left: 4px solid #444;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            height: 100%;
+        }
+
+        .store-header {
+            background: #222;
+            padding: 10px;
+            text-align: center;
             color: #ffd700;
-            pointer-events: none;
-            text-shadow: 2px 2px 4px black;
-            animation: floatUp 1.5s forwards;
+            border-bottom: 2px solid #ffd700;
         }
 
-        .stats {
-            background: rgba(0, 0, 0, 0.7);
-            padding: 15px;
-            border: 4px solid #00ff9d;
-            margin: 20px 0;
-            font-size: 1.1em;
-        }
-
-        .shop {
-            background: rgba(0, 0, 0, 0.8);
-            border: 4px solid #ffd700;
-            padding: 15px;
-            max-height: 600px;
+        .section {
+            padding: 10px;
             overflow-y: auto;
+        }
+
+        /* UPGRADES AREA - Top portion */
+        #upgrades-section {
+            flex: 0 0 120px;
+            border-bottom: 2px solid #444;
+        }
+
+        .upgrade-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+        }
+
+        .upgrade-item {
+            width: 50px;
+            height: 50px;
+            background: #333;
+            border: 2px solid #ffd700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+
+        /* MINERS AREA - Bottom portion */
+        #miners-section {
+            flex: 1;
         }
 
         .item {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            background: #1a1a2e;
-            margin: 10px 0;
-            padding: 15px;
-            border: 3px solid #00ff9d;
+            background: #222;
+            border: 1px solid #00ff9d;
+            margin-bottom: 5px;
+            padding: 5px;
             cursor: pointer;
-            transition: all 0.2s;
         }
 
-        .item:hover {
-            background: #2a2a4e;
-            border-color: #ffd700;
-            transform: scale(1.03);
-        }
+        .item:hover { background: #333; }
+        .item.locked { opacity: 0.4; cursor: not-allowed; }
 
-        .item.locked {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .item-name {
-            font-size: 1.1em;
-            color: #ffd700;
-        }
-
-        .item-cost {
-            color: #ff4444;
-            font-weight: bold;
-        }
-
-        .item-owned {
-            color: #00ff9d;
-            font-size: 0.9em;
-        }
-
-        button {
-            background: #ffd700;
-            color: black;
-            border: none;
-            padding: 12px 24px;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 1em;
-            cursor: pointer;
-            margin: 10px;
-        }
-
-        button:hover {
-            background: #ffed4e;
-        }
+        .item-icon { font-size: 2em; margin-right: 10px; }
+        .item-info { flex: 1; }
+        .item-name { font-size: 0.7em; color: #ffd700; }
+        .item-cost { font-size: 0.6em; color: #00ff9d; }
+        .item-count { font-size: 1.2em; color: #444; margin-left: 10px; }
 
         .floating-text {
             position: absolute;
-            color: #00ff9d;
+            color: #ffd700;
             font-weight: bold;
             pointer-events: none;
             animation: floatUp 1s ease-out forwards;
@@ -148,166 +167,134 @@
 
         @keyframes floatUp {
             0% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-80px); }
-        }
-
-        footer {
-            margin-top: 30px;
-            font-size: 0.8em;
-            opacity: 0.7;
+            100% { opacity: 0; transform: translateY(-100px); }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Left Panel: Big Bitcoin -->
+
+    <div class="game-container">
         <div class="left-panel">
             <h1>BITCOIN CLICKER</h1>
-            <div style="position: relative;">
-                <div id="bitcoin">₿</div>
+            <div id="bitcoin">
+                <img src="https://via.placeholder.com/250x250/f2a900/111111?text=₿" alt="Bitcoin">
             </div>
-            <div class="stats">
-                <h2>Bitcoin: <span id="bitcoin-count">0</span></h2>
-                <p>Per second: <span id="bitcoin-per-second">0</span></p>
+            <div style="margin-top:20px; text-align:center;">
+                <span id="bitcoin-count">0</span> BTC<br>
+                <small style="font-size:0.6em">per second: <span id="bps">0</span></small>
             </div>
         </div>
 
-        <!-- Right Panel: Shop -->
+        <div class="center-panel">
+            <div class="news-ticker">
+                <div id="news-text">Gathering hash power... Market is looking bullish today!</div>
+            </div>
+        </div>
+
         <div class="right-panel">
-            <h2>MINERS &amp; UPGRADES</h2>
-            <div class="shop" id="shop"></div>
+            <div class="store-header">STORE</div>
+            
+            <div class="section" id="upgrades-section">
+                <div class="upgrade-grid" id="upgrades-grid"></div>
+            </div>
+
+            <div class="section" id="miners-section">
+                <div id="miners-list"></div>
+            </div>
         </div>
     </div>
 
-    <footer>Made with ❤️ for the Bitcoin community • Inspired by Cookie Clicker</footer>
-
     <script>
-        // Game Variables
         let bitcoin = 0;
-        let bitcoinPerSecond = 0;
+        let bps = 0;
         let clickValue = 1;
 
-        // Items (Miners & Upgrades)
-        let items = [
-            { id: "gpu", name: "GPU Miner", baseCost: 15, cost: 15, owned: 0, production: 0.1, emoji: "🖥️" },
-            { id: "asic", name: "ASIC Miner", baseCost: 100, cost: 100, owned: 0, production: 1, emoji: "⛏️" },
-            { id: "farm", name: "Mining Farm", baseCost: 500, cost: 500, owned: 0, production: 8, emoji: "🏭" },
-            { id: "pool", name: "Mining Pool", baseCost: 2000, cost: 2000, owned: 0, production: 40, emoji: "🌐" },
-            { id: "satellite", name: "Satellite Miner", baseCost: 10000, cost: 10000, owned: 0, production: 200, emoji: "🛰️" },
-            { id: "halving", name: "Halving Protection", baseCost: 50000, cost: 50000, owned: 0, production: 1000, emoji: "🔄" }
+        const miners = [
+            { id: "gpu", name: "GPU", cost: 15, owned: 0, production: 0.1, emoji: "🖥️" },
+            { id: "asic", name: "ASIC", cost: 100, owned: 0, production: 1, emoji: "⛏️" },
+            { id: "farm", name: "Farm", cost: 1100, owned: 0, production: 8, emoji: "🏭" },
+            { id: "pool", name: "Pool", cost: 12000, owned: 0, production: 47, emoji: "🌐" }
         ];
 
-        const bitcoinElement = document.getElementById('bitcoin');
-        const bitcoinCountElement = document.getElementById('bitcoin-count');
-        const bitcoinPerSecondElement = document.getElementById('bitcoin-per-second');
-        const shopElement = document.getElementById('shop');
+        const upgrades = [
+            { id: "u1", name: "Mouse", cost: 100, icon: "🖱️", effect: () => clickValue *= 2 },
+            { id: "u2", name: "Cooling", cost: 500, icon: "❄️", effect: () => bps *= 1.1 }
+        ];
 
-        // Create floating text when clicking Bitcoin
-        function createFloatingText(x, y, amount) {
-            const text = document.createElement('div');
-            text.className = 'floating-text';
-            text.textContent = `+${amount}`;
-            text.style.left = `${x}px`;
-            text.style.top = `${y}px`;
-            document.body.appendChild(text);
+        function render() {
+            document.getElementById('bitcoin-count').innerText = Math.floor(bitcoin);
+            document.getElementById('bps').innerText = bps.toFixed(1);
 
-            setTimeout(() => text.remove(), 1000);
-        }
-
-        // Click handler
-        bitcoinElement.addEventListener('click', (e) => {
-            bitcoin += clickValue;
-            
-            const rect = bitcoinElement.getBoundingClientRect();
-            const clickX = e.clientX - rect.left + rect.left + (Math.random() * 40 - 20);
-            const clickY = e.clientY - rect.top + rect.top - 30;
-
-            createFloatingText(clickX, clickY, clickValue);
-
-            updateDisplay();
-        });
-
-        // Buy item
-        function buyItem(index) {
-            const item = items[index];
-            if (bitcoin >= item.cost) {
-                bitcoin -= item.cost;
-                item.owned++;
-                bitcoinPerSecond += item.production;
-
-                // Increase cost for next purchase (exponential growth)
-                item.cost = Math.ceil(item.baseCost * Math.pow(1.15, item.owned));
-
-                updateDisplay();
-                renderShop();
-            }
-        }
-
-        // Render the shop
-        function renderShop() {
-            shopElement.innerHTML = '';
-            items.forEach((item, index) => {
+            // Render Miners
+            const minersList = document.getElementById('miners-list');
+            minersList.innerHTML = '';
+            miners.forEach((m, i) => {
                 const div = document.createElement('div');
-                div.className = `item ${bitcoin < item.cost ? 'locked' : ''}`;
+                div.className = `item ${bitcoin < m.cost ? 'locked' : ''}`;
                 div.innerHTML = `
-                    <div>
-                        <span style="font-size: 1.8em;">${item.emoji}</span><br>
-                        <span class="item-name">${item.name}</span><br>
-                        <span class="item-owned">Owned: ${item.owned}</span>
+                    <div class="item-icon">${m.emoji}</div>
+                    <div class="item-info">
+                        <div class="item-name">${m.name}</div>
+                        <div class="item-cost">${Math.floor(m.cost)} BTC</div>
                     </div>
-                    <div style="text-align: right;">
-                        <span class="item-cost">${Math.floor(item.cost)} ₿</span><br>
-                        <small>+${item.production} ₿/s</small>
-                    </div>
+                    <div class="item-count">${m.owned}</div>
                 `;
-                div.addEventListener('click', () => buyItem(index));
-                shopElement.appendChild(div);
+                div.onclick = () => {
+                    if(bitcoin >= m.cost) {
+                        bitcoin -= m.cost;
+                        m.owned++;
+                        m.cost *= 1.15;
+                        updateBPS();
+                        render();
+                    }
+                };
+                minersList.appendChild(div);
+            });
+
+            // Render Upgrades
+            const upgradesGrid = document.getElementById('upgrades-grid');
+            upgradesGrid.innerHTML = '';
+            upgrades.forEach((u) => {
+                if(bitcoin > u.cost * 0.5) {
+                    const div = document.createElement('div');
+                    div.className = 'upgrade-item';
+                    div.innerHTML = u.icon;
+                    div.title = `${u.name}: ${u.cost} BTC`;
+                    div.onclick = () => {
+                        if(bitcoin >= u.cost) {
+                            bitcoin -= u.cost;
+                            u.effect();
+                            upgrades.splice(upgrades.indexOf(u), 1);
+                            render();
+                        }
+                    };
+                    upgradesGrid.appendChild(div);
+                }
             });
         }
 
-        // Update main display
-        function updateDisplay() {
-            bitcoinCountElement.textContent = Math.floor(bitcoin);
-            bitcoinPerSecondElement.textContent = bitcoinPerSecond.toFixed(1);
+        function updateBPS() {
+            bps = miners.reduce((acc, m) => acc + (m.owned * m.production), 0);
         }
 
-        // Game loop (every 100ms)
+        document.getElementById('bitcoin').onclick = (e) => {
+            bitcoin += clickValue;
+            render();
+            const fly = document.createElement('div');
+            fly.className = 'floating-text';
+            fly.innerText = `+${clickValue}`;
+            fly.style.left = e.clientX + 'px';
+            fly.style.top = e.clientY + 'px';
+            document.body.appendChild(fly);
+            setTimeout(() => fly.remove(), 1000);
+        };
+
         setInterval(() => {
-            bitcoin += bitcoinPerSecond / 10;
-            updateDisplay();
+            bitcoin += bps / 10;
+            render();
         }, 100);
 
-        // Auto-save every 10 seconds
-        setInterval(() => {
-            localStorage.setItem('bitcoinClickerSave', JSON.stringify({
-                bitcoin: bitcoin,
-                items: items
-            }));
-        }, 10000);
-
-        // Load save
-        function loadSave() {
-            const saved = localStorage.getItem('bitcoinClickerSave');
-            if (saved) {
-                const data = JSON.parse(saved);
-                bitcoin = data.bitcoin || 0;
-                
-                if (data.items) {
-                    items = data.items;
-                    // Recalculate bitcoinPerSecond
-                    bitcoinPerSecond = items.reduce((sum, item) => sum + (item.production * item.owned), 0);
-                }
-            }
-        }
-
-        // Initialize game
-        function init() {
-            loadSave();
-            renderShop();
-            updateDisplay();
-        }
-
-        window.onload = init;
+        render();
     </script>
 </body>
 </html>
