@@ -24,7 +24,7 @@
             box-sizing: border-box;
         }
 
-        /* LEFT COLUMN: The Bitcoin */
+        /* LEFT COLUMN */
         .left-panel {
             flex: 0 0 33%;
             display: flex;
@@ -92,7 +92,7 @@
             100% { transform: translateX(-100%); }
         }
 
-        /* RIGHT COLUMN: The Store (Upgrades + Miners) */
+        /* RIGHT COLUMN */
         .right-panel {
             flex: 0 0 350px;
             background: rgba(0, 0, 0, 0.5);
@@ -110,7 +110,6 @@
             font-size: 1.2em;
         }
 
-        /* Upgrades (Top section of Right Panel) */
         #upgrades-section {
             padding: 10px;
             min-height: 100px;
@@ -135,7 +134,6 @@
             font-size: 1.2em;
         }
 
-        /* Miners (Bottom section of Right Panel) */
         #miners-section {
             flex: 1;
             overflow-y: auto;
@@ -161,7 +159,6 @@
         .item-cost { font-size: 0.7em; color: #00ff9d; }
         .item-owned { font-size: 1.2em; color: #333; align-self: center; }
 
-        /* Floating Text */
         .floating-text {
             position: absolute;
             color: #ffd700;
@@ -193,17 +190,15 @@
 
         <div class="center-panel">
             <div class="news-ticker-container">
-                <div id="news-text">Welcome to the mining rig. Start clicking to generate revenue...</div>
+                <div id="news-text"></div>
             </div>
-            </div>
+        </div>
 
         <div class="right-panel">
             <div class="store-header">STORE</div>
-            
             <div id="upgrades-section">
                 <div class="upgrade-grid" id="upgrades-grid"></div>
             </div>
-
             <div id="miners-section">
                 <div id="miners-list"></div>
             </div>
@@ -215,6 +210,35 @@
         let bps = 0;
         let clickValue = 1;
 
+        // --- News System ---
+        const newsMessages = [
+            'Welcome to Bitcoin Clicker! Start clicking to generate sats...',
+            'Local man becomes millionaire by clicking a golden coin',
+            'Breaking: ASIC miners now louder than actual mining operations',
+            'Scientists confirm Bitcoin is digital gold... but needs more clicks',
+            'Halving in progress - experts recommend buying more GPUs',
+            'Grandma asks why her grandson is farming satellites in the basement',
+            'New upgrade: Lightning Network makes your clicks 300% faster',
+            'Warning: Excessive clicking may lead to extreme wealth',
+            'Mining pool party tonight - bring your own electricity',
+            'Bitcoin price prediction: It will either go up... or down',
+            'Satellite farm owner reports beautiful view but terrible power bill'
+        ];
+
+        let currentNewsIndex = 0;
+
+        function updateNews() {
+            const newsElement = document.getElementById('news-text');
+            // Force reset the animation so it starts from the right again
+            newsElement.style.animation = 'none';
+            newsElement.offsetHeight; 
+            newsElement.style.animation = 'ticker 20s linear infinite';
+            
+            newsElement.innerText = newsMessages[currentNewsIndex];
+            currentNewsIndex = (currentNewsIndex + 1) % newsMessages.length;
+        }
+
+        // --- Store Data ---
         const miners = [
             { id: "gpu", name: "GPU Miner", cost: 15, owned: 0, production: 0.1, emoji: "🖥️" },
             { id: "asic", name: "ASIC Miner", cost: 100, owned: 0, production: 1, emoji: "⛏️" },
@@ -227,6 +251,7 @@
             { id: "u2", name: "Liquid Cooling", cost: 500, icon: "❄️", effect: () => bps *= 1.2 }
         ];
 
+        // --- Game Logic ---
         function updateDisplay() {
             document.getElementById('balance').innerText = Math.floor(bitcoin).toLocaleString();
             document.getElementById('bps').innerText = bps.toFixed(1);
@@ -237,7 +262,7 @@
         function renderMiners() {
             const list = document.getElementById('miners-list');
             list.innerHTML = '';
-            miners.forEach((m, i) => {
+            miners.forEach((m) => {
                 const div = document.createElement('div');
                 div.className = `item ${bitcoin < m.cost ? 'locked' : ''}`;
                 div.innerHTML = `
@@ -265,7 +290,6 @@
             const grid = document.getElementById('upgrades-grid');
             grid.innerHTML = '';
             upgrades.forEach((u, i) => {
-                // Only show if we've reached 60% of the cost
                 if (bitcoin > u.cost * 0.6) {
                     const div = document.createElement('div');
                     div.className = 'upgrade-item';
@@ -302,12 +326,16 @@
             setTimeout(() => fly.remove(), 800);
         };
 
-        // Main game loop
+        // --- Loops ---
         setInterval(() => {
             bitcoin += bps / 10;
             updateDisplay();
         }, 100);
 
+        setInterval(updateNews, 20000); // Change news every 20 seconds
+        
+        // --- Init ---
+        updateNews();
         updateDisplay();
     </script>
 </body>
