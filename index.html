@@ -6,12 +6,8 @@
     <title>Bitcoin Clicker</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-        /* Prevent highlighting/selecting text and images */
-* {
-    -webkit-user-select: none; /* Safari */
-    -ms-user-select: none;     /* IE 10 and 11 */
-    user-select: none;         /* Standard syntax */
-}
+        * { -webkit-user-select: none; -ms-user-select: none; user-select: none; }
+        
         body {
             margin: 0; padding: 0;
             background: linear-gradient(#0a0a0a, #1a1a2e);
@@ -20,6 +16,32 @@
             overflow: hidden;
             height: 100vh;
         }
+
+        /* Stats Modal Styling */
+        #stats-modal {
+            display: none;
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: #111;
+            border: 4px solid #ffd700;
+            padding: 30px;
+            z-index: 2000;
+            width: 400px;
+            text-align: left;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+        }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1999;
+        }
+        .stats-line { margin: 15px 0; font-size: 0.7em; color: #fff; }
+        .stats-val { color: #00ff9d; float: right; }
+        .modal-btns { display: flex; gap: 10px; margin-top: 25px; }
+        .modal-btns button { flex: 1; padding: 10px; font-family: inherit; font-size: 0.5em; cursor: pointer; border: none; }
 
         .game-container { display: flex; height: 100vh; width: 100vw; }
 
@@ -77,13 +99,13 @@
                 <div style="font-size: 1.5em;"><span id="balance">0</span> BTC</div>
                 <div style="font-size: 0.7em; margin-top: 10px; color: #ffd700;">per second: <span id="bps">0</span></div>
             </div>
-            <button onclick="resetGame()" style="margin-top: 20px; font-family: inherit; font-size: 0.5em; cursor: pointer; background: #ff4d4d; border: none; padding: 5px;">RESET SAVE</button>
         </div>
 
         <div class="center-panel">
             <div class="news-ticker-container">
                 <div id="news-text"></div>
             </div>
+            <button onclick="toggleStats(true)" style="margin: 20px auto; padding: 10px 20px; font-family: inherit; background: #333; color: #ffd700; border: 1px solid #ffd700; cursor: pointer;">STATS</button>
         </div>
 
         <div class="right-panel">
@@ -97,12 +119,29 @@
         </div>
     </div>
 
+    <div id="modal-bg" class="modal-overlay" onclick="toggleStats(false)"></div>
+    <div id="stats-modal">
+        <h2 style="color: #ffd700; font-size: 1em; margin-bottom: 20px;">STATISTICS</h2>
+        <div class="stats-line">Current Balance: <span class="stats-val" id="stat-current">0</span></div>
+        <div class="stats-line">Total Mined: <span class="stats-val" id="stat-total">0</span></div>
+        <div class="stats-line">Raw Mined (Idle): <span class="stats-val" id="stat-raw">0</span></div>
+        <div class="stats-line">Total Clicks: <span class="stats-val" id="stat-clicks">0</span></div>
+        <div class="stats-line">Per Second: <span class="stats-val" id="stat-bps-modal">0</span></div>
+        
+        <div class="modal-btns">
+            <button onclick="saveGame(); alert('Game Saved!')" style="background: #00ff9d;">SAVE GAME</button>
+            <button onclick="resetGame()" style="background: #ff4d4d;">RESET SAVE</button>
+            <button onclick="toggleStats(false)" style="background: #555; color: white;">CLOSE</button>
+        </div>
+    </div>
+
     <div id="tooltip" class="tooltip"></div>
 
     <script>
-        // --- GAME STATE ---
         let gameData = {
             bitcoin: 0,
+            totalMined: 0,
+            totalClicks: 0,
             clickValue: 1,
             bpsMultiplier: 1,
             isOfflineEnabled: false,
@@ -118,169 +157,94 @@
             'Beware of bitcoin scams, some give you dogecoin instead'
         ];
 
-      const minerNames = [
-    // --- 1-20: THE HARDWARE ERA ---
-    "Lemon Battery", "Potato Circuit", "Calculated Abacus", "Rust-Bucket PC", "Budget Laptop", 
-    "Office Desktop", "Gaming Rig", "Overclocked Station", "Pro Miner Rack", "Liquid-Cooled Array", 
-    "Nitro-Injected GPU", "ASIC Prototype", "Industrial ASIC", "Server Closet", "Data Center Unit", 
-    "Mainframe Core", "Supercomputer Node", "Quantum Chipset", "Cold Storage Vault", "Silicon Valley Hub",
-    
-    // --- 21-40: THE DIGITAL FRONTIER ---
-    "Cloud Instance", "Virtual Machine", "Botnet Cluster", "Dark Web Node", "Encryption Engine", 
-    "Blockchain Relay", "Smart Contract Automaton", "Neural Network", "Deep Learning Hive", "AI Algorithm", 
-    "Digital Ghost", "Data Siphon", "Algorithm Optimizer", "Logic Gate Array", "Cyber-Hive Mind", 
-    "Binary Fountain", "Firewall Bypass", "Rootkit Miner", "Synthesized Reality", "Metaverse Server",
-    
-    // --- 41-60: THE PLANETARY SCALE ---
-    "Geothermal Rig", "Arctic Mining Vault", "Oceanic Server Floor", "Volcanic Power Plant", "Orbital Satellite", 
-    "Lunar Outpost", "Mars Colony Link", "Asteroid Driller", "Solar Array", "Atmospheric Siphon", 
-    "Tectonic Generator", "Magma Core Miner", "Planetary Wi-Fi", "Global Mesh-Net", "Saturnian Ring Miner", 
-    "Jupiter Gas Refiner", "Titan Ice Station", "Venusian Heat Sink", "Icy Comet Rig", "Dwarf Planet Relay",
-    
-    // --- 61-80: THE GALACTIC EXPANSION ---
-    "Star Harvester", "Dyson Swarm Fragment", "Nebula Gas Sifter", "Supernova Collector", "Black Hole Rim Node", 
-    "Event Horizon Link", "Dark Matter Reactor", "Antimatter Forge", "Wormhole Tunnel", "Galactic Core Hub", 
-    "Quasar Beaming Station", "Pulsar Clock Sync", "Interstellar Cable", "Void Energy Siphon", "Cosmic Ray Mirror", 
-    "Gravity Wave Miner", "Spacetime Loom", "Light-Speed Array", "Orion Belt Mining", "Andromeda Uplink",
-    
-    // --- 81-100: THE COSMIC & DIVINE ---
-    "Dimensional Breach", "Reality Warper", "Timeline Splitter", "Entropy Inverter", "Universal Engine", 
-    "String Theory Weaver", "Multiverse Bridge", "Quantum Immortality Rig", "Existence Validator", "Laws of Physics Editor", 
-    "Celestial Architect", "Omega Point Node", "Simulation Overlord", "Concept Harvester", "Thought Form Miner", 
-    "The Source Code", "Absolute Zero Engine", "Infinity Siphon", "Eternity Engine", "The Bitcoin Singularity"
-];
+        const minerNames = [
+            "Lemon Battery", "Potato Circuit", "Calculated Abacus", "Rust-Bucket PC", "Budget Laptop", 
+            "Office Desktop", "Gaming Rig", "Overclocked Station", "Pro Miner Rack", "Liquid-Cooled Array", 
+            "Nitro-Injected GPU", "ASIC Prototype", "Industrial ASIC", "Server Closet", "Data Center Unit", 
+            "Mainframe Core", "Supercomputer Node", "Quantum Chipset", "Cold Storage Vault", "Silicon Valley Hub",
+            "Cloud Instance", "Virtual Machine", "Botnet Cluster", "Dark Web Node", "Encryption Engine", 
+            "Blockchain Relay", "Smart Contract Automaton", "Neural Network", "Deep Learning Hive", "AI Algorithm", 
+            "Digital Ghost", "Data Siphon", "Algorithm Optimizer", "Logic Gate Array", "Cyber-Hive Mind", 
+            "Binary Fountain", "Firewall Bypass", "Rootkit Miner", "Synthesized Reality", "Metaverse Server",
+            "Geothermal Rig", "Arctic Mining Vault", "Oceanic Server Floor", "Volcanic Power Plant", "Orbital Satellite", 
+            "Lunar Outpost", "Mars Colony Link", "Asteroid Driller", "Solar Array", "Atmospheric Siphon", 
+            "Tectonic Generator", "Magma Core Miner", "Planetary Wi-Fi", "Global Mesh-Net", "Saturnian Ring Miner", 
+            "Jupiter Gas Refiner", "Titan Ice Station", "Venusian Heat Sink", "Icy Comet Rig", "Dwarf Planet Relay",
+            "Star Harvester", "Dyson Swarm Fragment", "Nebula Gas Sifter", "Supernova Collector", "Black Hole Rim Node", 
+            "Event Horizon Link", "Dark Matter Reactor", "Antimatter Forge", "Wormhole Tunnel", "Galactic Core Hub", 
+            "Quasar Beaming Station", "Pulsar Clock Sync", "Interstellar Cable", "Void Energy Siphon", "Cosmic Ray Mirror", 
+            "Gravity Wave Miner", "Spacetime Loom", "Light-Speed Array", "Orion Belt Mining", "Andromeda Uplink",
+            "Dimensional Breach", "Reality Warper", "Timeline Splitter", "Entropy Inverter", "Universal Engine", 
+            "String Theory Weaver", "Multiverse Bridge", "Quantum Immortality Rig", "Existence Validator", "Laws of Physics Editor", 
+            "Celestial Architect", "Omega Point Node", "Simulation Overlord", "Concept Harvester", "Thought Form Miner", 
+            "The Source Code", "Absolute Zero Engine", "Infinity Siphon", "Eternity Engine", "The Bitcoin Singularity"
+        ];
 
-const miners = [];
-
-// Generate the 100 unique miners
-for (let i = 0; i < 100; i++) {
-    miners.push({
-        id: `miner_${i}`,
-        name: minerNames[i],
-        // Cost starts at 15 and grows by 45% each step
-        baseCost: Math.floor(15 * Math.pow(1.45, i)),
-        // Production starts at 0.1 and grows by 40% each step
-        production: Number((0.1 * Math.pow(1.40, i)).toFixed(2)),
-        emoji: getEmojiForTier(i)
-    });
-}
-
-// Helper function to pick emojis based on progress
-function getEmojiForTier(index) {
-    if (index < 20) return "💻";
-    if (index < 40) return "🌐";
-    if (index < 60) return "🚀";
-    if (index < 80) return "🌌";
-    return "👁️";
-}
-        // --- UPGRADE DATA ---
-const upgrades = [
-    // --- STARTER UPGRADES ---
-    { id: "u1", name: "Pro Mouse", cost: 100, icon: "🖱️", type: "click", boost: 2 },
-    { id: "u2", name: "Liquid Cooling", cost: 500, icon: "❄️", type: "bps", boost: 1.2 },
-    { id: "offline", name: "Offline Collector", cost: 5000, icon: "💤", type: "special", desc: "Earn 50% while away!" },
-    { id: "u3", name: "Golden Click", cost: 2000, icon: "✨", type: "click", boost: 5 },
-
-    // --- NEW TIER 1: EARLY GAME (8k - 150k) ---
-    { id: "n1", name: "Gaming Chair", cost: 8000, icon: "💺", type: "click", boost: 2 },
-    { id: "n2", name: "Fiber Optic", cost: 15000, icon: "⚡", type: "bps", boost: 1.5 },
-    { id: "n3", name: "Energy Drink", cost: 30000, icon: "🥤", type: "click", boost: 2 },
-    { id: "n4", name: "Server Rack", cost: 75000, icon: "🗄️", type: "bps", boost: 1.4 },
-    { id: "n5", name: "Diamond Cursor", cost: 150000, icon: "💎", type: "click", boost: 3 },
-
-    // --- NEW TIER 2: MID GAME (300k - 10M) ---
-    { id: "n6", name: "Satellite Link", cost: 300000, icon: "📡", type: "bps", boost: 1.6 },
-    { id: "n7", name: "Macro Script", cost: 500000, icon: "📜", type: "click", boost: 2 },
-    { id: "n8", name: "Power Plant", cost: 1000000, icon: "☢️", type: "bps", boost: 1.5 },
-    { id: "n9", name: "Quantum CPU", cost: 2500000, icon: "🧬", type: "click", boost: 4 },
-    { id: "n10", name: "Global Mesh", cost: 5000000, icon: "🌍", type: "bps", boost: 2 },
-
-    // --- NEW TIER 3: LATE GAME (10M - 500M) ---
-    { id: "n11", name: "Robo-Clicker", cost: 10000000, icon: "🤖", type: "click", boost: 2 },
-    { id: "n12", name: "Deep Sea Cables", cost: 25000000, icon: "⚓", type: "bps", boost: 1.8 },
-    { id: "n13", name: "Neural Link", cost: 75000000, icon: "🧠", type: "click", boost: 3 },
-    { id: "n14", name: "Space Solar", cost: 150000000, icon: "☀️", type: "bps", boost: 2 },
-    { id: "n15", name: "Time Warp", cost: 500000000, icon: "⏳", type: "click", boost: 5 },
-
-    // --- NEW TIER 4: END GAME (1B - 1T) ---
-    { id: "n16", name: "Dyson Swarm", cost: 1000000000, icon: "🛸", type: "bps", boost: 2.5 },
-    { id: "n17", name: "God Protocol", cost: 5000000000, icon: "👁️", type: "click", boost: 10 },
-    { id: "n18", name: "Multiverse Hub", cost: 25000000000, icon: "🌀", type: "bps", boost: 3 },
-    { id: "n19", name: "Infinite Loop", cost: 100000000000, icon: "♾️", type: "click", boost: 2 },
-    { id: "n20", name: "The Singularity", cost: 1000000000000, icon: "🌌", type: "special", boost: 10, desc: "Final Upgrade: 10x EVERYTHING!" }
-];
-
-        // --- SAVE SYSTEM ---
-        function saveGame() {
-            gameData.lastSaveTime = Date.now();
-            localStorage.setItem('btcClickerSave', JSON.stringify(gameData));
+        const miners = [];
+        for (let i = 0; i < 100; i++) {
+            miners.push({
+                id: `miner_${i}`,
+                name: minerNames[i],
+                baseCost: Math.floor(15 * Math.pow(1.45, i)),
+                production: Number((0.1 * Math.pow(1.40, i)).toFixed(2)),
+                emoji: i < 20 ? "💻" : i < 40 ? "🌐" : i < 60 ? "🚀" : i < 80 ? "🌌" : "👁️"
+            });
         }
 
-        // Save when user closes the tab
-        window.onbeforeunload = function() {
-            saveGame();
-        };
+        const upgrades = [
+            { id: "u1", name: "Pro Mouse", cost: 100, icon: "🖱️", type: "click", boost: 2 },
+            { id: "u2", name: "Liquid Cooling", cost: 500, icon: "❄️", type: "bps", boost: 1.2 },
+            { id: "offline", name: "Offline Collector", cost: 5000, icon: "💤", type: "special", desc: "Earn 50% while away!" },
+            { id: "u3", name: "Golden Click", cost: 2000, icon: "✨", type: "click", boost: 5 },
+            { id: "n1", name: "Gaming Chair", cost: 8000, icon: "💺", type: "click", boost: 2 },
+            { id: "n2", name: "Fiber Optic", cost: 15000, icon: "⚡", type: "bps", boost: 1.5 },
+            { id: "n3", name: "Energy Drink", cost: 30000, icon: "🥤", type: "click", boost: 2 },
+            { id: "n4", name: "Server Rack", cost: 75000, icon: "🗄️", type: "bps", boost: 1.4 },
+            { id: "n5", name: "Diamond Cursor", cost: 150000, icon: "💎", type: "click", boost: 3 },
+            { id: "n6", name: "Satellite Link", cost: 300000, icon: "📡", type: "bps", boost: 1.6 },
+            { id: "n7", name: "Macro Script", cost: 500000, icon: "📜", type: "click", boost: 2 },
+            { id: "n8", name: "Power Plant", cost: 1000000, icon: "☢️", type: "bps", boost: 1.5 },
+            { id: "n9", name: "Quantum CPU", cost: 2500000, icon: "🧬", type: "click", boost: 4 },
+            { id: "n10", name: "Global Mesh", cost: 5000000, icon: "🌍", type: "bps", boost: 2 },
+            { id: "n11", name: "Robo-Clicker", cost: 10000000, icon: "🤖", type: "click", boost: 2 },
+            { id: "n12", name: "Deep Sea Cables", cost: 25000000, icon: "⚓", type: "bps", boost: 1.8 },
+            { id: "n13", name: "Neural Link", cost: 75000000, icon: "🧠", type: "click", boost: 3 },
+            { id: "n14", name: "Space Solar", cost: 150000000, icon: "☀️", type: "bps", boost: 2 },
+            { id: "n15", name: "Time Warp", cost: 500000000, icon: "⏳", type: "click", boost: 5 },
+            { id: "n16", name: "Dyson Swarm", cost: 1000000000, icon: "🛸", type: "bps", boost: 2.5 },
+            { id: "n17", name: "God Protocol", cost: 5000000000, icon: "👁️", type: "click", boost: 10 },
+            { id: "n18", name: "Multiverse Hub", cost: 25000000000, icon: "🌀", type: "bps", boost: 3 },
+            { id: "n19", name: "Infinite Loop", cost: 100000000000, icon: "♾️", type: "click", boost: 2 },
+            { id: "n20", name: "The Singularity", cost: 1000000000000, icon: "🌌", type: "special", boost: 10, desc: "Final Upgrade: 10x EVERYTHING!" }
+        ];
 
-        function loadGame() {
-            const saved = localStorage.getItem('btcClickerSave');
-            if (saved) {
-                const loadedData = JSON.parse(saved);
-                gameData = { ...gameData, ...loadedData };
-                
-                // Calculate Offline Earnings
-                if (gameData.isOfflineEnabled) {
-                    const now = Date.now();
-                    const secondsAway = Math.floor((now - gameData.lastSaveTime) / 1000);
-                    
-                    // Trigger only if away for more than 5 seconds
-                    if (secondsAway > 5) {
-                        const activeBps = calculateCurrentBPS();
-                        // Apply the 50% penalty ONLY to the offline portion
-                        const earned = (activeBps * 0.5) * secondsAway;
-                        
-                        gameData.bitcoin += earned;
-                        alert(`While you were gone for ${secondsAway}s, your rigs mined ${earned.toFixed(1)} BTC at 50% efficiency!`);
-                    }
-                }
-            }
-            updateDisplay();
-        }
-
-        function resetGame() {
-            if(confirm("Are you sure? This deletes everything!")) {
-                localStorage.removeItem('btcClickerSave');
-                location.reload();
+        function toggleStats(show) {
+            document.getElementById('stats-modal').style.display = show ? 'block' : 'none';
+            document.getElementById('modal-bg').style.display = show ? 'block' : 'none';
+            if(show) {
+                document.getElementById('stat-current').innerText = Math.floor(gameData.bitcoin).toLocaleString();
+                document.getElementById('stat-total').innerText = Math.floor(gameData.totalMined).toLocaleString();
+                document.getElementById('stat-raw').innerText = Math.floor(gameData.totalMined - (gameData.totalClicks * gameData.clickValue)).toLocaleString();
+                document.getElementById('stat-clicks').innerText = gameData.totalClicks.toLocaleString();
+                document.getElementById('stat-bps-modal').innerText = calculateCurrentBPS().toFixed(1);
             }
         }
 
-        // --- LOGIC ---
         function calculateCurrentBPS() {
-    let base = 0;
-    miners.forEach(m => {
-        const count = gameData.ownedMiners[m.id] || 0;
-        base += count * m.production;
-    });
-
-    // Apply standard multiplier
-    let total = base * gameData.bpsMultiplier;
-
-    // FIX: Apply 10x boost if Singularity is owned
-    if (gameData.boughtUpgrades.includes("n20")) {
-        total *= 10;
-    }
-
-    return total;
-}
+            let base = 0;
+            miners.forEach(m => { base += (gameData.ownedMiners[m.id] || 0) * m.production; });
+            let total = base * gameData.bpsMultiplier;
+            return gameData.boughtUpgrades.includes("n20") ? total * 10 : total;
+        }
 
         function getMinerCost(miner) {
-            const count = gameData.ownedMiners[miner.id] || 0;
-            return Math.floor(miner.baseCost * Math.pow(1.15, count));
+            return Math.floor(miner.baseCost * Math.pow(1.15, gameData.ownedMiners[miner.id] || 0));
         }
 
         function updateDisplay() {
-            const currentBps = calculateCurrentBPS();
+            const bps = calculateCurrentBPS();
             document.getElementById('balance').innerText = Math.floor(gameData.bitcoin).toLocaleString();
-            document.getElementById('bps').innerText = currentBps.toFixed(1);
+            document.getElementById('bps').innerText = bps.toFixed(1);
             renderMiners();
             renderUpgrades();
         }
@@ -292,141 +256,81 @@ const upgrades = [
                 const cost = getMinerCost(m);
                 const owned = gameData.ownedMiners[m.id] || 0;
                 const canAfford = gameData.bitcoin >= cost;
-                
                 const div = document.createElement('div');
                 div.className = `item ${!canAfford ? 'locked' : ''}`;
-                div.innerHTML = `
-                    <div class="item-icon">${m.emoji}</div>
-                    <div class="item-details">
-                        <div class="item-name">${m.name}</div>
-                        <div class="item-cost ${canAfford ? 'can-afford' : 'cannot-afford'}">${cost.toLocaleString()} BTC</div>
-                    </div>
-                    <div class="item-owned">${owned}</div>
-                `;
-                
-                div.onmousemove = (e) => showTooltip(e, `
-                    <div style="color:#ffd700">${m.name}</div>
-                    <div>Gives ${m.production} BTC/s</div>
-                `);
+                div.innerHTML = `<div class="item-icon">${m.emoji}</div><div class="item-details"><div class="item-name">${m.name}</div><div class="item-cost ${canAfford ? 'can-afford' : 'cannot-afford'}">${cost.toLocaleString()} BTC</div></div><div class="item-owned">${owned}</div>`;
+                div.onmousemove = (e) => showTooltip(e, `<div style="color:#ffd700">${m.name}</div><div>Gives ${m.production} BTC/s</div>`);
                 div.onmouseleave = hideTooltip;
-
-                div.onclick = () => {
-                    if (gameData.bitcoin >= cost) {
-                        gameData.bitcoin -= cost;
-                        gameData.ownedMiners[m.id] = owned + 1;
-                        updateDisplay();
-                        saveGame();
-                    }
-                };
+                div.onclick = () => { if (gameData.bitcoin >= cost) { gameData.bitcoin -= cost; gameData.ownedMiners[m.id] = owned + 1; updateDisplay(); saveGame(); } };
                 list.appendChild(div);
             });
         }
 
-       function renderUpgrades() {
+        function renderUpgrades() {
             const grid = document.getElementById('upgrades-grid');
             grid.innerHTML = '';
-
             upgrades.forEach((u) => {
-                // 1. Hide it if already bought
                 if (gameData.boughtUpgrades.includes(u.id)) return;
-
-                // 2. Visibility threshold
-                if (gameData.bitcoin >= u.cost * 0.2) { 
+                if (gameData.bitcoin >= u.cost * 0.2) {
                     const canAfford = gameData.bitcoin >= u.cost;
                     const div = document.createElement('div');
-                    
-                    // --- ADDED THESE 3 LINES ---
                     div.className = 'upgrade-item';
                     div.innerHTML = u.icon;
                     div.style.opacity = canAfford ? '1' : '0.4';
-                    // ---------------------------
-
-                    div.onmousemove = (e) => {
-                        let desc = u.desc || `Boosts ${u.type === 'click' ? 'Click' : 'BPS'} by ${u.boost}x`;
-                        showTooltip(e, `
-                            <div style="color:#ffd700">${u.name}</div>
-                            <div style="color:${canAfford ? '#00ff9d' : '#ff4d4d'}">Cost: ${u.cost.toLocaleString()} BTC</div>
-                            <div style="font-size:0.7em; margin-top:5px;">${desc}</div>
-                        `);
-                    };
+                    div.onmousemove = (e) => showTooltip(e, `<div style="color:#ffd700">${u.name}</div><div style="color:${canAfford ? '#00ff9d' : '#ff4d4d'}">Cost: ${u.cost.toLocaleString()} BTC</div><div style="font-size:0.7em; margin-top:5px;">${u.desc || `Boosts ${u.type === 'click' ? 'Click' : 'BPS'} by ${u.boost}x`}</div>`);
                     div.onmouseleave = hideTooltip;
-
-                    div.onclick = () => {
-                        if (canAfford) {
-                            gameData.bitcoin -= u.cost;
-                            gameData.boughtUpgrades.push(u.id);
-                            
-                            if (u.type === 'click') gameData.clickValue *= u.boost;
-                            if (u.type === 'bps') gameData.bpsMultiplier *= u.boost;
-                            if (u.id === 'offline') gameData.isOfflineEnabled = true;
-
-                            hideTooltip();
-                            updateDisplay();
-                            saveGame();
-                        }
-                    };
+                    div.onclick = () => { if (canAfford) { gameData.bitcoin -= u.cost; gameData.boughtUpgrades.push(u.id); if (u.type === 'click') gameData.clickValue *= u.boost; if (u.type === 'bps') gameData.bpsMultiplier *= u.boost; if (u.id === 'offline') gameData.isOfflineEnabled = true; hideTooltip(); updateDisplay(); saveGame(); } };
                     grid.appendChild(div);
                 }
             });
         }
 
-        // --- TOOLTIP HELPERS ---
-        function showTooltip(e, content) {
-            const tooltip = document.getElementById('tooltip');
-            tooltip.style.display = 'block';
-            tooltip.style.left = (e.pageX + 15) + 'px';
-            tooltip.style.top = (e.pageY + 15) + 'px';
-            tooltip.innerHTML = content;
-        }
-        function hideTooltip() { document.getElementById('tooltip').style.display = 'none'; }
-
-        // --- NEWS TICKER ---
-        let firstMessageShown = false;
-        let currentNewsIndex = 0;
-        function updateNews() {
-            const newsElement = document.getElementById('news-text');
-            newsElement.innerText = newsMessages[currentNewsIndex];
-            if (!firstMessageShown) { newsMessages.shift(); firstMessageShown = true; } 
-            else { currentNewsIndex = (currentNewsIndex + 1) % newsMessages.length; }
-            newsElement.style.animation = 'none';
-            newsElement.offsetHeight; 
-            newsElement.style.animation = 'ticker 20s linear infinite';
-        }
-
         document.getElementById('bitcoin').onclick = (e) => {
-    let val = gameData.clickValue;
-
-    // FIX: Apply 10x boost to clicking if Singularity is owned
-    if (gameData.boughtUpgrades.includes("n20")) {
-        val *= 10;
-    }
-
-    gameData.bitcoin += val;
-    updateDisplay();
-
-    // Create floating text
-    const fly = document.createElement('div');
-    fly.className = 'floating-text';
-    fly.innerText = `+${val >= 1000 ? (val/1000).toFixed(1)+'k' : Math.floor(val)}`;
-    fly.style.left = e.clientX + 'px';
-    fly.style.top = e.clientY + 'px';
-    document.body.appendChild(fly);
-    setTimeout(() => fly.remove(), 800);
-};
-
-        // --- MAIN LOOPS ---
-        setInterval(() => {
-            gameData.bitcoin += calculateCurrentBPS();
+            let val = gameData.clickValue;
+            if (gameData.boughtUpgrades.includes("n20")) val *= 10;
+            gameData.bitcoin += val;
+            gameData.totalMined += val;
+            gameData.totalClicks++;
             updateDisplay();
-        }, 1000);
+            const fly = document.createElement('div');
+            fly.className = 'floating-text';
+            fly.innerText = `+${val >= 1000 ? (val/1000).toFixed(1)+'k' : Math.floor(val)}`;
+            fly.style.left = e.clientX + 'px'; fly.style.top = e.clientY + 'px';
+            document.body.appendChild(fly);
+            setTimeout(() => fly.remove(), 800);
+        };
 
-        setInterval(saveGame, 30000); 
-        setInterval(updateNews, 20000); 
-// Disable right-click menu
-document.addEventListener('contextmenu', event => event.preventDefault());
-        // Start
-        loadGame();
-        updateNews();
+        function saveGame() { gameData.lastSaveTime = Date.now(); localStorage.setItem('btcClickerSave', JSON.stringify(gameData)); }
+        function loadGame() {
+            const saved = localStorage.getItem('btcClickerSave');
+            if (saved) {
+                gameData = Object.assign({}, gameData, JSON.parse(saved));
+                if (gameData.isOfflineEnabled) {
+                    const away = Math.floor((Date.now() - gameData.lastSaveTime) / 1000);
+                    if (away > 5) {
+                        const earned = (calculateCurrentBPS() * 0.5) * away;
+                        gameData.bitcoin += earned; gameData.totalMined += earned;
+                        alert(`Away for ${away}s, mined ${earned.toFixed(1)} BTC!`);
+                    }
+                }
+            }
+            updateDisplay();
+        }
+        function resetGame() { if(confirm("Reset everything?")) { localStorage.removeItem('btcClickerSave'); location.reload(); } }
+        function showTooltip(e, content) { const t = document.getElementById('tooltip'); t.style.display = 'block'; t.style.left = (e.pageX + 15) + 'px'; t.style.top = (e.pageY + 15) + 'px'; t.innerHTML = content; }
+        function hideTooltip() { document.getElementById('tooltip').style.display = 'none'; }
+        function updateNews() {
+            const news = document.getElementById('news-text');
+            news.innerText = newsMessages[currentNewsIndex];
+            currentNewsIndex = (currentNewsIndex + 1) % newsMessages.length;
+            news.style.animation = 'none'; news.offsetHeight; news.style.animation = 'ticker 20s linear infinite';
+        }
+
+        let currentNewsIndex = 0;
+        setInterval(() => { let bps = calculateCurrentBPS(); gameData.bitcoin += bps; gameData.totalMined += bps; updateDisplay(); }, 1000);
+        setInterval(saveGame, 30000); setInterval(updateNews, 20000);
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        loadGame(); updateNews();
     </script>
 </body>
 </html>
