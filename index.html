@@ -6,7 +6,12 @@
     <title>Bitcoin Clicker</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-
+        /* Prevent highlighting/selecting text and images */
+* {
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none;     /* IE 10 and 11 */
+    user-select: none;         /* Standard syntax */
+}
         body {
             margin: 0; padding: 0;
             background: linear-gradient(#0a0a0a, #1a1a2e);
@@ -249,7 +254,7 @@ const upgrades = [
         }
 
         // --- LOGIC ---
-        ffunction calculateCurrentBPS() {
+        function calculateCurrentBPS() {
     let base = 0;
     miners.forEach(m => {
         const count = gameData.ownedMiners[m.id] || 0;
