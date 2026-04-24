@@ -66,7 +66,7 @@
         <div class="left-panel">
             <h1>BITCOIN CLICKER</h1>
             <div id="bitcoin">
-            <img src="imgs/Bitcoin.png" alt="Bitcoin" onerror="this.src='https://via.placeholder.com/280x280/f2a900/111111?text=BTC';">
+                <img src="imgs/Bitcoin.png" alt="Bitcoin" onerror="this.src='https://via.placeholder.com/280x280/f2a900/111111?text=BTC';">
             </div>
             <div style="margin-top: 30px;">
                 <div style="font-size: 1.5em;"><span id="balance">0</span> BTC</div>
@@ -102,8 +102,8 @@
             bpsMultiplier: 1,
             isOfflineEnabled: false,
             lastSaveTime: Date.now(),
-            ownedMiners: {}, // Will look like {gpu: 5, asic: 2}
-            boughtUpgrades: [] // Will look like ["u1", "u2"]
+            ownedMiners: {},
+            boughtUpgrades: []
         };
 
         const newsMessages = [
@@ -113,28 +113,108 @@
             'Beware of bitcoin scams, some give you dogecoin instead'
         ];
 
-        // --- MINER DATA ---
-        const miners = [
-            { id: "gpu", name: "GPU Miner", baseCost: 15, production: 0.1, emoji: "🖥️" },
-            { id: "asic", name: "ASIC Miner", baseCost: 100, production: 1, emoji: "⛏️" },
-            { id: "farm", name: "Mining Farm", baseCost: 1100, production: 8, emoji: "🏭" },
-            { id: "pool", name: "Mining Pool", baseCost: 12000, production: 47, emoji: "🌐" },
-            { id: "labor", name: "Labourers", baseCost: 40000, production: 100, emoji: "🛠️" },
-        ];
+      const minerNames = [
+    // --- 1-20: THE HARDWARE ERA ---
+    "Lemon Battery", "Potato Circuit", "Calculated Abacus", "Rust-Bucket PC", "Budget Laptop", 
+    "Office Desktop", "Gaming Rig", "Overclocked Station", "Pro Miner Rack", "Liquid-Cooled Array", 
+    "Nitro-Injected GPU", "ASIC Prototype", "Industrial ASIC", "Server Closet", "Data Center Unit", 
+    "Mainframe Core", "Supercomputer Node", "Quantum Chipset", "Cold Storage Vault", "Silicon Valley Hub",
+    
+    // --- 21-40: THE DIGITAL FRONTIER ---
+    "Cloud Instance", "Virtual Machine", "Botnet Cluster", "Dark Web Node", "Encryption Engine", 
+    "Blockchain Relay", "Smart Contract Automaton", "Neural Network", "Deep Learning Hive", "AI Algorithm", 
+    "Digital Ghost", "Data Siphon", "Algorithm Optimizer", "Logic Gate Array", "Cyber-Hive Mind", 
+    "Binary Fountain", "Firewall Bypass", "Rootkit Miner", "Synthesized Reality", "Metaverse Server",
+    
+    // --- 41-60: THE PLANETARY SCALE ---
+    "Geothermal Rig", "Arctic Mining Vault", "Oceanic Server Floor", "Volcanic Power Plant", "Orbital Satellite", 
+    "Lunar Outpost", "Mars Colony Link", "Asteroid Driller", "Solar Array", "Atmospheric Siphon", 
+    "Tectonic Generator", "Magma Core Miner", "Planetary Wi-Fi", "Global Mesh-Net", "Saturnian Ring Miner", 
+    "Jupiter Gas Refiner", "Titan Ice Station", "Venusian Heat Sink", "Icy Comet Rig", "Dwarf Planet Relay",
+    
+    // --- 61-80: THE GALACTIC EXPANSION ---
+    "Star Harvester", "Dyson Swarm Fragment", "Nebula Gas Sifter", "Supernova Collector", "Black Hole Rim Node", 
+    "Event Horizon Link", "Dark Matter Reactor", "Antimatter Forge", "Wormhole Tunnel", "Galactic Core Hub", 
+    "Quasar Beaming Station", "Pulsar Clock Sync", "Interstellar Cable", "Void Energy Siphon", "Cosmic Ray Mirror", 
+    "Gravity Wave Miner", "Spacetime Loom", "Light-Speed Array", "Orion Belt Mining", "Andromeda Uplink",
+    
+    // --- 81-100: THE COSMIC & DIVINE ---
+    "Dimensional Breach", "Reality Warper", "Timeline Splitter", "Entropy Inverter", "Universal Engine", 
+    "String Theory Weaver", "Multiverse Bridge", "Quantum Immortality Rig", "Existence Validator", "Laws of Physics Editor", 
+    "Celestial Architect", "Omega Point Node", "Simulation Overlord", "Concept Harvester", "Thought Form Miner", 
+    "The Source Code", "Absolute Zero Engine", "Infinity Siphon", "Eternity Engine", "The Bitcoin Singularity"
+];
 
+const miners = [];
+
+// Generate the 100 unique miners
+for (let i = 0; i < 100; i++) {
+    miners.push({
+        id: `miner_${i}`,
+        name: minerNames[i],
+        // Cost starts at 15 and grows by 45% each step
+        baseCost: Math.floor(15 * Math.pow(1.45, i)),
+        // Production starts at 0.1 and grows by 40% each step
+        production: Number((0.1 * Math.pow(1.40, i)).toFixed(2)),
+        emoji: getEmojiForTier(i)
+    });
+}
+
+// Helper function to pick emojis based on progress
+function getEmojiForTier(index) {
+    if (index < 20) return "💻";
+    if (index < 40) return "🌐";
+    if (index < 60) return "🚀";
+    if (index < 80) return "🌌";
+    return "👁️";
+}
         // --- UPGRADE DATA ---
-        const upgrades = [
-            { id: "u1", name: "Pro Mouse", cost: 100, icon: "🖱️", type: "click", boost: 2 },
-            { id: "u2", name: "Liquid Cooling", cost: 500, icon: "❄️", type: "bps", boost: 1.2 },
-            { id: "offline", name: "Offline Collector", cost: 5000, icon: "💤", type: "special", desc: "Earn while away, but cuts current production by 50%!" },
-            { id: "u3", name: "Golden Click", cost: 2000, icon: "✨", type: "click", boost: 5 }
-        ];
+const upgrades = [
+    // --- STARTER UPGRADES ---
+    { id: "u1", name: "Pro Mouse", cost: 100, icon: "🖱️", type: "click", boost: 2 },
+    { id: "u2", name: "Liquid Cooling", cost: 500, icon: "❄️", type: "bps", boost: 1.2 },
+    { id: "offline", name: "Offline Collector", cost: 5000, icon: "💤", type: "special", desc: "Earn 50% while away!" },
+    { id: "u3", name: "Golden Click", cost: 2000, icon: "✨", type: "click", boost: 5 },
+
+    // --- NEW TIER 1: EARLY GAME (8k - 150k) ---
+    { id: "n1", name: "Gaming Chair", cost: 8000, icon: "💺", type: "click", boost: 2 },
+    { id: "n2", name: "Fiber Optic", cost: 15000, icon: "⚡", type: "bps", boost: 1.5 },
+    { id: "n3", name: "Energy Drink", cost: 30000, icon: "🥤", type: "click", boost: 2 },
+    { id: "n4", name: "Server Rack", cost: 75000, icon: "🗄️", type: "bps", boost: 1.4 },
+    { id: "n5", name: "Diamond Cursor", cost: 150000, icon: "💎", type: "click", boost: 3 },
+
+    // --- NEW TIER 2: MID GAME (300k - 10M) ---
+    { id: "n6", name: "Satellite Link", cost: 300000, icon: "📡", type: "bps", boost: 1.6 },
+    { id: "n7", name: "Macro Script", cost: 500000, icon: "📜", type: "click", boost: 2 },
+    { id: "n8", name: "Power Plant", cost: 1000000, icon: "☢️", type: "bps", boost: 1.5 },
+    { id: "n9", name: "Quantum CPU", cost: 2500000, icon: "🧬", type: "click", boost: 4 },
+    { id: "n10", name: "Global Mesh", cost: 5000000, icon: "🌍", type: "bps", boost: 2 },
+
+    // --- NEW TIER 3: LATE GAME (10M - 500M) ---
+    { id: "n11", name: "Robo-Clicker", cost: 10000000, icon: "🤖", type: "click", boost: 2 },
+    { id: "n12", name: "Deep Sea Cables", cost: 25000000, icon: "⚓", type: "bps", boost: 1.8 },
+    { id: "n13", name: "Neural Link", cost: 75000000, icon: "🧠", type: "click", boost: 3 },
+    { id: "n14", name: "Space Solar", cost: 150000000, icon: "☀️", type: "bps", boost: 2 },
+    { id: "n15", name: "Time Warp", cost: 500000000, icon: "⏳", type: "click", boost: 5 },
+
+    // --- NEW TIER 4: END GAME (1B - 1T) ---
+    { id: "n16", name: "Dyson Swarm", cost: 1000000000, icon: "🛸", type: "bps", boost: 2.5 },
+    { id: "n17", name: "God Protocol", cost: 5000000000, icon: "👁️", type: "click", boost: 10 },
+    { id: "n18", name: "Multiverse Hub", cost: 25000000000, icon: "🌀", type: "bps", boost: 3 },
+    { id: "n19", name: "Infinite Loop", cost: 100000000000, icon: "♾️", type: "click", boost: 2 },
+    { id: "n20", name: "The Singularity", cost: 1000000000000, icon: "🌌", type: "special", boost: 10, desc: "Final Upgrade: 10x EVERYTHING!" }
+];
 
         // --- SAVE SYSTEM ---
         function saveGame() {
             gameData.lastSaveTime = Date.now();
             localStorage.setItem('btcClickerSave', JSON.stringify(gameData));
         }
+
+        // Save when user closes the tab
+        window.onbeforeunload = function() {
+            saveGame();
+        };
 
         function loadGame() {
             const saved = localStorage.getItem('btcClickerSave');
@@ -146,11 +226,15 @@
                 if (gameData.isOfflineEnabled) {
                     const now = Date.now();
                     const secondsAway = Math.floor((now - gameData.lastSaveTime) / 1000);
-                    if (secondsAway > 0) {
-                        const currentBps = calculateCurrentBPS();
-                        const earned = currentBps * secondsAway;
+                    
+                    // Trigger only if away for more than 5 seconds
+                    if (secondsAway > 5) {
+                        const activeBps = calculateCurrentBPS();
+                        // Apply the 50% penalty ONLY to the offline portion
+                        const earned = (activeBps * 0.5) * secondsAway;
+                        
                         gameData.bitcoin += earned;
-                        alert(`While you were gone for ${secondsAway}s, you mined ${earned.toFixed(1)} BTC!`);
+                        alert(`While you were gone for ${secondsAway}s, your rigs mined ${earned.toFixed(1)} BTC at 50% efficiency!`);
                     }
                 }
             }
@@ -165,16 +249,23 @@
         }
 
         // --- LOGIC ---
-        function calculateCurrentBPS() {
-            let base = 0;
-            miners.forEach(m => {
-                const count = gameData.ownedMiners[m.id] || 0;
-                base += count * m.production;
-            });
-            let total = base * gameData.bpsMultiplier;
-            if (gameData.isOfflineEnabled) total *= 0.5; // The 50% penalty
-            return total;
-        }
+        ffunction calculateCurrentBPS() {
+    let base = 0;
+    miners.forEach(m => {
+        const count = gameData.ownedMiners[m.id] || 0;
+        base += count * m.production;
+    });
+
+    // Apply standard multiplier
+    let total = base * gameData.bpsMultiplier;
+
+    // FIX: Apply 10x boost if Singularity is owned
+    if (gameData.boughtUpgrades.includes("n20")) {
+        total *= 10;
+    }
+
+    return total;
+}
 
         function getMinerCost(miner) {
             const count = gameData.ownedMiners[miner.id] || 0;
@@ -231,7 +322,7 @@
             grid.innerHTML = '';
 
             upgrades.forEach((u) => {
-                if (gameData.boughtUpgrades.includes(u.id)) return; // Don't show bought ones
+                if (gameData.boughtUpgrades.includes(u.id)) return;
 
                 if (gameData.bitcoin > u.cost * 0.5) {
                     const canAfford = gameData.bitcoin >= u.cost;
@@ -255,7 +346,6 @@
                             gameData.bitcoin -= u.cost;
                             gameData.boughtUpgrades.push(u.id);
                             
-                            // Apply Effect
                             if (u.type === 'click') gameData.clickValue *= u.boost;
                             if (u.type === 'bps') gameData.bpsMultiplier *= u.boost;
                             if (u.id === 'offline') gameData.isOfflineEnabled = true;
@@ -293,18 +383,26 @@
             newsElement.style.animation = 'ticker 20s linear infinite';
         }
 
-        // --- CLICKING ---
         document.getElementById('bitcoin').onclick = (e) => {
-            gameData.bitcoin += gameData.clickValue;
-            updateDisplay();
-            const fly = document.createElement('div');
-            fly.className = 'floating-text';
-            fly.innerText = `+${gameData.clickValue}`;
-            fly.style.left = e.clientX + 'px';
-            fly.style.top = e.clientY + 'px';
-            document.body.appendChild(fly);
-            setTimeout(() => { fly.remove(); saveGame(); }, 800);
-        };
+    let val = gameData.clickValue;
+
+    // FIX: Apply 10x boost to clicking if Singularity is owned
+    if (gameData.boughtUpgrades.includes("n20")) {
+        val *= 10;
+    }
+
+    gameData.bitcoin += val;
+    updateDisplay();
+
+    // Create floating text
+    const fly = document.createElement('div');
+    fly.className = 'floating-text';
+    fly.innerText = `+${val >= 1000 ? (val/1000).toFixed(1)+'k' : Math.floor(val)}`;
+    fly.style.left = e.clientX + 'px';
+    fly.style.top = e.clientY + 'px';
+    document.body.appendChild(fly);
+    setTimeout(() => fly.remove(), 800);
+};
 
         // --- MAIN LOOPS ---
         setInterval(() => {
@@ -312,7 +410,7 @@
             updateDisplay();
         }, 1000);
 
-        setInterval(saveGame, 30000); // Auto-save every 30 seconds
+        setInterval(saveGame, 30000); 
         setInterval(updateNews, 20000); 
 
         // Start
