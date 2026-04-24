@@ -412,7 +412,8 @@ const upgrades = [
 
         setInterval(saveGame, 30000); 
         setInterval(updateNews, 20000); 
-
+// Disable right-click menu
+document.addEventListener('contextmenu', event => event.preventDefault());
         // Start
         loadGame();
         updateNews();
