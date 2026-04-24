@@ -91,36 +91,36 @@
 
     <div class="game-container">
     <div class="left-panel">
-        <h1>BITCOIN CLICKER</h1>
+    <h1>BITCOIN CLICKER</h1>
+    
+    <div style="position: relative; width: 280px; height: 280px; margin: 0 auto;">
         
-        <div style="position: relative; width: 280px; height: 280px; margin: 0 auto;">
-            
-            <button onclick="toggleStats(true)" style="
-                position: absolute;
-                top: 0px; 
-                left: 0px;
-                z-index: 100;
-                padding: 6px 12px;
-                font-family: inherit;
-                font-size: 0.55em;
-                background: #111;
-                color: #ffd700;
-                border: 2px solid #ffd700;
-                cursor: pointer;
-                box-shadow: 3px 3px 0px #000;
-                image-rendering: pixelated;
-            ">STATS</button>
+        <button onclick="toggleStats(true)" style="
+            position: absolute;
+            top: 10px; 
+            left: 10px;
+            z-index: 101;
+            padding: 6px 12px;
+            font-family: inherit;
+            font-size: 0.55em;
+            background: #111;
+            color: #ffd700;
+            border: 2px solid #ffd700;
+            cursor: pointer;
+            box-shadow: 3px 3px 0px #000;
+            image-rendering: pixelated;
+        ">STATS</button>
 
-            <div id="bitcoin">
-                <img src="imgs/Bitcoin.png" alt="Bitcoin" onerror="this.src='https://via.placeholder.com/280x280/f2a900/111111?text=BTC';">
-            </div>
-        </div>
-
-        <div style="margin-top: 30px;">
-            <div style="font-size: 1.5em;"><span id="balance">0</span> BTC</div>
-            <div style="font-size: 0.7em; margin-top: 10px; color: #ffd700;">per second: <span id="bps">0</span></div>
+        <div id="bitcoin">
+            <img src="imgs/Bitcoin.png" alt="Bitcoin" onerror="this.src='https://via.placeholder.com/280x280/f2a900/111111?text=BTC';">
         </div>
     </div>
+
+    <div style="margin-top: 30px;">
+        <div style="font-size: 1.5em;"><span id="balance">0</span> BTC</div>
+        <div style="font-size: 0.7em; margin-top: 10px; color: #ffd700;">per second: <span id="bps">0</span></div>
+    </div>
+</div>
 
     <div class="center-panel">
         <div class="news-ticker-container">
