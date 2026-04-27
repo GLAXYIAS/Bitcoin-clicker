@@ -17,7 +17,6 @@
             height: 100vh;
         }
 
-        /* Stats Modal Styling */
         #stats-modal {
             display: none;
             position: fixed;
@@ -27,7 +26,7 @@
             border: 4px solid #ffd700;
             padding: 30px;
             z-index: 2000;
-            width: 400px;
+            width: 450px; /* Widened for long suffix names */
             text-align: left;
             box-shadow: 0 0 50px rgba(0,0,0,0.8);
         }
@@ -38,25 +37,22 @@
             background: rgba(0,0,0,0.7);
             z-index: 1999;
         }
-        .stats-line { margin: 15px 0; font-size: 0.7em; color: #fff; }
+        .stats-line { margin: 15px 0; font-size: 0.6em; color: #fff; }
         .stats-val { color: #00ff9d; float: right; }
         .modal-btns { display: flex; gap: 10px; margin-top: 25px; }
         .modal-btns button { flex: 1; padding: 10px; font-family: inherit; font-size: 0.5em; cursor: pointer; border: none; }
 
         .game-container { display: flex; height: 100vh; width: 100vw; }
 
-        /* PANELS */
         .left-panel { flex: 0 0 33%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
         .center-panel { flex: 1; border-left: 2px solid #333; border-right: 2px solid #333; display: flex; flex-direction: column; background: rgba(0,0,0,0.2); }
-        .right-panel { flex: 0 0 350px; background: rgba(0, 0, 0, 0.5); display: flex; flex-direction: column; height: 100%; }
+        .right-panel { flex: 0 0 400px; background: rgba(0, 0, 0, 0.5); display: flex; flex-direction: column; height: 100%; }
 
-        /* BITCOIN */
         h1 { color: #ffd700; font-size: 1.1em; margin-bottom: 40px; text-shadow: 0 0 10px #ffd700; }
         #bitcoin { width: 280px; height: 280px; cursor: pointer; transition: transform 0.05s; filter: drop-shadow(0 0 20px rgba(242, 169, 0, 0.4)); }
         #bitcoin:active { transform: scale(0.92); }
         #bitcoin img { width: 100%; height: 100%; object-fit: contain; }
 
-        /* STORE */
         .store-header { background: #111; padding: 15px; text-align: center; color: #ffd700; border-bottom: 2px solid #ffd700; font-size: 1.2em; }
         #upgrades-section { padding: 10px; min-height: 100px; border-bottom: 2px solid #444; background: rgba(255, 255, 255, 0.05); }
         .upgrade-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
@@ -67,19 +63,20 @@
         .item:not(.locked):hover { background: #2a2a2a; border-color: #ffd700; }
         .item.locked { opacity: 0.3; cursor: not-allowed; }
         .item-icon { font-size: 2em; margin-right: 15px; }
-        .item-details { flex: 1; }
-        .item-name { font-size: 0.8em; color: #ffd700; margin-bottom: 4px; }
+        .item-details { flex: 1; overflow: hidden; }
+        .item-name { font-size: 0.7em; color: #ffd700; margin-bottom: 4px; white-space: nowrap; }
+        .item-cost { font-size: 0.6em; }
         .item-cost.can-afford { color: #00ff9d; }
         .item-cost.cannot-afford { color: #ff4d4d; }
-        .item-owned { font-size: 1.2em; color: #333; align-self: center; }
+        .item-owned { font-size: 1.2em; color: #444; align-self: center; margin-left: 10px; }
 
-        .floating-text { position: absolute; color: #ffd700; font-weight: bold; pointer-events: none; z-index: 1000; animation: floatUp 0.8s ease-out forwards; }
+        .floating-text { position: absolute; color: #ffd700; font-weight: bold; pointer-events: none; z-index: 1000; animation: floatUp 0.8s ease-out forwards; font-size: 0.8em; }
         @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-80px); } }
 
         .tooltip { 
             position: absolute; display: none; background: #111; border: 2px solid #ffd700; 
             padding: 10px; color: #fff; font-size: 0.6em; z-index: 1000; pointer-events: none;
-            line-height: 1.4; max-width: 200px;
+            line-height: 1.4; max-width: 250px;
         }
 
         .news-ticker-container { width: 100%; height: 45px; background: #000; border-bottom: 2px solid #444; overflow: hidden; position: relative; display: flex; align-items: center; }
@@ -89,44 +86,26 @@
 </head>
 <body>
 
-    <div class="game-container">
+<div class="game-container">
     <div class="left-panel">
-    <h1>BITCOIN CLICKER</h1>
-    
-    <div style="position: relative; width: 280px; height: 280px; margin: 0 auto;">
-        
-        <button onclick="toggleStats(true)" style="
-            position: absolute;
-            top: 10px; 
-            left: 10px;
-            z-index: 101;
-            padding: 6px 12px;
-            font-family: inherit;
-            font-size: 0.55em;
-            background: #111;
-            color: #ffd700;
-            border: 2px solid #ffd700;
-            cursor: pointer;
-            box-shadow: 3px 3px 0px #000;
-            image-rendering: pixelated;
-        ">STATS</button>
-
-        <div id="bitcoin">
-            <img src="imgs/Bitcoin.png" alt="Bitcoin" onerror="this.src='https://via.placeholder.com/280x280/f2a900/111111?text=BTC';">
+        <h1>BITCOIN CLICKER</h1>
+        <div style="position: relative; width: 280px; height: 280px; margin: 0 auto;">
+            <button onclick="toggleStats(true)" style="position: absolute; top: 10px; left: 10px; z-index: 101; padding: 6px 12px; font-family: inherit; font-size: 0.55em; background: #111; color: #ffd700; border: 2px solid #ffd700; cursor: pointer; box-shadow: 3px 3px 0px #000;">STATS</button>
+            <div id="bitcoin">
+                <img src="imgs/Bitcoin.png" alt="Bitcoin" onerror="this.src='https://via.placeholder.com/280x280/f2a900/111111?text=BTC';">
+            </div>
+        </div>
+        <div style="margin-top: 30px;">
+            <div style="font-size: 1.2em;"><span id="balance">0</span> BTC</div>
+            <div style="font-size: 0.7em; margin-top: 10px; color: #ffd700;">per second: <span id="bps">0</span></div>
         </div>
     </div>
-
-    <div style="margin-top: 30px;">
-        <div style="font-size: 1.5em;"><span id="balance">0</span> BTC</div>
-        <div style="font-size: 0.7em; margin-top: 10px; color: #ffd700;">per second: <span id="bps">0</span></div>
-    </div>
-</div>
 
     <div class="center-panel">
         <div class="news-ticker-container">
             <div id="news-text"></div>
         </div>
-        </div>
+    </div>
 
     <div class="right-panel">
         <div class="store-header">STORE</div>
@@ -139,79 +118,59 @@
     </div>
 </div>
 
-    <div id="modal-bg" class="modal-overlay" onclick="toggleStats(false)"></div>
-    <div id="stats-modal">
-        <h2 style="color: #ffd700; font-size: 1em; margin-bottom: 20px;">STATISTICS</h2>
-        <div class="stats-line">Current Balance: <span class="stats-val" id="stat-current">0</span></div>
-        <div class="stats-line">Total Mined: <span class="stats-val" id="stat-total">0</span></div>
-        <div class="stats-line">Raw Mined (Idle): <span class="stats-val" id="stat-raw">0</span></div>
-        <div class="stats-line">Total Clicks: <span class="stats-val" id="stat-clicks">0</span></div>
-        <div class="stats-line">Per Second: <span class="stats-val" id="stat-bps-modal">0</span></div>
-        
-        <div class="modal-btns">
-            <button onclick="saveGame(); alert('Game Saved!')" style="background: #00ff9d;">SAVE GAME</button>
-            <button onclick="resetGame()" style="background: #ff4d4d;">RESET SAVE</button>
-            <button onclick="toggleStats(false)" style="background: #555; color: white;">CLOSE</button>
-        </div>
+<div id="modal-bg" class="modal-overlay" onclick="toggleStats(false)"></div>
+<div id="stats-modal">
+    <h2 style="color: #ffd700; font-size: 1em; margin-bottom: 20px;">STATISTICS</h2>
+    <div class="stats-line">Current Balance: <span class="stats-val" id="stat-current">0</span></div>
+    <div class="stats-line">Total Mined: <span class="stats-val" id="stat-total">0</span></div>
+    <div class="stats-line">Total Clicks: <span class="stats-val" id="stat-clicks">0</span></div>
+    <div class="stats-line">Per Second: <span class="stats-val" id="stat-bps-modal">0</span></div>
+    <div class="modal-btns">
+        <button onclick="saveGame(); alert('Game Saved!')" style="background: #00ff9d;">SAVE GAME</button>
+        <button onclick="resetGame()" style="background: #ff4d4d;">RESET SAVE</button>
+        <button onclick="toggleStats(false)" style="background: #555; color: white;">CLOSE</button>
     </div>
+</div>
 
-    <div id="tooltip" class="tooltip"></div>
+<div id="tooltip" class="tooltip"></div>
 
-    <script>
-        let gameData = {
-            bitcoin: 0,
-            totalMined: 0,
-            totalClicks: 0,
-            clickValue: 1,
-            bpsMultiplier: 1,
-            isOfflineEnabled: false,
-            lastSaveTime: Date.now(),
-            ownedMiners: {},
-            boughtUpgrades: []
-        };
+<script>
+    // --- DATA ---
+    let gameData = {
+        bitcoin: 0,
+        totalMined: 0,
+        totalClicks: 0,
+        clickValue: 1,
+        bpsMultiplier: 1,
+        isOfflineEnabled: false,
+        lastSaveTime: Date.now(),
+        ownedMiners: {},
+        boughtUpgrades: []
+    };
 
-        const newsMessages = [
-            'Welcome to Bitcoin Clicker! Start clicking to generate Bitcoins',
-            'Local business man becomes trillionare after investing in crypto',
-            'Elon Musk states "Forever in dogecoin" and riots start in the streets',
-            'Beware of bitcoin scams, some give you dogecoin instead'
-        ];
+    const suffixes = ["", " Thousand", " Million", " Billion", " Trillion", " Quadrillion", " Quintillion", " Sextillion", " Septillion", " Octillion", " Nonillion", " Decillion", " Undecillion", " Duodecillion", " Tredecillion", " Quattuordecillion", " Quindecillion", " Sexdecillion", " Septendecillion", " Octodecillion", " Novemdecillion", " Vigintillion", " Unvigintillion", " Duovigintillion", " Tresvigintillion", " Quattuorvigintillion", " Quinvigintillion", " Sexvigintillion", " Septenvigintillion", " Octovigintillion", " Novemvigintillion", " Trigintillion", " Untrigintillion", " Duotrigintillion", " Trestrigintillion", " Quattuortrigintillion", " Quintrigintillion", " Sextrigintillion", " Septentrigintillion", " Octotrigintillion", " Novemtrigintillion", " Quadragintillion", " Unquadragintillion", " Duoquadragintillion", " Tresquadragintillion", " Quattuorquadragintillion", " Quinquadragintillion", " Sexquadragintillion", " Septenquadragintillion", " Octoquadragintillion", " Novemquadragintillion", " Quinquagintillion", " Unquinquagintillion", " Duoquinquagintillion", " Tresquinquagintillion", " Quattuorquinquagintillion", " Quinquinquagintillion", " Sexquinquagintillion", " Septenquinquagintillion", " Octoquinquagintillion", " Novemquinquagintillion", " Sexagintillion", " Unsexagintillion", " Duosexagintillion", " Tresexagintillion", " Quattuorsexagintillion", " Quinsexagintillion", " Sexsexagintillion", " Septensexagintillion", " Octosexagintillion", " Novemsexagintillion", " Septuagintillion", " Unseptuagintillion", " Duoseptuagintillion", " Treseptuagintillion", " Quattuorseptuagintillion", " Quinseptuagintillion", " Sexseptuagintillion", " Septenseptuagintillion", " Octoseptuagintillion", " Novemseptuagintillion", " Octogintillion", " Unoctogintillion", " Duooctogintillion", " Tresoctogintillion", " Quattuoroctogintillion", " Quinoctogintillion", " Sexoctogintillion", " Septenoctogintillion", " Octooctogintillion", " Novemoctogintillion", " Nonagintillion", " Unnonagintillion", " Duononagintillion", " Tresnonagintillion", " Quattuornonagintillion", " Quinnonagintillion", " Sexnonagintillion", " Septennonagintillion", " Octononagintillion", " Novemnonagintillion", " Centillion", " Uncentillion", " Duocentillion", " Trescentillion", " Quattuorcentillion", " Quincentillion", " Sexcentillion", " Septencentillion", " Octocentillion", " Novemcentillion", " Ducentillion", " Unducentillion", " Duoducentillion", " Tresducentillion", " Quattuorducentillion", " Quinducentillion", " Sexducentillion", " Septenducentillion", " Octoducentillion", " Novemducentillion", " Trecentillion", " Untrecentillion", " Duotrecentillion", " Trestrecentillion", " Quattuortrecentillion", " Quintrecentillion", " Sextrecentillion", " Septentrecentillion", " Octotrecentillion", " Novemtrecentillion", " Quadringentillion", " Unquadringentillion", " Duoquadringentillion", " Tresquadringentillion", " Quattuorquadringentillion", " Quinquadringentillion", " Sexquadringentillion", " Septenquadringentillion", " Octoquadringentillion", " Novemquadringentillion", " Quingentillion", " Unquingentillion", " Duoquingentillion", " Tresquingentillion", " Quattuorquingentillion", " Quinquingentillion", " Sexquingentillion", " Septenquingentillion", " Octoquingentillion", " Novemquingentillion", " Sescentillion", " Unsescentillion", " Duosescentillion", " Tressescentillion", " Quattuorsescentillion", " Quinsescentillion", " Sexsescentillion", " Septensescentillion", " Octosescentillion", " Novemsescentillion", " Septingentillion", " Unseptingentillion", " Duoseptingentillion", " Treseptingentillion", " Quattuorseptingentillion", " Quinseptingentillion", " Sexseptingentillion", " Septenseptingentillion", " Octoseptingentillion", " Novemseptingentillion", " Octingentillion", " Unoctingentillion", " Duooctingentillion", " Tresoctingentillion", " Quattuoroctingentillion", " Quinoctingentillion", " Sexoctingentillion", " Septenoctingentillion", " Octooctingentillion", " Novemoctingentillion", " Nongentillion", " Unnongentillion", " Duonongentillion", " Tresnongentillion", " Quattuornongentillion", " Quinnongentillion", " Sexnongentillion", " Septennongentillion", " Octonongentillion", " Novemnongentillion", " Millinillion"];
 
-        const minerNames = [
-            "Lemon Battery", "Potato Circuit", "Calculated Abacus", "Rust-Bucket PC", "Budget Laptop", 
-            "Office Desktop", "Gaming Rig", "Overclocked Station", "Pro Miner Rack", "Liquid-Cooled Array", 
-            "Nitro-Injected GPU", "ASIC Prototype", "Industrial ASIC", "Server Closet", "Data Center Unit", 
-            "Mainframe Core", "Supercomputer Node", "Quantum Chipset", "Cold Storage Vault", "Silicon Valley Hub",
-            "Cloud Instance", "Virtual Machine", "Botnet Cluster", "Dark Web Node", "Encryption Engine", 
-            "Blockchain Relay", "Smart Contract Automaton", "Neural Network", "Deep Learning Hive", "AI Algorithm", 
-            "Digital Ghost", "Data Siphon", "Algorithm Optimizer", "Logic Gate Array", "Cyber-Hive Mind", 
-            "Binary Fountain", "Firewall Bypass", "Rootkit Miner", "Synthesized Reality", "Metaverse Server",
-            "Geothermal Rig", "Arctic Mining Vault", "Oceanic Server Floor", "Volcanic Power Plant", "Orbital Satellite", 
-            "Lunar Outpost", "Mars Colony Link", "Asteroid Driller", "Solar Array", "Atmospheric Siphon", 
-            "Tectonic Generator", "Magma Core Miner", "Planetary Wi-Fi", "Global Mesh-Net", "Saturnian Ring Miner", 
-            "Jupiter Gas Refiner", "Titan Ice Station", "Venusian Heat Sink", "Icy Comet Rig", "Dwarf Planet Relay",
-            "Star Harvester", "Dyson Swarm Fragment", "Nebula Gas Sifter", "Supernova Collector", "Black Hole Rim Node", 
-            "Event Horizon Link", "Dark Matter Reactor", "Antimatter Forge", "Wormhole Tunnel", "Galactic Core Hub", 
-            "Quasar Beaming Station", "Pulsar Clock Sync", "Interstellar Cable", "Void Energy Siphon", "Cosmic Ray Mirror", 
-            "Gravity Wave Miner", "Spacetime Loom", "Light-Speed Array", "Orion Belt Mining", "Andromeda Uplink",
-            "Dimensional Breach", "Reality Warper", "Timeline Splitter", "Entropy Inverter", "Universal Engine", 
-            "String Theory Weaver", "Multiverse Bridge", "Quantum Immortality Rig", "Existence Validator", "Laws of Physics Editor", 
-            "Celestial Architect", "Omega Point Node", "Simulation Overlord", "Concept Harvester", "Thought Form Miner", 
-            "The Source Code", "Absolute Zero Engine", "Infinity Siphon", "Eternity Engine", "The Bitcoin Singularity"
-        ];
+    const newsMessages = [
+        'Welcome to Bitcoin Clicker!',
+        'Local business man becomes trillionare after investing in crypto',
+        'Elon Musk states "Forever in dogecoin" and riots start',
+        'Beware of bitcoin scams, some give you dogecoin instead'
+    ];
 
-        const miners = [];
-        for (let i = 0; i < 100; i++) {
-            miners.push({
-                id: `miner_${i}`,
-                name: minerNames[i],
-                baseCost: Math.floor(15 * Math.pow(1.45, i)),
-                production: Number((0.1 * Math.pow(1.40, i)).toFixed(2)),
-                emoji: i < 20 ? "💻" : i < 40 ? "🌐" : i < 60 ? "🚀" : i < 80 ? "🌌" : "👁️"
-            });
-        }
+    const minerNames = ["Lemon Battery", "Potato Circuit", "Calculated Abacus", "Rust-Bucket PC", "Budget Laptop", "Office Desktop", "Gaming Rig", "Overclocked Station", "Pro Miner Rack", "Liquid-Cooled Array", "Nitro-Injected GPU", "ASIC Prototype", "Industrial ASIC", "Server Closet", "Data Center Unit", "Mainframe Core", "Supercomputer Node", "Quantum Chipset", "Cold Storage Vault", "Silicon Valley Hub", "Cloud Instance", "Virtual Machine", "Botnet Cluster", "Dark Web Node", "Encryption Engine", "Blockchain Relay", "Smart Contract Automaton", "Neural Network", "Deep Learning Hive", "AI Algorithm", "Digital Ghost", "Data Siphon", "Algorithm Optimizer", "Logic Gate Array", "Cyber-Hive Mind", "Binary Fountain", "Firewall Bypass", "Rootkit Miner", "Synthesized Reality", "Metaverse Server", "Geothermal Rig", "Arctic Mining Vault", "Oceanic Server Floor", "Volcanic Power Plant", "Orbital Satellite", "Lunar Outpost", "Mars Colony Link", "Asteroid Driller", "Solar Array", "Atmospheric Siphon", "Tectonic Generator", "Magma Core Miner", "Planetary Wi-Fi", "Global Mesh-Net", "Saturnian Ring Miner", "Jupiter Gas Refiner", "Titan Ice Station", "Venusian Heat Sink", "Icy Comet Rig", "Dwarf Planet Relay", "Star Harvester", "Dyson Swarm Fragment", "Nebula Gas Sifter", "Supernova Collector", "Black Hole Rim Node", "Event Horizon Link", "Dark Matter Reactor", "Antimatter Forge", "Wormhole Tunnel", "Galactic Core Hub", "Quasar Beaming Station", "Pulsar Clock Sync", "Interstellar Cable", "Void Energy Siphon", "Cosmic Ray Mirror", "Gravity Wave Miner", "Spacetime Loom", "Light-Speed Array", "Orion Belt Mining", "Andromeda Uplink", "Dimensional Breach", "Reality Warper", "Timeline Splitter", "Entropy Inverter", "Universal Engine", "String Theory Weaver", "Multiverse Bridge", "Quantum Immortality Rig", "Existence Validator", "Laws of Physics Editor", "Celestial Architect", "Omega Point Node", "Simulation Overlord", "Concept Harvester", "Thought Form Miner", "The Source Code", "Absolute Zero Engine", "Infinity Siphon", "Eternity Engine", "The Bitcoin Singularity"];
 
-        const upgrades = [
+    const miners = [];
+    for (let i = 0; i < 100; i++) {
+        miners.push({
+            id: `miner_${i}`,
+            name: minerNames[i],
+            baseCost: Math.floor(15 * Math.pow(1.45, i)),
+            production: Number((0.1 * Math.pow(1.40, i)).toFixed(2)),
+            emoji: i < 20 ? "💻" : i < 40 ? "🌐" : i < 60 ? "🚀" : i < 80 ? "🌌" : "👁️"
+        });
+    }
+
+   const upgrades = [
             { id: "u1", name: "Pro Mouse", cost: 100, icon: "🖱️", type: "click", boost: 2 },
             { id: "u2", name: "Liquid Cooling", cost: 500, icon: "❄️", type: "bps", boost: 1.2 },
             { id: "offline", name: "Offline Collector", cost: 5000, icon: "💤", type: "special", desc: "Earn 50% while away!" },
@@ -238,119 +197,145 @@
             { id: "n20", name: "The Singularity", cost: 1000000000000, icon: "🌌", type: "special", boost: 10, desc: "Final Upgrade: 10x EVERYTHING!" }
         ];
 
-        function toggleStats(show) {
-            document.getElementById('stats-modal').style.display = show ? 'block' : 'none';
-            document.getElementById('modal-bg').style.display = show ? 'block' : 'none';
-            if(show) {
-                document.getElementById('stat-current').innerText = Math.floor(gameData.bitcoin).toLocaleString();
-                document.getElementById('stat-total').innerText = Math.floor(gameData.totalMined).toLocaleString();
-                document.getElementById('stat-raw').innerText = Math.floor(gameData.totalMined - (gameData.totalClicks * gameData.clickValue)).toLocaleString();
-                document.getElementById('stat-clicks').innerText = gameData.totalClicks.toLocaleString();
-                document.getElementById('stat-bps-modal').innerText = calculateCurrentBPS().toFixed(1);
-            }
-        }
 
-        function calculateCurrentBPS() {
-            let base = 0;
-            miners.forEach(m => { base += (gameData.ownedMiners[m.id] || 0) * m.production; });
-            let total = base * gameData.bpsMultiplier;
-            return gameData.boughtUpgrades.includes("n20") ? total * 10 : total;
-        }
+    // --- LOGIC ---
 
-        function getMinerCost(miner) {
-            return Math.floor(miner.baseCost * Math.pow(1.15, gameData.ownedMiners[miner.id] || 0));
-        }
+    function formatNum(n) {
+        if (n < 1000) return Math.floor(n).toString();
+        const tier = Math.floor(Math.log10(n) / 3);
+        if (tier <= 0) return Math.floor(n).toString();
+        if (tier >= suffixes.length) return n.toExponential(2);
+        const suffix = suffixes[tier];
+        const scale = Math.pow(10, tier * 3);
+        const scaled = n / scale;
+        return scaled.toFixed(2) + suffix;
+    }
 
-        function updateDisplay() {
-            const bps = calculateCurrentBPS();
-            document.getElementById('balance').innerText = Math.floor(gameData.bitcoin).toLocaleString();
-            document.getElementById('bps').innerText = bps.toFixed(1);
-            renderMiners();
-            renderUpgrades();
-        }
+    function calculateCurrentBPS() {
+        let base = 0;
+        miners.forEach(m => { base += (gameData.ownedMiners[m.id] || 0) * m.production; });
+        let total = base * gameData.bpsMultiplier;
+        return gameData.boughtUpgrades.includes("n20") ? total * 10 : total;
+    }
 
-        function renderMiners() {
-            const list = document.getElementById('miners-list');
-            list.innerHTML = '';
-            miners.forEach((m) => {
-                const cost = getMinerCost(m);
-                const owned = gameData.ownedMiners[m.id] || 0;
-                const canAfford = gameData.bitcoin >= cost;
+    function getMinerCost(miner) {
+        return Math.floor(miner.baseCost * Math.pow(1.15, gameData.ownedMiners[miner.id] || 0));
+    }
+
+    function updateDisplay() {
+        const bps = calculateCurrentBPS();
+        document.getElementById('balance').innerText = formatNum(gameData.bitcoin);
+        document.getElementById('bps').innerText = formatNum(bps);
+        renderMiners();
+        renderUpgrades();
+    }
+
+    function renderMiners() {
+        const list = document.getElementById('miners-list');
+        list.innerHTML = '';
+        miners.forEach((m) => {
+            const cost = getMinerCost(m);
+            const owned = gameData.ownedMiners[m.id] || 0;
+            const canAfford = gameData.bitcoin >= cost;
+            const div = document.createElement('div');
+            div.className = `item ${!canAfford ? 'locked' : ''}`;
+            div.innerHTML = `
+                <div class="item-icon">${m.emoji}</div>
+                <div class="item-details">
+                    <div class="item-name">${m.name}</div>
+                    <div class="item-cost ${canAfford ? 'can-afford' : 'cannot-afford'}">${formatNum(cost)} BTC</div>
+                </div>
+                <div class="item-owned">${owned}</div>`;
+            div.onmousemove = (e) => showTooltip(e, `<div style="color:#ffd700">${m.name}</div><div>Gives ${formatNum(m.production)} BTC/s</div>`);
+            div.onmouseleave = hideTooltip;
+            div.onclick = () => { 
+                if (gameData.bitcoin >= cost) { 
+                    gameData.bitcoin -= cost; 
+                    gameData.ownedMiners[m.id] = owned + 1; 
+                    updateDisplay(); 
+                    saveGame(); 
+                } 
+            };
+            list.appendChild(div);
+        });
+    }
+
+    function renderUpgrades() {
+        const grid = document.getElementById('upgrades-grid');
+        grid.innerHTML = '';
+        upgrades.forEach((u) => {
+            if (gameData.boughtUpgrades.includes(u.id)) return;
+            if (gameData.bitcoin >= u.cost * 0.2) {
+                const canAfford = gameData.bitcoin >= u.cost;
                 const div = document.createElement('div');
-                div.className = `item ${!canAfford ? 'locked' : ''}`;
-                div.innerHTML = `<div class="item-icon">${m.emoji}</div><div class="item-details"><div class="item-name">${m.name}</div><div class="item-cost ${canAfford ? 'can-afford' : 'cannot-afford'}">${cost.toLocaleString()} BTC</div></div><div class="item-owned">${owned}</div>`;
-                div.onmousemove = (e) => showTooltip(e, `<div style="color:#ffd700">${m.name}</div><div>Gives ${m.production} BTC/s</div>`);
+                div.className = 'upgrade-item';
+                div.innerHTML = u.icon;
+                div.style.opacity = canAfford ? '1' : '0.4';
+                div.onmousemove = (e) => showTooltip(e, `<div style="color:#ffd700">${u.name}</div><div style="color:${canAfford ? '#00ff9d' : '#ff4d4d'}">Cost: ${formatNum(u.cost)} BTC</div><div style="font-size:0.7em; margin-top:5px;">${u.desc || `Boosts ${u.type === 'click' ? 'Click' : 'BPS'} by ${u.boost}x`}</div>`);
                 div.onmouseleave = hideTooltip;
-                div.onclick = () => { if (gameData.bitcoin >= cost) { gameData.bitcoin -= cost; gameData.ownedMiners[m.id] = owned + 1; updateDisplay(); saveGame(); } };
-                list.appendChild(div);
-            });
+                div.onclick = () => { if (canAfford) { gameData.bitcoin -= u.cost; gameData.boughtUpgrades.push(u.id); if (u.type === 'click') gameData.clickValue *= u.boost; if (u.type === 'bps') gameData.bpsMultiplier *= u.boost; if (u.id === 'offline') gameData.isOfflineEnabled = true; hideTooltip(); updateDisplay(); saveGame(); } };
+                grid.appendChild(div);
+            }
+        });
+    }
+
+    document.getElementById('bitcoin').onclick = (e) => {
+        let val = gameData.clickValue;
+        if (gameData.boughtUpgrades.includes("n20")) val *= 10;
+        gameData.bitcoin += val;
+        gameData.totalMined += val;
+        gameData.totalClicks++;
+        updateDisplay();
+        const fly = document.createElement('div');
+        fly.className = 'floating-text';
+        fly.innerText = `+${formatNum(val)}`;
+        fly.style.left = e.clientX + 'px'; fly.style.top = e.clientY + 'px';
+        document.body.appendChild(fly);
+        setTimeout(() => fly.remove(), 800);
+    };
+
+    function toggleStats(show) {
+        document.getElementById('stats-modal').style.display = show ? 'block' : 'none';
+        document.getElementById('modal-bg').style.display = show ? 'block' : 'none';
+        if(show) {
+            document.getElementById('stat-current').innerText = formatNum(gameData.bitcoin);
+            document.getElementById('stat-total').innerText = formatNum(gameData.totalMined);
+            document.getElementById('stat-clicks').innerText = gameData.totalClicks.toLocaleString();
+            document.getElementById('stat-bps-modal').innerText = formatNum(calculateCurrentBPS());
         }
+    }
 
-        function renderUpgrades() {
-            const grid = document.getElementById('upgrades-grid');
-            grid.innerHTML = '';
-            upgrades.forEach((u) => {
-                if (gameData.boughtUpgrades.includes(u.id)) return;
-                if (gameData.bitcoin >= u.cost * 0.2) {
-                    const canAfford = gameData.bitcoin >= u.cost;
-                    const div = document.createElement('div');
-                    div.className = 'upgrade-item';
-                    div.innerHTML = u.icon;
-                    div.style.opacity = canAfford ? '1' : '0.4';
-                    div.onmousemove = (e) => showTooltip(e, `<div style="color:#ffd700">${u.name}</div><div style="color:${canAfford ? '#00ff9d' : '#ff4d4d'}">Cost: ${u.cost.toLocaleString()} BTC</div><div style="font-size:0.7em; margin-top:5px;">${u.desc || `Boosts ${u.type === 'click' ? 'Click' : 'BPS'} by ${u.boost}x`}</div>`);
-                    div.onmouseleave = hideTooltip;
-                    div.onclick = () => { if (canAfford) { gameData.bitcoin -= u.cost; gameData.boughtUpgrades.push(u.id); if (u.type === 'click') gameData.clickValue *= u.boost; if (u.type === 'bps') gameData.bpsMultiplier *= u.boost; if (u.id === 'offline') gameData.isOfflineEnabled = true; hideTooltip(); updateDisplay(); saveGame(); } };
-                    grid.appendChild(div);
-                }
-            });
-        }
-
-        document.getElementById('bitcoin').onclick = (e) => {
-            let val = gameData.clickValue;
-            if (gameData.boughtUpgrades.includes("n20")) val *= 10;
-            gameData.bitcoin += val;
-            gameData.totalMined += val;
-            gameData.totalClicks++;
-            updateDisplay();
-            const fly = document.createElement('div');
-            fly.className = 'floating-text';
-            fly.innerText = `+${val >= 1000 ? (val/1000).toFixed(1)+'k' : Math.floor(val)}`;
-            fly.style.left = e.clientX + 'px'; fly.style.top = e.clientY + 'px';
-            document.body.appendChild(fly);
-            setTimeout(() => fly.remove(), 800);
-        };
-
-        function saveGame() { gameData.lastSaveTime = Date.now(); localStorage.setItem('btcClickerSave', JSON.stringify(gameData)); }
-        function loadGame() {
-            const saved = localStorage.getItem('btcClickerSave');
-            if (saved) {
-                gameData = Object.assign({}, gameData, JSON.parse(saved));
-                if (gameData.isOfflineEnabled) {
-                    const away = Math.floor((Date.now() - gameData.lastSaveTime) / 1000);
-                    if (away > 5) {
-                        const earned = (calculateCurrentBPS() * 0.5) * away;
-                        gameData.bitcoin += earned; gameData.totalMined += earned;
-                        alert(`Away for ${away}s, mined ${earned.toFixed(1)} BTC!`);
-                    }
+    function saveGame() { gameData.lastSaveTime = Date.now(); localStorage.setItem('btcClickerSave', JSON.stringify(gameData)); }
+    function loadGame() {
+        const saved = localStorage.getItem('btcClickerSave');
+        if (saved) {
+            gameData = Object.assign({}, gameData, JSON.parse(saved));
+            if (gameData.isOfflineEnabled) {
+                const away = Math.floor((Date.now() - gameData.lastSaveTime) / 1000);
+                if (away > 5) {
+                    const earned = (calculateCurrentBPS() * 0.5) * away;
+                    gameData.bitcoin += earned; gameData.totalMined += earned;
+                    alert(`Away for ${away}s, mined ${formatNum(earned)} BTC!`);
                 }
             }
-            updateDisplay();
         }
-        function resetGame() { if(confirm("Reset everything?")) { localStorage.removeItem('btcClickerSave'); location.reload(); } }
-        function showTooltip(e, content) { const t = document.getElementById('tooltip'); t.style.display = 'block'; t.style.left = (e.pageX + 15) + 'px'; t.style.top = (e.pageY + 15) + 'px'; t.innerHTML = content; }
-        function hideTooltip() { document.getElementById('tooltip').style.display = 'none'; }
-        function updateNews() {
-            const news = document.getElementById('news-text');
-            news.innerText = newsMessages[currentNewsIndex];
-            currentNewsIndex = (currentNewsIndex + 1) % newsMessages.length;
-            news.style.animation = 'none'; news.offsetHeight; news.style.animation = 'ticker 20s linear infinite';
-        }
+        updateDisplay();
+    }
+    function resetGame() { if(confirm("Reset everything?")) { localStorage.removeItem('btcClickerSave'); location.reload(); } }
+    function showTooltip(e, content) { const t = document.getElementById('tooltip'); t.style.display = 'block'; t.style.left = (e.pageX + 15) + 'px'; t.style.top = (e.pageY + 15) + 'px'; t.innerHTML = content; }
+    function hideTooltip() { document.getElementById('tooltip').style.display = 'none'; }
+    function updateNews() {
+        const news = document.getElementById('news-text');
+        news.innerText = newsMessages[currentNewsIndex];
+        currentNewsIndex = (currentNewsIndex + 1) % newsMessages.length;
+        news.style.animation = 'none'; news.offsetHeight; news.style.animation = 'ticker 20s linear infinite';
+    }
 
-        let currentNewsIndex = 0;
-        setInterval(() => { let bps = calculateCurrentBPS(); gameData.bitcoin += bps; gameData.totalMined += bps; updateDisplay(); }, 1000);
-        setInterval(saveGame, 30000); setInterval(updateNews, 20000);
-        document.addEventListener('contextmenu', event => event.preventDefault());
-        loadGame(); updateNews();
-    </script>
+    let currentNewsIndex = 0;
+    setInterval(() => { let bps = calculateCurrentBPS(); gameData.bitcoin += bps; gameData.totalMined += bps; updateDisplay(); }, 1000);
+    setInterval(saveGame, 30000); setInterval(updateNews, 20000);
+    document.addEventListener('contextmenu', event => event.preventDefault());
+    loadGame(); updateNews();
+</script>
 </body>
 </html>
