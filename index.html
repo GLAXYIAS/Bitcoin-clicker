@@ -160,43 +160,44 @@
     const minerNames = ["Lemon Battery", "Potato Circuit", "Calculated Abacus", "Rust-Bucket PC", "Budget Laptop", "Office Desktop", "Gaming Rig", "Overclocked Station", "Pro Miner Rack", "Liquid-Cooled Array", "Nitro-Injected GPU", "ASIC Prototype", "Industrial ASIC", "Server Closet", "Data Center Unit", "Mainframe Core", "Supercomputer Node", "Quantum Chipset", "Cold Storage Vault", "Silicon Valley Hub", "Cloud Instance", "Virtual Machine", "Botnet Cluster", "Dark Web Node", "Encryption Engine", "Blockchain Relay", "Smart Contract Automaton", "Neural Network", "Deep Learning Hive", "AI Algorithm", "Digital Ghost", "Data Siphon", "Algorithm Optimizer", "Logic Gate Array", "Cyber-Hive Mind", "Binary Fountain", "Firewall Bypass", "Rootkit Miner", "Synthesized Reality", "Metaverse Server", "Geothermal Rig", "Arctic Mining Vault", "Oceanic Server Floor", "Volcanic Power Plant", "Orbital Satellite", "Lunar Outpost", "Mars Colony Link", "Asteroid Driller", "Solar Array", "Atmospheric Siphon", "Tectonic Generator", "Magma Core Miner", "Planetary Wi-Fi", "Global Mesh-Net", "Saturnian Ring Miner", "Jupiter Gas Refiner", "Titan Ice Station", "Venusian Heat Sink", "Icy Comet Rig", "Dwarf Planet Relay", "Star Harvester", "Dyson Swarm Fragment", "Nebula Gas Sifter", "Supernova Collector", "Black Hole Rim Node", "Event Horizon Link", "Dark Matter Reactor", "Antimatter Forge", "Wormhole Tunnel", "Galactic Core Hub", "Quasar Beaming Station", "Pulsar Clock Sync", "Interstellar Cable", "Void Energy Siphon", "Cosmic Ray Mirror", "Gravity Wave Miner", "Spacetime Loom", "Light-Speed Array", "Orion Belt Mining", "Andromeda Uplink", "Dimensional Breach", "Reality Warper", "Timeline Splitter", "Entropy Inverter", "Universal Engine", "String Theory Weaver", "Multiverse Bridge", "Quantum Immortality Rig", "Existence Validator", "Laws of Physics Editor", "Celestial Architect", "Omega Point Node", "Simulation Overlord", "Concept Harvester", "Thought Form Miner", "The Source Code", "Absolute Zero Engine", "Infinity Siphon", "Eternity Engine", "The Bitcoin Singularity"];
 
     const miners = [];
-    for (let i = 0; i < 100; i++) {
-        miners.push({
-            id: `miner_${i}`,
-            name: minerNames[i],
-            baseCost: Math.floor(15 * Math.pow(1.45, i)),
-            production: Number((0.1 * Math.pow(1.40, i)).toFixed(2)),
-            emoji: i < 20 ? "💻" : i < 40 ? "🌐" : i < 60 ? "🚀" : i < 80 ? "🌌" : "👁️"
-        });
-    }
+for (let i = 0; i < 100; i++) {
+    miners.push({
+        id: `miner_${i}`,
+        name: minerNames[i],
+        // Base cost jumps significantly (1.65x per tier)
+        baseCost: Math.floor(25 * Math.pow(1.65, i)), 
+        // Production grows slower (1.30x per tier)
+        production: Number((0.1 * Math.pow(1.30, i)).toFixed(2)),
+        emoji: i < 20 ? "💻" : i < 40 ? "🌐" : i < 60 ? "🚀" : i < 80 ? "🌌" : "👁️"
+    });
+}
 
    const upgrades = [
-            { id: "u1", name: "Pro Mouse", cost: 100, icon: "🖱️", type: "click", boost: 2 },
-            { id: "u2", name: "Liquid Cooling", cost: 500, icon: "❄️", type: "bps", boost: 1.2 },
-            { id: "offline", name: "Offline Collector", cost: 5000, icon: "💤", type: "special", desc: "Earn 50% while away!" },
-            { id: "u3", name: "Golden Click", cost: 2000, icon: "✨", type: "click", boost: 5 },
-            { id: "n1", name: "Gaming Chair", cost: 8000, icon: "💺", type: "click", boost: 2 },
-            { id: "n2", name: "Fiber Optic", cost: 15000, icon: "⚡", type: "bps", boost: 1.5 },
-            { id: "n3", name: "Energy Drink", cost: 30000, icon: "🥤", type: "click", boost: 2 },
-            { id: "n4", name: "Server Rack", cost: 75000, icon: "🗄️", type: "bps", boost: 1.4 },
-            { id: "n5", name: "Diamond Cursor", cost: 150000, icon: "💎", type: "click", boost: 3 },
-            { id: "n6", name: "Satellite Link", cost: 300000, icon: "📡", type: "bps", boost: 1.6 },
-            { id: "n7", name: "Macro Script", cost: 500000, icon: "📜", type: "click", boost: 2 },
-            { id: "n8", name: "Power Plant", cost: 1000000, icon: "☢️", type: "bps", boost: 1.5 },
-            { id: "n9", name: "Quantum CPU", cost: 2500000, icon: "🧬", type: "click", boost: 4 },
-            { id: "n10", name: "Global Mesh", cost: 5000000, icon: "🌍", type: "bps", boost: 2 },
-            { id: "n11", name: "Robo-Clicker", cost: 10000000, icon: "🤖", type: "click", boost: 2 },
-            { id: "n12", name: "Deep Sea Cables", cost: 25000000, icon: "⚓", type: "bps", boost: 1.8 },
-            { id: "n13", name: "Neural Link", cost: 75000000, icon: "🧠", type: "click", boost: 3 },
-            { id: "n14", name: "Space Solar", cost: 150000000, icon: "☀️", type: "bps", boost: 2 },
-            { id: "n15", name: "Time Warp", cost: 500000000, icon: "⏳", type: "click", boost: 5 },
-            { id: "n16", name: "Dyson Swarm", cost: 1000000000, icon: "🛸", type: "bps", boost: 2.5 },
-            { id: "n17", name: "God Protocol", cost: 5000000000, icon: "👁️", type: "click", boost: 10 },
-            { id: "n18", name: "Multiverse Hub", cost: 25000000000, icon: "🌀", type: "bps", boost: 3 },
-            { id: "n19", name: "Infinite Loop", cost: 100000000000, icon: "♾️", type: "click", boost: 2 },
-            { id: "n20", name: "The Singularity", cost: 1000000000000, icon: "🌌", type: "special", boost: 10, desc: "Final Upgrade: 10x EVERYTHING!" }
-        ];
-
+    { id: "u1", name: "Pro Mouse", cost: 1000, icon: "🖱️", type: "click", boost: 1.2 },
+    { id: "u2", name: "Liquid Cooling", cost: 5000, icon: "❄️", type: "bps", boost: 1.1 },
+    { id: "offline", name: "Offline Collector", cost: 50000, icon: "💤", type: "special", desc: "Earn 10% while away!" },
+    { id: "u3", name: "Golden Click", cost: 250000, icon: "✨", type: "click", boost: 1.5 },
+    { id: "n1", name: "Gaming Chair", cost: 1000000, icon: "💺", type: "click", boost: 1.2 },
+    { id: "n2", name: "Fiber Optic", cost: 5000000, icon: "⚡", type: "bps", boost: 1.2 },
+    { id: "n3", name: "Energy Drink", cost: 25000000, icon: "🥤", type: "click", boost: 1.2 },
+    { id: "n4", name: "Server Rack", cost: 100000000, icon: "🗄️", type: "bps", boost: 1.15 },
+    { id: "n5", name: "Diamond Cursor", cost: 500000000, icon: "💎", type: "click", boost: 1.3 },
+    { id: "n6", name: "Satellite Link", cost: 2500000000, icon: "📡", type: "bps", boost: 1.2 },
+    { id: "n7", name: "Macro Script", cost: 10000000000, icon: "📜", type: "click", boost: 1.2 },
+    { id: "n8", name: "Power Plant", cost: 50000000000, icon: "☢️", type: "bps", boost: 1.2 },
+    { id: "n9", name: "Quantum CPU", cost: 250000000000, icon: "🧬", type: "click", boost: 1.5 },
+    { id: "n10", name: "Global Mesh", cost: 1000000000000, icon: "🌍", type: "bps", boost: 1.3 },
+    { id: "n11", name: "Robo-Clicker", cost: 5000000000000, icon: "🤖", type: "click", boost: 1.2 },
+    { id: "n12", name: "Deep Sea Cables", cost: 25000000000000, icon: "⚓", type: "bps", boost: 1.2 },
+    { id: "n13", name: "Neural Link", cost: 100000000000000, icon: "🧠", type: "click", boost: 1.3 },
+    { id: "n14", name: "Space Solar", cost: 500000000000000, icon: "☀️", type: "bps", boost: 1.3 },
+    { id: "n15", name: "Time Warp", cost: 2500000000000000, icon: "⏳", type: "click", boost: 1.5 },
+    { id: "n16", name: "Dyson Swarm", cost: 10000000000000000, icon: "🛸", type: "bps", boost: 1.4 },
+    { id: "n17", name: "God Protocol", cost: 50000000000000000, icon: "👁️", type: "click", boost: 2 },
+    { id: "n18", name: "Multiverse Hub", cost: 250000000000000000, icon: "🌀", type: "bps", boost: 1.5 },
+    { id: "n19", name: "Infinite Loop", cost: 1000000000000000000, icon: "♾️", type: "click", boost: 1.2 },
+    { id: "n20", name: "The Singularity", cost: 1e21, icon: "🌌", type: "special", boost: 2, desc: "Final Upgrade: 2x EVERYTHING!" }
+];
 
     // --- LOGIC ---
 
@@ -212,15 +213,32 @@
     }
 
     function calculateCurrentBPS() {
-        let base = 0;
-        miners.forEach(m => { base += (gameData.ownedMiners[m.id] || 0) * m.production; });
-        let total = base * gameData.bpsMultiplier;
-        return gameData.boughtUpgrades.includes("n20") ? total * 10 : total;
-    }
+    let totalBPS = 0;
 
+    miners.forEach(m => {
+        let count = gameData.ownedMiners[m.id] || 0;
+        if (count > 0) {
+            let minerMult = 1;
+            
+            // Search the hard-coded array for upgrades that match this miner
+            gameData.boughtUpgrades.forEach(uId => {
+                const upgrade = upgrades.find(up => up.id === uId);
+                if (upgrade && upgrade.type === "miner_boost" && upgrade.target === m.id) {
+                    minerMult *= upgrade.boost;
+                }
+            });
+
+            totalBPS += (count * m.production * minerMult);
+        }
+    });
+
+    return totalBPS * gameData.bpsMultiplier * (gameData.boughtUpgrades.includes("n20") ? 2 : 1);
+}
     function getMinerCost(miner) {
-        return Math.floor(miner.baseCost * Math.pow(1.15, gameData.ownedMiners[miner.id] || 0));
-    }
+    const owned = gameData.ownedMiners[miner.id] || 0;
+    // 1.28x increase means the price doubles roughly every 2.8 units bought
+    return Math.floor(miner.baseCost * Math.pow(1.28, owned));
+}
 
     function updateDisplay() {
         const bps = calculateCurrentBPS();
@@ -231,54 +249,82 @@
     }
 
     function renderMiners() {
-        const list = document.getElementById('miners-list');
-        list.innerHTML = '';
-        miners.forEach((m) => {
-            const cost = getMinerCost(m);
-            const owned = gameData.ownedMiners[m.id] || 0;
-            const canAfford = gameData.bitcoin >= cost;
+    const list = document.getElementById('miners-list');
+    list.innerHTML = '';
+    miners.forEach((m) => {
+        const cost = getMinerCost(m);
+        const owned = gameData.ownedMiners[m.id] || 0;
+        const canAfford = gameData.bitcoin >= cost;
+        const div = document.createElement('div');
+        div.className = `item ${!canAfford ? 'locked' : ''}`;
+        div.innerHTML = `
+            <div class="item-icon">${m.emoji}</div>
+            <div class="item-details">
+                <div class="item-name">${m.name}</div>
+                <div class="item-cost ${canAfford ? 'can-afford' : 'cannot-afford'}">${formatNum(cost)} BTC</div>
+            </div>
+            <div class="item-owned">${owned}</div>`;
+        
+        div.onmousemove = (e) => showTooltip(e, `<div style="color:#ffd700">${m.name}</div><div>Gives ${formatNum(m.production)} BTC/s</div>`);
+        div.onmouseleave = hideTooltip;
+        
+        div.onclick = () => { 
+            if (canAfford) { 
+                gameData.bitcoin -= cost; 
+                gameData.ownedMiners[m.id] = (gameData.ownedMiners[m.id] || 0) + 1; 
+                updateDisplay(); 
+                saveGame(); 
+            } 
+        };
+        list.appendChild(div);
+    });
+}
+
+    function renderUpgrades() {
+    const grid = document.getElementById('upgrades-grid');
+    grid.innerHTML = '';
+    upgrades.forEach((u) => {
+        if (gameData.boughtUpgrades.includes(u.id)) return;
+
+        let isVisible = false;
+        if (u.type === "miner_boost") {
+            // Show boost if you own the miner
+            if ((gameData.ownedMiners[u.target] || 0) > 0) isVisible = true;
+        } else if (gameData.bitcoin >= u.cost * 0.2) {
+            // Show global upgrades if you have 20% of the cost
+            isVisible = true;
+        }
+
+        if (isVisible) {
+            const canAfford = gameData.bitcoin >= u.cost;
             const div = document.createElement('div');
-            div.className = `item ${!canAfford ? 'locked' : ''}`;
-            div.innerHTML = `
-                <div class="item-icon">${m.emoji}</div>
-                <div class="item-details">
-                    <div class="item-name">${m.name}</div>
-                    <div class="item-cost ${canAfford ? 'can-afford' : 'cannot-afford'}">${formatNum(cost)} BTC</div>
-                </div>
-                <div class="item-owned">${owned}</div>`;
-            div.onmousemove = (e) => showTooltip(e, `<div style="color:#ffd700">${m.name}</div><div>Gives ${formatNum(m.production)} BTC/s</div>`);
+            div.className = 'upgrade-item';
+            div.innerHTML = u.icon;
+            div.style.opacity = canAfford ? '1' : '0.4';
+            
+            div.onmousemove = (e) => showTooltip(e, `
+                <div style="color:#ffd700">${u.name}</div>
+                <div style="color:${canAfford ? '#00ff9d' : '#ff4d4d'}">Cost: ${formatNum(u.cost)} BTC</div>
+                <div style="font-size:0.7em; margin-top:5px;">${u.desc || `Boosts ${u.type} by ${u.boost}x`}</div>
+            `);
             div.onmouseleave = hideTooltip;
+            
             div.onclick = () => { 
-                if (gameData.bitcoin >= cost) { 
-                    gameData.bitcoin -= cost; 
-                    gameData.ownedMiners[m.id] = owned + 1; 
+                if (canAfford) { 
+                    gameData.bitcoin -= u.cost; 
+                    gameData.boughtUpgrades.push(u.id); 
+                    if (u.type === 'click') gameData.clickValue *= u.boost; 
+                    if (u.type === 'bps') gameData.bpsMultiplier *= u.boost; 
+                    if (u.id === 'offline') gameData.isOfflineEnabled = true; 
+                    hideTooltip(); 
                     updateDisplay(); 
                     saveGame(); 
                 } 
             };
-            list.appendChild(div);
-        });
-    }
-
-    function renderUpgrades() {
-        const grid = document.getElementById('upgrades-grid');
-        grid.innerHTML = '';
-        upgrades.forEach((u) => {
-            if (gameData.boughtUpgrades.includes(u.id)) return;
-            if (gameData.bitcoin >= u.cost * 0.2) {
-                const canAfford = gameData.bitcoin >= u.cost;
-                const div = document.createElement('div');
-                div.className = 'upgrade-item';
-                div.innerHTML = u.icon;
-                div.style.opacity = canAfford ? '1' : '0.4';
-                div.onmousemove = (e) => showTooltip(e, `<div style="color:#ffd700">${u.name}</div><div style="color:${canAfford ? '#00ff9d' : '#ff4d4d'}">Cost: ${formatNum(u.cost)} BTC</div><div style="font-size:0.7em; margin-top:5px;">${u.desc || `Boosts ${u.type === 'click' ? 'Click' : 'BPS'} by ${u.boost}x`}</div>`);
-                div.onmouseleave = hideTooltip;
-                div.onclick = () => { if (canAfford) { gameData.bitcoin -= u.cost; gameData.boughtUpgrades.push(u.id); if (u.type === 'click') gameData.clickValue *= u.boost; if (u.type === 'bps') gameData.bpsMultiplier *= u.boost; if (u.id === 'offline') gameData.isOfflineEnabled = true; hideTooltip(); updateDisplay(); saveGame(); } };
-                grid.appendChild(div);
-            }
-        });
-    }
-
+            grid.appendChild(div);
+        }
+    });
+}
     document.getElementById('bitcoin').onclick = (e) => {
         let val = gameData.clickValue;
         if (gameData.boughtUpgrades.includes("n20")) val *= 10;
