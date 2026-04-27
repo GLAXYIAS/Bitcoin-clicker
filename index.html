@@ -220,17 +220,23 @@ for (let i = 0; i < 100; i++) {
         if (count > 0) {
             let minerMult = 1;
             
-            // Search the hard-coded array for upgrades that match this miner
+            // Filter only the upgrades you have already bought
             gameData.boughtUpgrades.forEach(uId => {
-                const upgrade = upgrades.find(up => up.id === uId);
-                if (upgrade && upgrade.type === "miner_boost" && upgrade.target === m.id) {
-                    minerMult *= upgrade.boost;
+                // We only care about IDs that start with "m_b" (miner boosts)
+                if (uId.startsWith("m_b")) {
+                    const upgrade = upgrades.find(up => up.id === uId);
+                    if (upgrade && upgrade.target === m.id) {
+                        minerMult *= upgrade.boost;
+                    }
                 }
             });
 
             totalBPS += (count * m.production * minerMult);
         }
     });
+
+    return totalBPS * gameData.bpsMultiplier * (gameData.boughtUpgrades.includes("n20") ? 2 : 1);
+}
 
     return totalBPS * gameData.bpsMultiplier * (gameData.boughtUpgrades.includes("n20") ? 2 : 1);
 }
