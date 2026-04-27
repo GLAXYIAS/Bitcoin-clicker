@@ -302,54 +302,57 @@ for (let i = 0; i < 100; i++) {
     });
 }
 
-    function renderUpgrades() {
-    const grid = document.getElementById('upgrades-grid');
-    grid.innerHTML = '';
-    upgrades.forEach((u) => {
-        if (gameData.boughtUpgrades.includes(u.id)) return;
+   function renderUpgrades() {
+        const grid = document.getElementById('upgrades-grid');
+        grid.innerHTML = '';
+        upgrades.forEach((u) => {
+            if (gameData.boughtUpgrades.includes(u.id)) return;
 
-        let isVisible = false;
-        if (u.type === "miner_boost") {
-    // Replace the old ownedMiners > 0 logic with this:
-    const ownedCount = gameData.ownedMiners[u.target] || 0;
-    const tier = u.id.split('_')[2]; // Checks if it's tier 1 or 2
-    if (tier === "1" && ownedCount >= 10) isVisible = true;
-    else if (tier === "2" && ownedCount >= 25) isVisible = true;
+            let isVisible = false;
+            
+            if (u.type === "miner_boost") {
+                const ownedCount = gameData.ownedMiners[u.target] || 0;
+                const tier = u.id.split('_')[2]; 
+                if (tier === "1" && ownedCount >= 10) isVisible = true;
+                else if (tier === "2" && ownedCount >= 25) isVisible = true;
             } else {
-}            
-        // Show global upgrades if you have 20% of the cost
-            isVisible = true; 
+                // This handles your regular upgrades like Pro Mouse or Golden Click
+                // They show up if you have at least 20% of the cost
+                if (gameData.bitcoin >= u.cost * 0.2 || gameData.totalMined >= u.cost) {
+                    isVisible = true;
+                }
+            }
 
-        if (isVisible) {
-            const canAfford = gameData.bitcoin >= u.cost;
-            const div = document.createElement('div');
-            div.className = 'upgrade-item';
-            div.innerHTML = u.icon;
-            div.style.opacity = canAfford ? '1' : '0.4';
-            
-            div.onmousemove = (e) => showTooltip(e, `
-                <div style="color:#ffd700">${u.name}</div>
-                <div style="color:${canAfford ? '#00ff9d' : '#ff4d4d'}">Cost: ${formatNum(u.cost)} BTC</div>
-                <div style="font-size:0.7em; margin-top:5px;">${u.desc || `Boosts ${u.type} by ${u.boost}x`}</div>
-            `);
-            div.onmouseleave = hideTooltip;
-            
-            div.onclick = () => { 
-                if (canAfford) { 
-                    gameData.bitcoin -= u.cost; 
-                    gameData.boughtUpgrades.push(u.id); 
-                    if (u.type === 'click') gameData.clickValue *= u.boost; 
-                    if (u.type === 'bps') gameData.bpsMultiplier *= u.boost; 
-                    if (u.id === 'offline') gameData.isOfflineEnabled = true; 
-                    hideTooltip(); 
-                    updateDisplay(); 
-                    saveGame(); 
-                } 
-            };
-            grid.appendChild(div);
-        }
-    });
-}
+            if (isVisible) {
+                const canAfford = gameData.bitcoin >= u.cost;
+                const div = document.createElement('div');
+                div.className = 'upgrade-item';
+                div.innerHTML = u.icon;
+                div.style.opacity = canAfford ? '1' : '0.4';
+                
+                div.onmousemove = (e) => showTooltip(e, `
+                    <div style="color:#ffd700">${u.name}</div>
+                    <div style="color:${canAfford ? '#00ff9d' : '#ff4d4d'}">Cost: ${formatNum(u.cost)} BTC</div>
+                    <div style="font-size:0.7em; margin-top:5px;">${u.desc || `Boosts ${u.type} by ${u.boost}x`}</div>
+                `);
+                div.onmouseleave = hideTooltip;
+                
+                div.onclick = () => { 
+                    if (canAfford) { 
+                        gameData.bitcoin -= u.cost; 
+                        gameData.boughtUpgrades.push(u.id); 
+                        if (u.type === 'click') gameData.clickValue *= u.boost; 
+                        if (u.type === 'bps') gameData.bpsMultiplier *= u.boost; 
+                        if (u.id === 'offline') gameData.isOfflineEnabled = true; 
+                        hideTooltip(); 
+                        updateDisplay(); 
+                        saveGame(); 
+                    } 
+                };
+                grid.appendChild(div);
+            }
+        });
+    }
     function toggleStats(show) {
         document.getElementById('stats-modal').style.display = show ? 'block' : 'none';
         document.getElementById('modal-bg').style.display = show ? 'block' : 'none';
