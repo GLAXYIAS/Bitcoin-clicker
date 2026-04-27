@@ -197,6 +197,25 @@ for (let i = 0; i < 100; i++) {
     { id: "n18", name: "Multiverse Hub", cost: 250000000000000000, icon: "🌀", type: "bps", boost: 1.5 },
     { id: "n19", name: "Infinite Loop", cost: 1000000000000000000, icon: "♾️", type: "click", boost: 1.2 },
     { id: "n20", name: "The Singularity", cost: 1e21, icon: "🌌", type: "special", boost: 2, desc: "Final Upgrade: 2x EVERYTHING!" }
+       // --- Miner 1: Potato Circuit -> Rebranded: "Entry-Level Logic Board" ---
+{ id: "m_b1_1", name: "Starch-Based Polymers", cost: 1500, icon: "🧬", type: "miner_boost", target: "miner_1", boost: 2, desc: "Logic Boards: New polymer coatings reduce resistance, doubling hash output." },
+{ id: "m_b1_2", name: "Parallel Processing", cost: 12000, icon: "🔳", type: "miner_boost", target: "miner_1", boost: 3, desc: "Logic Boards: Instruction pipelining enables 3x computational density." },
+
+// --- Miner 2: Calculated Abacus -> Rebranded: "Manual Logic Array" ---
+{ id: "m_b2_1", name: "Low-Friction Bearings", cost: 8000, icon: "⚙️", type: "miner_boost", target: "miner_2", boost: 2, desc: "Logic Arrays: Mechanical throughput increased by 100% via kinetic optimization." },
+{ id: "m_b2_2", name: "Quadratic Algorithms", cost: 50000, icon: "📈", type: "miner_boost", target: "miner_2", boost: 3, desc: "Logic Arrays: Advanced mathematical frameworks triple calculation speed." },
+
+// --- Miner 3: Rust-Bucket PC -> Rebranded: "Legacy Workstation" ---
+{ id: "m_b3_1", name: "Component Refurbishment", cost: 45000, icon: "🛠️", type: "miner_boost", target: "miner_3", boost: 2, desc: "Legacy Workstations: Restoring vintage capacitors doubles operational stability." },
+{ id: "m_b3_2", name: "Heatsink Overhaul", cost: 200000, icon: "🌬️", type: "miner_boost", target: "miner_3", boost: 3, desc: "Legacy Workstations: Passive cooling upgrades allow for 3x safer clock-speeds." },
+
+// --- Miner 4: Budget Laptop -> Rebranded: "Mobile Mining Node" ---
+{ id: "m_b4_1", name: "Battery Bypass", cost: 180000, icon: "🔌", type: "miner_boost", target: "miner_4", boost: 2, desc: "Mobile Nodes: Direct AC power conversion doubles energy efficiency." },
+{ id: "m_b4_2", name: "Undervolting Profile", cost: 950000, icon: "📉", type: "miner_boost", target: "miner_4", boost: 3, desc: "Mobile Nodes: Precise voltage control triples the performance-per-watt ratio." },
+
+// --- Miner 5: Office Desktop -> Rebranded: "Corporate Terminal" ---
+{ id: "m_b5_1", name: "Background Threading", cost: 1.2e6, icon: "🧵", type: "miner_boost", target: "miner_5", boost: 2, desc: "Corporate Terminals: Utilizing idle CPU cycles doubles mining background priority." },
+{ id: "m_b5_2", name: "Bloatware Removal", cost: 6e6, icon: "🧹", type: "miner_boost", target: "miner_5", boost: 3, desc: "Corporate Terminals: Stripped-down OS architecture triples available hash power." },
 ];
 
     // --- LOGIC ---
@@ -234,9 +253,6 @@ for (let i = 0; i < 100; i++) {
             totalBPS += (count * m.production * minerMult);
         }
     });
-
-    return totalBPS * gameData.bpsMultiplier * (gameData.boughtUpgrades.includes("n20") ? 2 : 1);
-}
 
     return totalBPS * gameData.bpsMultiplier * (gameData.boughtUpgrades.includes("n20") ? 2 : 1);
 }
@@ -294,12 +310,15 @@ for (let i = 0; i < 100; i++) {
 
         let isVisible = false;
         if (u.type === "miner_boost") {
-            // Show boost if you own the miner
-            if ((gameData.ownedMiners[u.target] || 0) > 0) isVisible = true;
-        } else if (gameData.bitcoin >= u.cost * 0.2) {
-            // Show global upgrades if you have 20% of the cost
-            isVisible = true;
-        }
+    // Replace the old ownedMiners > 0 logic with this:
+    const ownedCount = gameData.ownedMiners[u.target] || 0;
+    const tier = u.id.split('_')[2]; // Checks if it's tier 1 or 2
+    if (tier === "1" && ownedCount >= 10) isVisible = true;
+    else if (tier === "2" && ownedCount >= 25) isVisible = true;
+            } else {
+}            
+        // Show global upgrades if you have 20% of the cost
+            isVisible = true; 
 
         if (isVisible) {
             const canAfford = gameData.bitcoin >= u.cost;
@@ -331,7 +350,17 @@ for (let i = 0; i < 100; i++) {
         }
     });
 }
-    document.getElementById('bitcoin').onclick = (e) => {
+    function toggleStats(show) {
+        document.getElementById('stats-modal').style.display = show ? 'block' : 'none';
+        document.getElementById('modal-bg').style.display = show ? 'block' : 'none';
+        if(show) {
+            document.getElementById('stat-current').innerText = formatNum(gameData.bitcoin);
+            document.getElementById('stat-total').innerText = formatNum(gameData.totalMined);
+            document.getElementById('stat-clicks').innerText = gameData.totalClicks.toLocaleString();
+            document.getElementById('stat-bps-modal').innerText = formatNum(calculateCurrentBPS());
+        }
+    }
+document.getElementById('bitcoin').onclick = (e) => {
         let val = gameData.clickValue;
         if (gameData.boughtUpgrades.includes("n20")) val *= 10;
         gameData.bitcoin += val;
@@ -345,18 +374,6 @@ for (let i = 0; i < 100; i++) {
         document.body.appendChild(fly);
         setTimeout(() => fly.remove(), 800);
     };
-
-    function toggleStats(show) {
-        document.getElementById('stats-modal').style.display = show ? 'block' : 'none';
-        document.getElementById('modal-bg').style.display = show ? 'block' : 'none';
-        if(show) {
-            document.getElementById('stat-current').innerText = formatNum(gameData.bitcoin);
-            document.getElementById('stat-total').innerText = formatNum(gameData.totalMined);
-            document.getElementById('stat-clicks').innerText = gameData.totalClicks.toLocaleString();
-            document.getElementById('stat-bps-modal').innerText = formatNum(calculateCurrentBPS());
-        }
-    }
-
     function saveGame() { gameData.lastSaveTime = Date.now(); localStorage.setItem('btcClickerSave', JSON.stringify(gameData)); }
     function loadGame() {
         const saved = localStorage.getItem('btcClickerSave');
