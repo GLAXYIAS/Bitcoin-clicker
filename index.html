@@ -266,8 +266,7 @@ for (let i = 0; i < 100; i++) {
         const bps = calculateCurrentBPS();
         document.getElementById('balance').innerText = formatNum(gameData.bitcoin);
         document.getElementById('bps').innerText = formatNum(bps);
-        renderMiners();
-        renderUpgrades();
+        // We removed renderMiners and renderUpgrades from here
     }
 
     function renderMiners() {
@@ -369,7 +368,10 @@ document.getElementById('bitcoin').onclick = (e) => {
         gameData.bitcoin += val;
         gameData.totalMined += val;
         gameData.totalClicks++;
-        updateDisplay();
+        
+        // Update ONLY the balance text immediately
+        document.getElementById('balance').innerText = formatNum(gameData.bitcoin);
+        
         const fly = document.createElement('div');
         fly.className = 'floating-text';
         fly.innerText = `+${formatNum(val)}`;
@@ -404,10 +406,26 @@ document.getElementById('bitcoin').onclick = (e) => {
     }
 
     let currentNewsIndex = 0;
-    setInterval(() => { let bps = calculateCurrentBPS(); gameData.bitcoin += bps; gameData.totalMined += bps; updateDisplay(); }, 1000);
-    setInterval(saveGame, 30000); setInterval(updateNews, 20000);
-    document.addEventListener('contextmenu', event => event.preventDefault());
-    loadGame(); updateNews();
+
+// 1. FAST INTERVAL: Only updates numbers (Smooth & Fast)
+setInterval(() => { 
+    let bps = calculateCurrentBPS(); 
+    gameData.bitcoin += bps; 
+    gameData.totalMined += bps; 
+    
+    // Update the numbers on screen
+    document.getElementById('balance').innerText = formatNum(gameData.bitcoin);
+    document.getElementById('bps').innerText = formatNum(bps);
+}, 1000);
+
+// 2. SLOW INTERVAL: Only refreshes the store buttons (Prevents Freezing)
+setInterval(() => {
+    renderMiners();
+    renderUpgrades();
+}, 2000); // Every 2 seconds is plenty
+
+setInterval(saveGame, 30000); 
+setInterval(updateNews, 20000);
 </script>
 </body>
 </html>
