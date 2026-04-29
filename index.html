@@ -221,208 +221,132 @@ for (let i = 0; i < 100; i++) {
     // --- LOGIC ---
 
     function formatNum(n) {
-        if (n < 1000) return Math.floor(n).toString();
-        const tier = Math.floor(Math.log10(n) / 3);
-        if (tier <= 0) return Math.floor(n).toString();
-        if (tier >= suffixes.length) return n.toExponential(2);
-        const suffix = suffixes[tier];
-        const scale = Math.pow(10, tier * 3);
-        const scaled = n / scale;
-        return scaled.toFixed(2) + suffix;
-    }
+    if (n < 1000) return Math.floor(n).toString();
+    const tier = Math.floor(Math.log10(n) / 3);
+    if (tier >= suffixes.length) return n.toExponential(2);
+    const suffix = suffixes[tier];
+    const scale = Math.pow(10, tier * 3);
+    return (n / scale).toFixed(2) + suffix;
+}
 
-    function calculateCurrentBPS() {
+function calculateCurrentBPS() {
     let totalBPS = 0;
-
     miners.forEach(m => {
         let count = gameData.ownedMiners[m.id] || 0;
         if (count > 0) {
             let minerMult = 1;
-            
-            // Filter only the upgrades you have already bought
             gameData.boughtUpgrades.forEach(uId => {
-                // We only care about IDs that start with "m_b" (miner boosts)
-                if (uId.startsWith("m_b")) {
-                    const upgrade = upgrades.find(up => up.id === uId);
-                    if (upgrade && upgrade.target === m.id) {
-                        minerMult *= upgrade.boost;
-                    }
+                const upgrade = upgrades.find(up => up.id === uId);
+                if (upgrade && upgrade.type === "miner_boost" && upgrade.target === m.id) {
+                    minerMult *= upgrade.boost;
                 }
             });
-
             totalBPS += (count * m.production * minerMult);
         }
     });
-
     return totalBPS * gameData.bpsMultiplier * (gameData.boughtUpgrades.includes("n20") ? 2 : 1);
 }
-    function getMinerCost(miner) {
+
+function getMinerCost(miner) {
     const owned = gameData.ownedMiners[miner.id] || 0;
-    // 1.28x increase means the price doubles roughly every 2.8 units bought
     return Math.floor(miner.baseCost * Math.pow(1.28, owned));
 }
 
-    function updateDisplay() {
-        const bps = calculateCurrentBPS();
-        document.getElementById('balance').innerText = formatNum(gameData.bitcoin);
-        document.getElementById('bps').innerText = formatNum(bps);
-        // We removed renderMiners and renderUpgrades from here
-    }
-
-    function renderMiners() {
+function renderMiners() {
     const list = document.getElementById('miners-list');
+    if (!list) return;
     list.innerHTML = '';
     miners.forEach((m) => {
         const cost = getMinerCost(m);
         const owned = gameData.ownedMiners[m.id] || 0;
         const canAfford = gameData.bitcoin >= cost;
-        const div = document.createElement('div');
-        div.className = `item ${!canAfford ? 'locked' : ''}`;
-        div.innerHTML = `
-            <div class="item-icon">${m.emoji}</div>
-            <div class="item-details">
-                <div class="item-name">${m.name}</div>
-                <div class="item-cost ${canAfford ? 'can-afford' : 'cannot-afford'}">${formatNum(cost)} BTC</div>
-            </div>
-            <div class="item-owned">${owned}</div>`;
         
-        div.onmousemove = (e) => showTooltip(e, `<div style="color:#ffd700">${m.name}</div><div>Gives ${formatNum(m.production)} BTC/s</div>`);
-        div.onmouseleave = hideTooltip;
-        
-        div.onclick = () => { 
-            if (canAfford) { 
-                gameData.bitcoin -= cost; 
-                gameData.ownedMiners[m.id] = (gameData.ownedMiners[m.id] || 0) + 1; 
-                updateDisplay(); 
-                saveGame(); 
-            } 
-        };
-        list.appendChild(div);
+        // Show miners if you can afford them OR if you already own some
+        if (gameData.bitcoin >= m.baseCost * 0.8 || owned > 0) {
+            const div = document.createElement('div');
+            div.className = `item ${!canAfford ? 'locked' : ''}`;
+            div.innerHTML = `
+                <div class="item-icon">${m.emoji}</div>
+                <div class="item-details">
+                    <div class="item-name">${m.name}</div>
+                    <div class="item-cost ${canAfford ? 'can-afford' : 'cannot-afford'}">${formatNum(cost)} BTC</div>
+                </div>
+                <div class="item-owned">${owned}</div>`;
+            
+            div.onclick = () => {
+                if (gameData.bitcoin >= cost) {
+                    gameData.bitcoin -= cost;
+                    gameData.ownedMiners[m.id] = (gameData.ownedMiners[m.id] || 0) + 1;
+                    renderMiners();
+                    updateDisplay();
+                }
+            };
+            list.appendChild(div);
+        }
     });
 }
 
-   function renderUpgrades() {
-        const grid = document.getElementById('upgrades-grid');
-        grid.innerHTML = '';
-        upgrades.forEach((u) => {
-            if (gameData.boughtUpgrades.includes(u.id)) return;
-
-            let isVisible = false;
-            
-            if (u.type === "miner_boost") {
-                const ownedCount = gameData.ownedMiners[u.target] || 0;
-                const tier = u.id.split('_')[2]; 
-                if (tier === "1" && ownedCount >= 10) isVisible = true;
-                else if (tier === "2" && ownedCount >= 25) isVisible = true;
-            } else {
-                // This handles your regular upgrades like Pro Mouse or Golden Click
-                // They show up if you have at least 20% of the cost
-                if (gameData.bitcoin >= u.cost * 0.2 || gameData.totalMined >= u.cost) {
-                    isVisible = true;
-                }
-            }
-
-            if (isVisible) {
-                const canAfford = gameData.bitcoin >= u.cost;
-                const div = document.createElement('div');
-                div.className = 'upgrade-item';
-                div.innerHTML = u.icon;
-                div.style.opacity = canAfford ? '1' : '0.4';
-                
-                div.onmousemove = (e) => showTooltip(e, `
-                    <div style="color:#ffd700">${u.name}</div>
-                    <div style="color:${canAfford ? '#00ff9d' : '#ff4d4d'}">Cost: ${formatNum(u.cost)} BTC</div>
-                    <div style="font-size:0.7em; margin-top:5px;">${u.desc || `Boosts ${u.type} by ${u.boost}x`}</div>
-                `);
-                div.onmouseleave = hideTooltip;
-                
-                div.onclick = () => { 
-                    if (canAfford) { 
-                        gameData.bitcoin -= u.cost; 
-                        gameData.boughtUpgrades.push(u.id); 
-                        if (u.type === 'click') gameData.clickValue *= u.boost; 
-                        if (u.type === 'bps') gameData.bpsMultiplier *= u.boost; 
-                        if (u.id === 'offline') gameData.isOfflineEnabled = true; 
-                        hideTooltip(); 
-                        updateDisplay(); 
-                        saveGame(); 
-                    } 
-                };
-                grid.appendChild(div);
-            }
-        });
-    }
-    function toggleStats(show) {
-        document.getElementById('stats-modal').style.display = show ? 'block' : 'none';
-        document.getElementById('modal-bg').style.display = show ? 'block' : 'none';
-        if(show) {
-            document.getElementById('stat-current').innerText = formatNum(gameData.bitcoin);
-            document.getElementById('stat-total').innerText = formatNum(gameData.totalMined);
-            document.getElementById('stat-clicks').innerText = gameData.totalClicks.toLocaleString();
-            document.getElementById('stat-bps-modal').innerText = formatNum(calculateCurrentBPS());
-        }
-    }
-document.getElementById('bitcoin').onclick = (e) => {
-        let val = gameData.clickValue;
-        if (gameData.boughtUpgrades.includes("n20")) val *= 10;
-        gameData.bitcoin += val;
-        gameData.totalMined += val;
-        gameData.totalClicks++;
+function renderUpgrades() {
+    const grid = document.getElementById('upgrades-grid');
+    grid.innerHTML = '';
+    upgrades.forEach((u) => {
+        if (gameData.boughtUpgrades.includes(u.id)) return;
         
-        // Update ONLY the balance text immediately
-        document.getElementById('balance').innerText = formatNum(gameData.bitcoin);
-        
-        const fly = document.createElement('div');
-        fly.className = 'floating-text';
-        fly.innerText = `+${formatNum(val)}`;
-        fly.style.left = e.clientX + 'px'; fly.style.top = e.clientY + 'px';
-        document.body.appendChild(fly);
-        setTimeout(() => fly.remove(), 800);
-    };
-    function saveGame() { gameData.lastSaveTime = Date.now(); localStorage.setItem('btcClickerSave', JSON.stringify(gameData)); }
-    function loadGame() {
-        const saved = localStorage.getItem('btcClickerSave');
-        if (saved) {
-            gameData = Object.assign({}, gameData, JSON.parse(saved));
-            if (gameData.isOfflineEnabled) {
-                const away = Math.floor((Date.now() - gameData.lastSaveTime) / 1000);
-                if (away > 5) {
-                    const earned = (calculateCurrentBPS() * 0.5) * away;
-                    gameData.bitcoin += earned; gameData.totalMined += earned;
-                    alert(`Away for ${away}s, mined ${formatNum(earned)} BTC!`);
+        let isVisible = (gameData.bitcoin >= u.cost * 0.5); 
+        if (isVisible) {
+            const div = document.createElement('div');
+            div.className = 'upgrade-item';
+            div.innerHTML = u.icon;
+            div.onclick = () => {
+                if (gameData.bitcoin >= u.cost) {
+                    gameData.bitcoin -= u.cost;
+                    gameData.boughtUpgrades.push(u.id);
+                    if (u.type === 'click') gameData.clickValue *= u.boost;
+                    if (u.type === 'bps') gameData.bpsMultiplier *= u.boost;
+                    renderUpgrades();
+                    updateDisplay();
                 }
-            }
+            };
+            grid.appendChild(div);
         }
-        updateDisplay();
-    }
-    function resetGame() { if(confirm("Reset everything?")) { localStorage.removeItem('btcClickerSave'); location.reload(); } }
-    function showTooltip(e, content) { const t = document.getElementById('tooltip'); t.style.display = 'block'; t.style.left = (e.pageX + 15) + 'px'; t.style.top = (e.pageY + 15) + 'px'; t.innerHTML = content; }
-    function hideTooltip() { document.getElementById('tooltip').style.display = 'none'; }
-    function updateNews() {
-        const news = document.getElementById('news-text');
-        news.innerText = newsMessages[currentNewsIndex];
-        currentNewsIndex = (currentNewsIndex + 1) % newsMessages.length;
-        news.style.animation = 'none'; news.offsetHeight; news.style.animation = 'ticker 20s linear infinite';
-    }
+    });
+}
 
-    let currentNewsIndex = 0;
-
-// 1. FAST INTERVAL: Only updates numbers (Smooth & Fast)
-setInterval(() => { 
-    let bps = calculateCurrentBPS(); 
-    gameData.bitcoin += bps; 
-    gameData.totalMined += bps; 
-    
-    // Update the numbers on screen
+function updateDisplay() {
     document.getElementById('balance').innerText = formatNum(gameData.bitcoin);
-    document.getElementById('bps').innerText = formatNum(bps);
+    document.getElementById('bps').innerText = formatNum(calculateCurrentBPS());
+}
+
+// Click Event
+document.getElementById('bitcoin').onclick = (e) => {
+    let val = gameData.clickValue;
+    gameData.bitcoin += val;
+    gameData.totalMined += val;
+    updateDisplay();
+};
+
+function loadGame() {
+    const saved = localStorage.getItem('btcClickerSave');
+    if (saved) gameData = Object.assign({}, gameData, JSON.parse(saved));
+    updateDisplay();
+}
+
+// INITIALIZE
+loadGame();
+renderMiners();
+renderUpgrades();
+
+// LOOPS
+setInterval(() => {
+    let bps = calculateCurrentBPS();
+    gameData.bitcoin += bps;
+    updateDisplay();
 }, 1000);
 
-// 2. SLOW INTERVAL: Only refreshes the store buttons (Prevents Freezing)
 setInterval(() => {
     renderMiners();
     renderUpgrades();
-}, 2000); // Every 2 seconds is plenty
+}, 2000);
 
 setInterval(saveGame, 30000); 
 setInterval(updateNews, 20000);
