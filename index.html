@@ -10,21 +10,20 @@
         
         body {
             margin: 0; padding: 0;
-            background: linear-gradient(#0a0a0a, #121225);
+            background: linear-gradient(#14141c, #2a2a45); /* Brighter, high-contrast matrix backdrop */
             color: #00ff9d;
             font-family: 'Press Start 2P', cursive;
             overflow: hidden;
             height: 100vh;
         }
 
-        /* Repositioned & Cleaned Stats Modal */
         #stats-modal {
             display: none;
             position: fixed;
             top: 25%; left: 50%;
             transform: translate(-50%, -20%);
-            background: #11111a;
-            border: 4px solid #b58900;
+            background: #1f1f2e;
+            border: 4px solid #ffd700;
             padding: 25px;
             z-index: 2000;
             width: 460px;
@@ -35,69 +34,74 @@
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.75);
+            background: rgba(0,0,0,0.6);
             z-index: 1999;
         }
-        .stats-line { margin: 12px 0; font-size: 0.6em; color: #ddd; }
+        .stats-line { margin: 12px 0; font-size: 0.6em; color: #fff; }
         .stats-val { color: #00ff9d; float: right; font-family: monospace; }
         .modal-btns { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; }
         .modal-btns button { padding: 10px; font-family: inherit; font-size: 0.55em; cursor: pointer; border: 2px solid #333; color: #000; font-weight: bold; }
 
         .game-container { display: flex; height: 100vh; width: 100vw; }
-        .left-panel { flex: 0 0 35%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; background: rgba(0,0,0,0.3); }
-        .center-panel { flex: 1; border-left: 4px solid #222; border-right: 4px solid #222; display: flex; flex-direction: column; background: rgba(0,0,0,0.5); }
-        .right-panel { flex: 0 0 450px; background: #09090d; display: flex; flex-direction: column; height: 100%; }
+        .left-panel { flex: 0 0 35%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; background: rgba(255,255,255,0.05); }
+        .center-panel { flex: 1; border-left: 4px solid #444; border-right: 4px solid #444; display: flex; flex-direction: column; background: rgba(0,0,0,0.3); }
+        .right-panel { flex: 0 0 450px; background: #1a1a26; display: flex; flex-direction: column; height: 100%; }
 
-        h1 { color: #b58900; font-size: 0.85em; margin-bottom: 30px; text-shadow: 0 0 6px rgba(181, 137, 0, 0.4); text-transform: uppercase; line-height: 1.4; }
+        h1 { color: #ffd700; font-size: 0.85em; margin-bottom: 30px; text-shadow: 0 0 6px rgba(255, 215, 0, 0.6); text-transform: uppercase; line-height: 1.4; cursor: pointer; border-bottom: 2px dashed rgba(255,215,0,0.3); padding-bottom: 4px; }
+        h1:hover { color: #ffffff; border-color: #ffffff; }
+
         #bitcoin { width: 250px; height: 250px; cursor: pointer; transition: transform 0.05s; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
         #bitcoin:active { transform: scale(0.94); }
-        #bitcoin img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 0 20px rgba(242, 169, 0, 0.5)); }
+        #bitcoin img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 0 25px rgba(242, 169, 0, 0.7)); }
 
-        .store-header { background: #000; padding: 20px; text-align: center; color: #b58900; border-bottom: 4px solid #222; font-size: 0.75em; letter-spacing: 1px; }
-        #upgrades-section { padding: 12px; min-height: 90px; border-bottom: 4px solid #222; background: rgba(0, 0, 0, 0.3); }
+        .store-header { background: #0c0c12; padding: 20px; text-align: center; color: #ffd700; border-bottom: 4px solid #444; font-size: 0.75em; letter-spacing: 1px; }
+        #upgrades-section { padding: 12px; min-height: 90px; border-bottom: 4px solid #444; background: rgba(255, 255, 255, 0.05); }
         .upgrade-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
-        .upgrade-item { aspect-ratio: 1/1; background: #111; border: 2px solid #444; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 6px; }
-        .upgrade-item:hover { border-color: #b58900; background: #151515; }
-        .upgrade-item svg { width: 22px; height: 22px; fill: #b58900; }
+        .upgrade-item { aspect-ratio: 1/1; background: #252538; border: 2px solid #666; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 6px; position: relative; }
+        .upgrade-item:hover { border-color: #ffd700; background: #32324d; }
+        .upgrade-item svg { width: 22px; height: 22px; fill: #ffd700; }
+        .upgrade-level { position: absolute; bottom: 2px; right: 2px; font-size: 0.35em; color: #00ff9d; font-family: monospace; }
         
         #miners-section { flex: 1; overflow-y: auto; padding: 12px; }
-        .item { display: flex; background: #0c0c0f; border: 2px solid #222; margin-bottom: 8px; padding: 12px; cursor: pointer; align-items: center; }
-        .item:not(.locked):hover { background: #131317; border-color: #00ff9d; }
-        .item.locked { opacity: 0.25; cursor: not-allowed; border-color: #252525; }
+        .item { display: flex; background: #222230; border: 2px solid #444; margin-bottom: 8px; padding: 14px; cursor: pointer; align-items: center; }
+        .item:not(.locked):hover { background: #2d2d42; border-color: #00ff9d; }
+        .item.locked { opacity: 0.35; cursor: not-allowed; border-color: #333; }
         .item-icon-frame { width: 32px; height: 32px; margin-right: 15px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .item-icon-frame svg { width: 100%; height: 100%; fill: #666; }
+        .item-icon-frame svg { width: 100%; height: 100%; fill: #888; }
         .item:not(.locked) .item-icon-frame svg { fill: #00ff9d; }
         .item-details { flex: 1; overflow: hidden; }
-        .item-name { font-size: 0.5em; color: #b58900; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .item-cost { font-size: 0.45em; font-family: monospace; }
-        .item-cost.can-afford { color: #00ff9d; }
-        .item-cost.cannot-afford { color: #ff4d4d; }
-        .item-owned { font-size: 0.8em; color: #444; font-family: monospace; margin-left: 10px; font-weight: bold; }
-        .item:not(.locked) .item-owned { color: #666; }
+        .item-name { font-size: 0.5em; color: #ffd700; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        /* Greatly Increased Scale & Visibility for Miner Costs */
+        .item-cost { font-size: 0.65em; font-family: monospace; font-weight: bold; letter-spacing: 0.5px; }
+        .item-cost.can-afford { color: #00ff9d; text-shadow: 0 0 2px rgba(0,255,157,0.3); }
+        .item-cost.cannot-afford { color: #ff6666; }
+        
+        .item-owned { font-size: 0.9em; color: #555577; font-family: monospace; margin-left: 10px; font-weight: bold; }
+        .item:not(.locked) .item-owned { color: #8888ba; }
 
-        .floating-text { position: absolute; color: #f2a900; font-family: monospace; font-weight: bold; pointer-events: none; z-index: 1000; animation: floatUp 0.7s ease-out forwards; font-size: 0.75em; text-shadow: 0 0 4px #000; }
+        .floating-text { position: absolute; color: #ffd700; font-family: monospace; font-weight: bold; pointer-events: none; z-index: 1000; animation: floatUp 0.7s ease-out forwards; font-size: 0.75em; text-shadow: 0 0 4px #000; }
         @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-100px); } }
 
         .tooltip { 
-            position: absolute; display: none; background: #000; border: 2px solid #b58900; 
+            position: absolute; display: none; background: #111; border: 2px solid #ffd700; 
             padding: 10px; color: #fff; font-size: 0.45em; z-index: 3000; pointer-events: none;
             line-height: 1.5; max-width: 260px; box-shadow: 4px 4px 0px rgba(0,0,0,0.5);
         }
 
-        .news-ticker-container { width: 100%; height: 50px; background: #000; border-bottom: 4px solid #222; overflow: hidden; position: relative; display: flex; align-items: center; }
-        #news-text { white-space: nowrap; position: absolute; font-family: monospace; font-size: 0.7em; color: #ff4d4d; padding-left: 20px; }
+        .news-ticker-container { width: 100%; height: 50px; background: #0c0c12; border-bottom: 4px solid #444; overflow: hidden; position: relative; display: flex; align-items: center; }
+        #news-text { white-space: nowrap; position: absolute; font-family: monospace; font-size: 0.7em; color: #ff6666; padding-left: 20px; }
 
-        /* Integrated Center Panel Rebirth Module Placed Safely Out of the Way */
         .rebirth-center-box {
             margin: auto 20px 20px 20px;
             padding: 20px;
             border: 2px dashed #ff4d4d;
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(20, 20, 30, 0.7);
             text-align: center;
         }
         .rebirth-title { font-size: 0.55em; color: #ff4d4d; letter-spacing: 1px; margin-bottom: 6px; }
-        .rebirth-desc { font-size: 0.45em; color: #aaa; line-height: 1.5; margin-bottom: 12px; }
-        .rebirth-btn { width: 100%; max-width: 350px; background: #000; color: #ff4d4d; border: 2px solid #ff4d4d; font-family: inherit; font-size: 0.5em; padding: 12px; cursor: pointer; transition: 0.2s; }
+        .rebirth-desc { font-size: 0.45em; color: #ccc; line-height: 1.5; margin-bottom: 12px; }
+        .rebirth-btn { width: 100%; max-width: 380px; background: #000; color: #ff4d4d; border: 2px solid #ff4d4d; font-family: inherit; font-size: 0.5em; padding: 12px; cursor: pointer; transition: 0.2s; }
         .rebirth-btn:not(:disabled):hover { background: #ff4d4d; color: #000; }
         .rebirth-btn:disabled { opacity: 0.25; cursor: not-allowed; border-color: #444; color: #444; }
     </style>
@@ -106,16 +110,16 @@
 
 <div class="game-container">
     <div class="left-panel">
-        <h1 id="minery-title">BITCOIN'S MINERY</h1>
+        <h1 id="minery-title" onclick="editMineryName()">BITCOIN'S MINERY</h1>
         <div style="position: relative; width: 250px; height: 250px; margin: 0 auto;">
-            <button onclick="toggleStats(true)" style="position: absolute; top: -25px; left: -15px; z-index: 101; padding: 6px 12px; font-family: inherit; font-size: 0.45em; background: #000; color: #b58900; border: 2px solid #b58900; cursor: pointer;">[STATS]</button>
+            <button onclick="toggleStats(true)" style="position: absolute; top: -25px; left: -15px; z-index: 101; padding: 6px 12px; font-family: inherit; font-size: 0.45em; background: #111; color: #ffd700; border: 2px solid #ffd700; cursor: pointer;">[STATS]</button>
             <div id="bitcoin">
                 <img src="imgs/Bitcoin.png" alt="Bitcoin" onerror="this.src='https://via.placeholder.com/250x250/f2a900/111111?text=BTC';">
             </div>
         </div>
         <div style="margin-top: 35px; width: 100%;">
             <div style="font-size: 1.4em; font-family: monospace; letter-spacing: -0.5px; color: #ffffff; font-weight: bold;"><span id="balance">0.00</span> BTC</div>
-            <div style="font-size: 0.55em; margin-top: 15px; color: #b58900; font-family: monospace; letter-spacing: 0.5px;">PER SECOND: <span id="bps">0.00</span></div>
+            <div style="font-size: 0.55em; margin-top: 15px; color: #ffd700; font-family: monospace; letter-spacing: 0.5px;">PER SECOND: <span id="bps">0.00</span></div>
         </div>
     </div>
 
@@ -128,7 +132,11 @@
 
         <div class="rebirth-center-box">
             <div class="rebirth-title">QUANTUM REBIRTH MACHINE</div>
-            <div class="rebirth-desc">Requires: 1.00 Quintillion BTC<br>Current Multiplier Bonus: <span id="rebirth-mult" style="color: #00ff9d;">1.0</span>x</div>
+            <div class="rebirth-desc">
+                Requires: 1.00 Quintillion BTC<br>
+                Progress: <span id="rebirth-progress" style="color:#ffd700; font-weight:bold;">0.00%</span><br>
+                Current Bonus Multiplier: <span id="rebirth-mult" style="color: #00ff9d;">1.0</span>x
+            </div>
             <button id="rebirth-btn-action" class="rebirth-btn" disabled onclick="triggerRebirth()">RESET TIMELINE FOR 5X SPEED BOOST</button>
         </div>
     </div>
@@ -146,7 +154,7 @@
 
 <div id="modal-bg" class="modal-overlay" onclick="toggleStats(false)"></div>
 <div id="stats-modal">
-    <h2 style="color: #b58900; font-size: 0.65em; margin-bottom: 25px; text-align: center;">GAME STATS</h2>
+    <h2 style="color: #ffd700; font-size: 0.65em; margin-bottom: 25px; text-align: center;">GAME STATS</h2>
     <div class="stats-line">Bitcoins in Bank: <span class="stats-val" id="stat-current">0</span></div>
     <div class="stats-line">Total Bitcoins Ever Mined: <span class="stats-val" id="stat-total">0</span></div>
     <div class="stats-line">Total Times Clicked: <span class="stats-val" id="stat-clicks">0</span></div>
@@ -162,11 +170,6 @@
 <div id="tooltip" class="tooltip"></div>
 
 <script>
-    // Configurable Owner Designation Name
-    const ownerName = "Bitcoin"; // Change this word to change the header!
-    document.getElementById("minery-title").innerText = `${ownerName}'s Minery`;
-
-    // Sharp Material Vector Icons 
     const SVGS = {
         hardware: `<svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2zm-2-7H7v2h10V6zm2 12H5v-2h14v2zM21 2H3c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>`,
         network: `<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L12 15v5z"/></svg>`,
@@ -179,16 +182,17 @@
         bitcoin: 0,
         totalMined: 0,
         totalClicks: 0,
-        clickValue: 1,
+        clickValue: 0.5, // Changed base action to 0.5 BTC
+        baseClickMultiplier: 1,
         bpsMultiplier: 1,
         rebirths: 0,
+        mineryName: "Bitcoin's Minery",
         lastSaveTime: Date.now(),
         ownedMiners: {},
-        boughtUpgrades: []
+        upgradeLevels: {} // Tracks repeat counts for every custom upgrade purchased
     };
 
-    const REBIRTH_REQUIREMENT = 1e18; // 1 Quintillion BTC 
-
+    const REBIRTH_REQUIREMENT = 1e18; 
     const suffixes = ["", " K", " M", " B", " T", " Qd", " Qn", " Sx", " Sp", " Oc", " No", " Dc", " Un", " Du", " Tr", " Qt", " Qid"];
 
     const newsMessages = [
@@ -199,16 +203,11 @@
         'NETWORK STATUS: Block synchronization running optimally across all globally distributed operational systems.'
     ];
 
-    // Normalized hardware components list
     const minerNames = [
         "Resistive Logic Breadboard", "Low-Voltage Silicon Gate", "Refurbished Thin-Client Terminal", "Cascaded Copper Array", 
         "Synchronous Micro-Controller", "Dedicated Coprocessor Node", "Integrated Core Workstation", "High-Throughput Bus Array", 
         "Overclocked Logic Cluster", "Regulated Multi-Thread Rig", "Direct-Injected Silicon Matrix", "Monolithic ASIC Die", 
-        "Parallel Processing Engine", "Cryogenic Storage Interconnect", "Modular Enterprise Node", "High-Density Storage Cluster", 
-        "Isolated Mainframe Sub-Grid", "Coherent Field-Programmable Gate", "Lithography Optical Engine", "Distributed Cluster Hub", 
-        "Sub-Station Power Injector", "Hyperconverged Blade Array", "Supercooled Compute Module", "Optical Waveguide Pipeline", 
-        "Autonomous Packet Relayer", "Stochastic Processing Matrix", "Multi-Phase Injection Cluster", "Vector Mathematical Accelerator", 
-        "Superscalar Microarchitecture Node", "Tectonic Low-Frequency Link", "Sub-Surface Thermal Siphon", "Deep-Water Submersed Frame"
+        "Parallel Processing Engine", "Cryogenic Storage Interconnect", "Modular Enterprise Node", "High-Density Storage Cluster"
     ];
 
     const miners = [];
@@ -218,17 +217,27 @@
             name: minerNames[i],
             baseCost: Math.floor(40 * Math.pow(2.1, i)), 
             production: Number((0.05 * Math.pow(1.35, i)).toFixed(4)),
-            svgType: i < 8 ? 'hardware' : i < 16 ? 'network' : i < 24 ? 'processor' : 'quantum'
+            svgType: i < 4 ? 'hardware' : i < 8 ? 'network' : i < 12 ? 'processor' : 'quantum'
         });
     }
 
+    // Dynamic, repeatable upgrade targets definition data
     const upgrades = [
-        { id: "u1", name: "High-Tactility Actuator", cost: 2500, svg: 'boost', type: "click", boost: 1.15, desc: "Increases mechanical mouse capacity by 15%." },
-        { id: "u2", name: "Low-Resistance Cabling", cost: 15000, svg: 'processor', type: "bps", boost: 1.05, desc: "System efficiency enhanced. Total income drops up 5% higher." },
-        { id: "u3", name: "Solid-State Flash Array", cost: 500000, svg: 'hardware', type: "click", boost: 1.25, desc: "Improves execution read limits. Clicks are 25% stronger." },
-        { id: "u4", name: "Dedicated Bus Upgrades", cost: 12000000, svg: 'network', type: "bps", boost: 1.08, desc: "Reduces data packet bottlenecks. Total income bumps up 8%." },
-        { id: "u5", name: "Liquid Nitrogen Cooling", cost: 950000000, svg: 'processor', type: "bps", boost: 1.1, desc: "Thermal stabilization yields 10% greater execution speed overall." }
+        { id: "u1", name: "High-Tactility Actuator", baseCost: 2500, svg: 'boost', type: "click", boost: 1.25, desc: "Increases mouse click harvest by 25%." },
+        { id: "u2", name: "Low-Resistance Cabling", baseCost: 15000, svg: 'processor', type: "bps", boost: 1.10, desc: "Boosts all your automatic miner speed by 10%." },
+        { id: "u3", name: "Solid-State Flash Array", baseCost: 500000, svg: 'hardware', type: "click", boost: 1.40, desc: "Upgrades storage read pipelines. Clicks gain +40% power." },
+        { id: "u4", name: "Dedicated Bus Upgrades", baseCost: 12000000, svg: 'network', type: "bps", boost: 1.15, desc: "Reduces server traffic jams. Total miner output rises 15%." },
+        { id: "u5", name: "Liquid Nitrogen Cooling", baseCost: 950000000, svg: 'processor', type: "bps", boost: 1.20, desc: "Supercools your system infrastructure, making miners 20% faster." }
     ];
+
+    function editMineryName() {
+        const newName = prompt("Enter a new name for your minery:", gameData.mineryName);
+        if (newName && newName.trim() !== "") {
+            gameData.mineryName = newName.trim();
+            document.getElementById("minery-title").innerText = gameData.mineryName.toUpperCase();
+            saveGame();
+        }
+    }
 
     function formatNum(n) {
         if (n === 0) return "0.00";
@@ -244,6 +253,25 @@
         return 1.0 + (gameData.rebirths * 5.0); 
     }
 
+    function getUpgradeCost(u) {
+        const lvl = gameData.upgradeLevels[u.id] || 0;
+        return Math.floor(u.baseCost * Math.pow(2.5, lvl));
+    }
+
+    function getClickValue() {
+        let totalClickVal = gameData.clickValue;
+        let clickMult = 1;
+        upgrades.forEach(u => {
+            if (u.type === 'click') {
+                const lvl = gameData.upgradeLevels[u.id] || 0;
+                if (lvl > 0) {
+                    clickMult *= Math.pow(u.boost, lvl);
+                }
+            }
+        });
+        return totalClickVal * clickMult * getRebirthMultiplier();
+    }
+
     function calculateCurrentBPS() {
         let totalBPS = 0;
         miners.forEach(m => {
@@ -252,7 +280,17 @@
                 totalBPS += (count * m.production);
             }
         });
-        return totalBPS * gameData.bpsMultiplier * getRebirthMultiplier();
+        
+        let upMult = 1;
+        upgrades.forEach(u => {
+            if (u.type === 'bps') {
+                const lvl = gameData.upgradeLevels[u.id] || 0;
+                if (lvl > 0) {
+                    upMult *= Math.pow(u.boost, lvl);
+                }
+            }
+        });
+        return totalBPS * gameData.bpsMultiplier * upMult * getRebirthMultiplier();
     }
 
     function getMinerCost(miner) {
@@ -300,22 +338,21 @@
         const grid = document.getElementById('upgrades-grid');
         grid.innerHTML = '';
         upgrades.forEach((u) => {
-            if (gameData.boughtUpgrades.includes(u.id)) return;
+            const cost = getUpgradeCost(u);
+            const lvl = gameData.upgradeLevels[u.id] || 0;
             
-            if (gameData.bitcoin >= u.cost * 0.25) {
+            if (gameData.bitcoin >= cost * 0.25 || lvl > 0) {
                 const div = document.createElement('div');
                 div.className = 'upgrade-item';
-                div.innerHTML = SVGS[u.svg || 'boost'];
+                div.innerHTML = SVGS[u.svg || 'boost'] + `<div class="upgrade-level">L${lvl}</div>`;
                 
-                div.onmouseenter = (e) => showTooltip(e, `<strong>${u.name}</strong><br>${u.desc}<br>Cost: ${formatNum(u.cost)} BTC`);
+                div.onmouseenter = (e) => showTooltip(e, `<strong>${u.name} (Lvl ${lvl})</strong><br>${u.desc}<br>Next Cost: ${formatNum(cost)} BTC`);
                 div.onmouseleave = hideTooltip;
                 
                 div.onclick = () => {
-                    if (gameData.bitcoin >= u.cost) {
-                        gameData.bitcoin -= u.cost;
-                        gameData.boughtUpgrades.push(u.id);
-                        if (u.type === 'click') gameData.clickValue *= u.boost;
-                        if (u.type === 'bps') gameData.bpsMultiplier *= u.boost;
+                    if (gameData.bitcoin >= cost) {
+                        gameData.bitcoin -= cost;
+                        gameData.upgradeLevels[u.id] = (gameData.upgradeLevels[u.id] || 0) + 1;
                         hideTooltip();
                         renderUpgrades();
                         updateDisplay();
@@ -331,12 +368,17 @@
         document.getElementById('bps').innerText = formatNum(calculateCurrentBPS());
         document.getElementById('rebirth-mult').innerText = getRebirthMultiplier().toFixed(1);
         
+        // Calculate Percentage Progress to Rebirth Requirement
+        let progressPercent = (gameData.bitcoin / REBIRTH_REQUIREMENT) * 100;
+        if (progressPercent > 100) progressPercent = 100;
+        document.getElementById('rebirth-progress').innerText = progressPercent.toFixed(4) + "%";
+        
         const rebirthBtn = document.getElementById('rebirth-btn-action');
         rebirthBtn.disabled = gameData.bitcoin < REBIRTH_REQUIREMENT;
     }
 
     document.getElementById('bitcoin').onclick = (e) => {
-        let val = gameData.clickValue * getRebirthMultiplier();
+        let val = getClickValue();
         gameData.bitcoin += val;
         gameData.totalMined += val;
         gameData.totalClicks++;
@@ -358,8 +400,7 @@
         if (confirm("Are you sure you want to rebirth?\n\nThis will reset your current hardware upgrades and total bitcoins, but you will receive a permanent 5x operational speed boost to speed up your next run!")) {
             gameData.bitcoin = 0;
             gameData.ownedMiners = {};
-            gameData.boughtUpgrades = [];
-            gameData.clickValue = 1;
+            gameData.upgradeLevels = {};
             gameData.bpsMultiplier = 1;
             gameData.rebirths++;
             
@@ -416,6 +457,7 @@
                 gameData = Object.assign({}, gameData, parsed);
             } catch(e) { console.error("Could not parse save file."); }
         }
+        document.getElementById("minery-title").innerText = gameData.mineryName.toUpperCase();
         updateDisplay();
     }
 
@@ -431,7 +473,6 @@
     renderUpgrades();
     updateNews();
 
-    // 10 ticks per second execution loop for smooth numbers
     setInterval(() => {
         let bps = calculateCurrentBPS();
         gameData.bitcoin += (bps / 10);
