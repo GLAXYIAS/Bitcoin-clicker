@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bitcoin Clicker: Industrial Minery</title>
+    <title>Bitcoin Clicker</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
         * { -webkit-user-select: none; -ms-user-select: none; user-select: none; box-sizing: border-box; }
@@ -42,8 +42,97 @@
         .modal-btns { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; }
         .modal-btns button { padding: 10px; font-family: inherit; font-size: 0.55em; cursor: pointer; border: 2px solid #333; color: #000; font-weight: bold; }
 
+        /* ========================================= */
+        /* CHEAT / DEV MENU SPECIAL CUSTOM STYLES    */
+        /* ========================================= */
+        #dev-trigger-btn {
+            display: none;
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            z-index: 2100;
+            padding: 8px 14px;
+            font-family: inherit;
+            font-size: 0.5em;
+            background: #000;
+            color: #bc34fa;
+            border: 2px solid #bc34fa;
+            box-shadow: 0 0 10px rgba(188, 52, 250, 0.6);
+            cursor: pointer;
+        }
+        #dev-menu-modal {
+            display: none;
+            position: fixed;
+            top: 10%; left: 5%;
+            background: #120a1c;
+            border: 4px solid #bc34fa;
+            padding: 20px;
+            z-index: 2500;
+            width: 480px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 0 30px rgba(188, 52, 250, 0.8);
+            color: #fff;
+        }
+        .dev-header {
+            color: #bc34fa;
+            font-size: 0.65em;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 0 0 5px rgba(188, 52, 250, 0.5);
+            letter-spacing: 1px;
+        }
+        .dev-section-title {
+            font-size: 0.45em;
+            color: #ffd700;
+            margin: 15px 0 8px 0;
+            border-bottom: 2px solid #bc34fa;
+            padding-bottom: 4px;
+            text-transform: uppercase;
+        }
+        .dev-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            gap: 10px;
+        }
+        .dev-label {
+            font-size: 0.4em;
+            flex: 1;
+            color: #ddd;
+        }
+        .dev-input {
+            width: 130px;
+            background: #000;
+            border: 1px solid #bc34fa;
+            color: #00ff9d;
+            font-family: monospace;
+            font-size: 0.6em;
+            padding: 4px;
+        }
+        .dev-btn {
+            padding: 6px 10px;
+            font-family: inherit;
+            font-size: 0.45em;
+            background: #bc34fa;
+            color: #000;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .dev-btn:hover {
+            background: #d466ff;
+        }
+        .dev-close-btn {
+            width: 100%;
+            margin-top: 15px;
+            background: #444;
+            color: #fff;
+        }
+
+        /* Standard Game Frame Structuring */
         .game-container { display: flex; height: 100vh; width: 100vw; }
-        .left-panel { flex: 0 0 35%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; background: rgba(255,255,255,0.05); }
+        .left-panel { flex: 0 0 35%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; background: rgba(255,255,255,0.05); position: relative; }
         .center-panel { flex: 1; border-left: 4px solid #444; border-right: 4px solid #444; display: flex; flex-direction: column; background: rgba(0,0,0,0.3); }
         .right-panel { flex: 0 0 450px; background: #1a1a26; display: flex; flex-direction: column; height: 100%; }
 
@@ -107,6 +196,8 @@
 </head>
 <body>
 
+<button id="dev-trigger-btn" onclick="toggleDevMenu(true)">[DEV MENU]</button>
+
 <div class="game-container">
     <div class="left-panel">
         <h1 id="minery-title" onclick="editMineryName()">BITCOIN'S MINERY</h1>
@@ -151,7 +242,8 @@
     </div>
 </div>
 
-<div id="modal-bg" class="modal-overlay" onclick="toggleStats(false)"></div>
+<div id="modal-bg" class="modal-overlay" onclick="closeAllModals()"></div>
+
 <div id="stats-modal">
     <h2 style="color: #ffd700; font-size: 0.65em; margin-bottom: 25px; text-align: center;">GAME STATS</h2>
     <div class="stats-line">Bitcoins in Bank: <span class="stats-val" id="stat-current">0</span></div>
@@ -163,6 +255,76 @@
         <button onclick="saveGame(); alert('Game saved successfully.')" style="background: #00ff9d;">SAVE GAME</button>
         <button onclick="resetGame()" style="background: #ff4d4d;">WIPE SAVE DATA</button>
         <button onclick="toggleStats(false)" style="background: #444; color: white;">CLOSE</button>
+    </div>
+</div>
+
+<div id="dev-menu-modal">
+    <div class="dev-header">SYSTEM ADMINISTRATION MANIFEST</div>
+    
+    <div class="dev-section-title">Currency Manipulation</div>
+    <div class="dev-row">
+        <div class="dev-label">Add Set Value:</div>
+        <input type="number" id="dev-add-funds-input" class="dev-input" value="1000">
+        <button class="dev-btn" onclick="devAddFunds()">EXECUTE</button>
+    </div>
+    <div class="dev-row">
+        <div class="dev-label">Multiply Current Wallet:</div>
+        <input type="number" id="dev-mult-funds-input" class="dev-input" value="2">
+        <button class="dev-btn" onclick="devMultiplyFunds()">EXECUTE</button>
+    </div>
+    <div class="dev-row">
+        <div class="dev-label">Set Bank Total Absolute:</div>
+        <input type="number" id="dev-set-funds-input" class="dev-input" value="500000">
+        <button class="dev-btn" onclick="devSetAbsoluteFunds()">EXECUTE</button>
+    </div>
+
+    <div class="dev-section-title">Timeline & Progression</div>
+    <div class="dev-row">
+        <div class="dev-label">Increment Rebirth Count:</div>
+        <input type="number" id="dev-rebirth-input" class="dev-input" value="1">
+        <button class="dev-btn" onclick="devAddRebirths()">GRANT</button>
+    </div>
+    <div class="dev-row">
+        <div class="dev-label">Set Global Speed Multiplier:</div>
+        <input type="number" id="dev-speed-mult-input" class="dev-input" value="10">
+        <button class="dev-btn" onclick="devSetGlobalBpsMultiplier()">SET MULT</button>
+    </div>
+    <div class="dev-row">
+        <div class="dev-label">Modify Lifetime Mined Value:</div>
+        <input type="number" id="dev-lifetime-input" class="dev-input" value="1000000">
+        <button class="dev-btn" onclick="devSetLifetimeMined()">OVERWRITE</button>
+    </div>
+
+    <div class="dev-section-title">Hardware & Store Hack</div>
+    <div class="dev-row">
+        <div class="dev-label">Max Out Upgrade Levels:</div>
+        <button class="dev-btn" style="width:130px;" onclick="devMaxUpgrades()">MAX ALL</button>
+    </div>
+    <div class="dev-row">
+        <div class="dev-label">Set Level for All Upgrades:</div>
+        <input type="number" id="dev-upgrade-lvl-input" class="dev-input" value="5">
+        <button class="dev-btn" onclick="devSetUpgradeLevelsSpecific()">APPLY</button>
+    </div>
+    <div class="dev-row">
+        <div class="dev-label">Instantly Add 10 of All Miners:</div>
+        <button class="dev-btn" style="width:130px;" onclick="devAddMinersBulk()">GRANT 10x</button>
+    </div>
+
+    <div class="dev-section-title">Click Engine Metrics</div>
+    <div class="dev-row">
+        <div class="dev-label">Set Base Click Weight:</div>
+        <input type="number" id="dev-click-base-input" class="dev-input" value="500">
+        <button class="dev-btn" onclick="devSetBaseClickValue()">SET BASE</button>
+    </div>
+    <div class="dev-row">
+        <div class="dev-label">Increase Mouse Clicks Counter:</div>
+        <input type="number" id="dev-click-count-input" class="dev-input" value="1000">
+        <button class="dev-btn" onclick="devAddClickStats()">ADD STAT</button>
+    </div>
+
+    <div class="dev-section-title">System Execution</div>
+    <div class="dev-row">
+        <button class="dev-btn dev-close-btn" onclick="toggleDevMenu(false)">DISMISS DASHBOARD</button>
     </div>
 </div>
 
@@ -186,7 +348,8 @@
         mineryName: "Bitcoin's Minery",
         lastSaveTime: Date.now(),
         ownedMiners: {},
-        upgradeLevels: {} 
+        upgradeLevels: {},
+        devMenuUnlocked: false // Special dynamic variable state track
     };
 
     const REBIRTH_REQUIREMENT = 1e18; 
@@ -226,15 +389,136 @@
         { id: "u5", name: "Liquid Nitrogen Cooling", baseCost: 950000000, svg: 'processor', type: "bps", boost: 1.20, desc: "Supercools your system infrastructure, making miners 20% faster." }
     ];
 
+    // Placeholder keyword for unlocking cheat console: admin1337
     function editMineryName() {
         const newName = prompt("Enter a new name for your minery:", gameData.mineryName);
         if (newName && newName.trim() !== "") {
             gameData.mineryName = newName.trim();
             document.getElementById("minery-title").innerText = gameData.mineryName.toUpperCase();
+            
+            if (gameData.mineryName.toLowerCase() === "admin1337") {
+                gameData.devMenuUnlocked = true;
+                alert("ADMIN MODE CONFIRMED. Developer console trigger initialized.");
+            }
+            
+            evaluateDevTriggerVisibility();
             saveGame();
         }
     }
 
+    function evaluateDevTriggerVisibility() {
+        const btn = document.getElementById("dev-trigger-btn");
+        if (gameData.devMenuUnlocked) {
+            btn.style.display = "block";
+        } else {
+            btn.style.display = "none";
+        }
+    }
+
+    // =======================================================
+    // DEV CHEAT ACTIONS CORE CORE IMPLEMENTATION ENGINE       
+    // =======================================================
+    function toggleDevMenu(open) {
+        document.getElementById('modal-bg').style.display = open ? 'block' : 'none';
+        document.getElementById('dev-menu-modal').style.display = open ? 'block' : 'none';
+    }
+
+    function devAddFunds() {
+        const input = document.getElementById("dev-add-funds-input");
+        const val = parseFloat(input.value) || 0;
+        gameData.bitcoin += val;
+        gameData.totalMined += val;
+        syncStatePostDevCheat();
+    }
+
+    function devMultiplyFunds() {
+        const input = document.getElementById("dev-mult-funds-input");
+        const val = parseFloat(input.value) || 1;
+        gameData.bitcoin *= val;
+        syncStatePostDevCheat();
+    }
+
+    function devSetAbsoluteFunds() {
+        const input = document.getElementById("dev-set-funds-input");
+        const val = parseFloat(input.value) || 0;
+        gameData.bitcoin = val;
+        syncStatePostDevCheat();
+    }
+
+    function devAddRebirths() {
+        const input = document.getElementById("dev-rebirth-input");
+        const val = parseInt(input.value) || 0;
+        gameData.rebirths += val;
+        syncStatePostDevCheat();
+    }
+
+    function devSetGlobalBpsMultiplier() {
+        const input = document.getElementById("dev-speed-mult-input");
+        const val = parseFloat(input.value) || 1;
+        // Map speed multiplier directly into the structural modifier stack
+        gameData.rebirths = Math.max(0, Math.floor((val - 1) / 5));
+        syncStatePostDevCheat();
+    }
+
+    function devSetLifetimeMined() {
+        const input = document.getElementById("dev-lifetime-input");
+        const val = parseFloat(input.value) || 0;
+        gameData.totalMined = val;
+        syncStatePostDevCheat();
+    }
+
+    function devMaxUpgrades() {
+        upgrades.forEach(u => {
+            gameData.upgradeLevels[u.id] = 100;
+        });
+        renderUpgrades();
+        syncStatePostDevCheat();
+    }
+
+    function devSetUpgradeLevelsSpecific() {
+        const input = document.getElementById("dev-upgrade-lvl-input");
+        const val = parseInt(input.value) || 0;
+        upgrades.forEach(u => {
+            gameData.upgradeLevels[u.id] = val;
+        });
+        renderUpgrades();
+        syncStatePostDevCheat();
+    }
+
+    function devAddMinersBulk() {
+        miners.forEach(m => {
+            gameData.ownedMiners[m.id] = (gameData.ownedMiners[m.id] || 0) + 10;
+        });
+        renderMiners();
+        syncStatePostDevCheat();
+    }
+
+    function devSetBaseClickValue() {
+        const input = document.getElementById("dev-click-base-input");
+        const val = parseFloat(input.value) || 0.5;
+        gameData.clickValue = val;
+        syncStatePostDevCheat();
+    }
+
+    function devAddClickStats() {
+        const input = document.getElementById("dev-click-count-input");
+        const val = parseInt(input.value) || 0;
+        gameData.totalClicks += val;
+        syncStatePostDevCheat();
+    }
+
+    function syncStatePostDevCheat() {
+        updateDisplay();
+        fastColorCheck();
+        saveGame();
+    }
+
+    function closeAllModals() {
+        toggleStats(false);
+        toggleDevMenu(false);
+    }
+
+    // Standard Math Formatters
     function formatNum(n) {
         if (n === 0) return "0.00";
         if (n < 1000) return n.toFixed(2);
@@ -298,7 +582,6 @@
         const list = document.getElementById('miners-list');
         if (!list) return;
         
-        // Render every miner once, they persist forever so you can buy them repeatedly
         list.innerHTML = '';
         miners.forEach((m) => {
             const cost = getMinerCost(m);
@@ -325,7 +608,6 @@
                     gameData.bitcoin -= updatedCost;
                     gameData.ownedMiners[m.id] = (gameData.ownedMiners[m.id] || 0) + 1;
                     
-                    // Instant single element visual updates upon successful click
                     const newCost = getMinerCost(m);
                     document.getElementById(`owned-${m.id}`).innerText = gameData.ownedMiners[m.id];
                     document.getElementById(`cost-${m.id}`).innerText = formatNum(newCost) + " BTC";
@@ -338,7 +620,6 @@
         });
     }
 
-    // High frequency checking routine to flip box status to green dynamically
     function fastColorCheck() {
         miners.forEach((m) => {
             const cost = getMinerCost(m);
@@ -482,6 +763,7 @@
             } catch(e) { console.error("Could not parse save data file."); }
         }
         document.getElementById("minery-title").innerText = gameData.mineryName.toUpperCase();
+        evaluateDevTriggerVisibility();
         updateDisplay();
     }
 
@@ -497,13 +779,12 @@
     renderUpgrades();
     updateNews();
 
-    // 10 ticks per second production execution loop
     setInterval(() => {
         let bps = calculateCurrentBPS();
         gameData.bitcoin += (bps / 10);
         gameData.totalMined += (bps / 10);
         updateDisplay();
-        fastColorCheck(); // Instant affordability validation running every 100ms
+        fastColorCheck(); 
     }, 100); 
 
     setInterval(saveGame, 20000); 
