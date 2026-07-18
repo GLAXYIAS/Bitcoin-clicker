@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bitcoin Clicker</title>
+    <title>Bitcoin Clicker: Industrial Minery</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
         * { -webkit-user-select: none; -ms-user-select: none; user-select: none; box-sizing: border-box; }
         
         body {
             margin: 0; padding: 0;
-            background: linear-gradient(#14141c, #2a2a45); /* Brighter, high-contrast matrix backdrop */
+            background: linear-gradient(#14141c, #2a2a45); 
             color: #00ff9d;
             font-family: 'Press Start 2P', cursive;
             overflow: hidden;
@@ -72,7 +72,6 @@
         .item-details { flex: 1; overflow: hidden; }
         .item-name { font-size: 0.5em; color: #ffd700; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
-        /* Greatly Increased Scale & Visibility for Miner Costs */
         .item-cost { font-size: 0.65em; font-family: monospace; font-weight: bold; letter-spacing: 0.5px; }
         .item-cost.can-afford { color: #00ff9d; text-shadow: 0 0 2px rgba(0,255,157,0.3); }
         .item-cost.cannot-afford { color: #ff6666; }
@@ -182,14 +181,12 @@
         bitcoin: 0,
         totalMined: 0,
         totalClicks: 0,
-        clickValue: 0.5, // Changed base action to 0.5 BTC
-        baseClickMultiplier: 1,
-        bpsMultiplier: 1,
+        clickValue: 0.5, 
         rebirths: 0,
         mineryName: "Bitcoin's Minery",
         lastSaveTime: Date.now(),
         ownedMiners: {},
-        upgradeLevels: {} // Tracks repeat counts for every custom upgrade purchased
+        upgradeLevels: {} 
     };
 
     const REBIRTH_REQUIREMENT = 1e18; 
@@ -221,7 +218,6 @@
         });
     }
 
-    // Dynamic, repeatable upgrade targets definition data
     const upgrades = [
         { id: "u1", name: "High-Tactility Actuator", baseCost: 2500, svg: 'boost', type: "click", boost: 1.25, desc: "Increases mouse click harvest by 25%." },
         { id: "u2", name: "Low-Resistance Cabling", baseCost: 15000, svg: 'processor', type: "bps", boost: 1.10, desc: "Boosts all your automatic miner speed by 10%." },
@@ -290,7 +286,7 @@
                 }
             }
         });
-        return totalBPS * gameData.bpsMultiplier * upMult * getRebirthMultiplier();
+        return totalBPS * upMult * getRebirthMultiplier();
     }
 
     function getMinerCost(miner) {
@@ -301,35 +297,63 @@
     function renderMiners() {
         const list = document.getElementById('miners-list');
         if (!list) return;
+        
+        // Render every miner once, they persist forever so you can buy them repeatedly
         list.innerHTML = '';
         miners.forEach((m) => {
             const cost = getMinerCost(m);
             const owned = gameData.ownedMiners[m.id] || 0;
             const canAfford = gameData.bitcoin >= cost;
             
-            if (gameData.bitcoin >= m.baseCost * 0.4 || owned > 0) {
-                const div = document.createElement('div');
-                div.className = `item ${!canAfford ? 'locked' : ''}`;
-                div.innerHTML = `
-                    <div class="item-icon-frame">${SVGS[m.svgType]}</div>
-                    <div class="item-details">
-                        <div class="item-name">${m.name}</div>
-                        <div class="item-cost ${canAfford ? 'can-afford' : 'cannot-afford'}">${formatNum(cost)} BTC</div>
-                    </div>
-                    <div class="item-owned">${owned}</div>`;
-                
-                div.onmouseenter = (e) => showTooltip(e, `Generates +${m.production.toFixed(4)} base BTC per second.`);
-                div.onmouseleave = hideTooltip;
-                
-                div.onclick = () => {
-                    if (gameData.bitcoin >= cost) {
-                        gameData.bitcoin -= cost;
-                        gameData.ownedMiners[m.id] = (gameData.ownedMiners[m.id] || 0) + 1;
-                        renderMiners();
-                        updateDisplay();
-                    }
-                };
-                list.appendChild(div);
+            const div = document.createElement('div');
+            div.id = `el-${m.id}`;
+            div.className = `item ${!canAfford ? 'locked' : ''}`;
+            div.innerHTML = `
+                <div class="item-icon-frame">${SVGS[m.svgType]}</div>
+                <div class="item-details">
+                    <div class="item-name">${m.name}</div>
+                    <div class="item-cost ${canAfford ? 'can-afford' : 'cannot-afford'}" id="cost-${m.id}">${formatNum(cost)} BTC</div>
+                </div>
+                <div class="item-owned" id="owned-${m.id}">${owned}</div>`;
+            
+            div.onmouseenter = (e) => showTooltip(e, `Generates +${m.production.toFixed(4)} base BTC per second.`);
+            div.onmouseleave = hideTooltip;
+            
+            div.onclick = () => {
+                const updatedCost = getMinerCost(m); 
+                if (gameData.bitcoin >= updatedCost) {
+                    gameData.bitcoin -= updatedCost;
+                    gameData.ownedMiners[m.id] = (gameData.ownedMiners[m.id] || 0) + 1;
+                    
+                    // Instant single element visual updates upon successful click
+                    const newCost = getMinerCost(m);
+                    document.getElementById(`owned-${m.id}`).innerText = gameData.ownedMiners[m.id];
+                    document.getElementById(`cost-${m.id}`).innerText = formatNum(newCost) + " BTC";
+                    
+                    updateDisplay();
+                    fastColorCheck();
+                }
+            };
+            list.appendChild(div);
+        });
+    }
+
+    // High frequency checking routine to flip box status to green dynamically
+    function fastColorCheck() {
+        miners.forEach((m) => {
+            const cost = getMinerCost(m);
+            const div = document.getElementById(`el-${m.id}`);
+            const costText = document.getElementById(`cost-${m.id}`);
+            if (!div || !costText) return;
+            
+            if (gameData.bitcoin >= cost) {
+                div.classList.remove('locked');
+                costText.classList.remove('cannot-afford');
+                costText.classList.add('can-afford');
+            } else {
+                div.classList.add('locked');
+                costText.classList.remove('can-afford');
+                costText.classList.add('cannot-afford');
             }
         });
     }
@@ -341,25 +365,25 @@
             const cost = getUpgradeCost(u);
             const lvl = gameData.upgradeLevels[u.id] || 0;
             
-            if (gameData.bitcoin >= cost * 0.25 || lvl > 0) {
-                const div = document.createElement('div');
-                div.className = 'upgrade-item';
-                div.innerHTML = SVGS[u.svg || 'boost'] + `<div class="upgrade-level">L${lvl}</div>`;
-                
-                div.onmouseenter = (e) => showTooltip(e, `<strong>${u.name} (Lvl ${lvl})</strong><br>${u.desc}<br>Next Cost: ${formatNum(cost)} BTC`);
-                div.onmouseleave = hideTooltip;
-                
-                div.onclick = () => {
-                    if (gameData.bitcoin >= cost) {
-                        gameData.bitcoin -= cost;
-                        gameData.upgradeLevels[u.id] = (gameData.upgradeLevels[u.id] || 0) + 1;
-                        hideTooltip();
-                        renderUpgrades();
-                        updateDisplay();
-                    }
-                };
-                grid.appendChild(div);
-            }
+            const div = document.createElement('div');
+            div.className = 'upgrade-item';
+            div.innerHTML = SVGS[u.svg || 'boost'] + `<div class="upgrade-level">L${lvl}</div>`;
+            
+            div.onmouseenter = (e) => showTooltip(e, `<strong>${u.name} (Lvl ${lvl})</strong><br>${u.desc}<br>Next Cost: ${formatNum(cost)} BTC`);
+            div.onmouseleave = hideTooltip;
+            
+            div.onclick = () => {
+                const activeCost = getUpgradeCost(u);
+                if (gameData.bitcoin >= activeCost) {
+                    gameData.bitcoin -= activeCost;
+                    gameData.upgradeLevels[u.id] = (gameData.upgradeLevels[u.id] || 0) + 1;
+                    hideTooltip();
+                    renderUpgrades();
+                    updateDisplay();
+                    fastColorCheck();
+                }
+            };
+            grid.appendChild(div);
         });
     }
 
@@ -368,7 +392,6 @@
         document.getElementById('bps').innerText = formatNum(calculateCurrentBPS());
         document.getElementById('rebirth-mult').innerText = getRebirthMultiplier().toFixed(1);
         
-        // Calculate Percentage Progress to Rebirth Requirement
         let progressPercent = (gameData.bitcoin / REBIRTH_REQUIREMENT) * 100;
         if (progressPercent > 100) progressPercent = 100;
         document.getElementById('rebirth-progress').innerText = progressPercent.toFixed(4) + "%";
@@ -392,6 +415,7 @@
         setTimeout(() => f.remove(), 700);
         
         updateDisplay();
+        fastColorCheck(); 
     };
 
     function triggerRebirth() {
@@ -401,13 +425,13 @@
             gameData.bitcoin = 0;
             gameData.ownedMiners = {};
             gameData.upgradeLevels = {};
-            gameData.bpsMultiplier = 1;
             gameData.rebirths++;
             
             saveGame();
             renderMiners();
             renderUpgrades();
             updateDisplay();
+            fastColorCheck();
             alert("Timeline reset complete! Welcome back to a faster minery.");
         }
     }
@@ -455,7 +479,7 @@
             try {
                 const parsed = JSON.parse(saved);
                 gameData = Object.assign({}, gameData, parsed);
-            } catch(e) { console.error("Could not parse save file."); }
+            } catch(e) { console.error("Could not parse save data file."); }
         }
         document.getElementById("minery-title").innerText = gameData.mineryName.toUpperCase();
         updateDisplay();
@@ -473,17 +497,14 @@
     renderUpgrades();
     updateNews();
 
+    // 10 ticks per second production execution loop
     setInterval(() => {
         let bps = calculateCurrentBPS();
         gameData.bitcoin += (bps / 10);
         gameData.totalMined += (bps / 10);
         updateDisplay();
+        fastColorCheck(); // Instant affordability validation running every 100ms
     }, 100); 
-
-    setInterval(() => {
-        renderMiners();
-        renderUpgrades();
-    }, 2500);
 
     setInterval(saveGame, 20000); 
     setInterval(updateNews, 14000);
