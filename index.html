@@ -10,124 +10,131 @@
         
         body {
             margin: 0; padding: 0;
-            background: linear-gradient(#050505, #0a0a16);
+            background: linear-gradient(#0a0a0a, #121225);
             color: #00ff9d;
             font-family: 'Press Start 2P', cursive;
             overflow: hidden;
             height: 100vh;
         }
 
+        /* Repositioned & Cleaned Stats Modal */
         #stats-modal {
             display: none;
             position: fixed;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            background: #0d0d0d;
+            top: 25%; left: 50%;
+            transform: translate(-50%, -20%);
+            background: #11111a;
             border: 4px solid #b58900;
-            padding: 30px;
+            padding: 25px;
             z-index: 2000;
-            width: 500px;
+            width: 460px;
             text-align: left;
-            box-shadow: 0 0 50px rgba(0,0,0,0.9);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.9);
         }
         .modal-overlay {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
+            background: rgba(0,0,0,0.75);
             z-index: 1999;
         }
-        .stats-line { margin: 15px 0; font-size: 0.55em; color: #aaa; }
-        .stats-val { color: #00ff9d; float: right; word-break: break-all; }
-        .modal-btns { display: flex; flex-direction: column; gap: 10px; margin-top: 25px; }
-        .modal-btns button { padding: 12px; font-family: inherit; font-size: 0.55em; cursor: pointer; border: 2px solid rgba(255,255,255,0.1); color: #000; font-weight: bold; }
+        .stats-line { margin: 12px 0; font-size: 0.6em; color: #ddd; }
+        .stats-val { color: #00ff9d; float: right; font-family: monospace; }
+        .modal-btns { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; }
+        .modal-btns button { padding: 10px; font-family: inherit; font-size: 0.55em; cursor: pointer; border: 2px solid #333; color: #000; font-weight: bold; }
 
         .game-container { display: flex; height: 100vh; width: 100vw; }
-        .left-panel { flex: 0 0 35%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; background: rgba(0,0,0,0.4); }
-        .center-panel { flex: 1; border-left: 4px solid #222; border-right: 4px solid #222; display: flex; flex-direction: column; background: rgba(0,0,0,0.6); }
-        .right-panel { flex: 0 0 450px; background: #08080c; display: flex; flex-direction: column; height: 100%; }
+        .left-panel { flex: 0 0 35%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; background: rgba(0,0,0,0.3); }
+        .center-panel { flex: 1; border-left: 4px solid #222; border-right: 4px solid #222; display: flex; flex-direction: column; background: rgba(0,0,0,0.5); }
+        .right-panel { flex: 0 0 450px; background: #09090d; display: flex; flex-direction: column; height: 100%; }
 
-        h1 { color: #b58900; font-size: 1em; margin-bottom: 30px; text-shadow: 0 0 8px rgba(181, 137, 0, 0.5); letter-spacing: -1px; }
-        #bitcoin { width: 240px; height: 240px; cursor: pointer; transition: transform 0.05s; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
+        h1 { color: #b58900; font-size: 0.85em; margin-bottom: 30px; text-shadow: 0 0 6px rgba(181, 137, 0, 0.4); text-transform: uppercase; line-height: 1.4; }
+        #bitcoin { width: 250px; height: 250px; cursor: pointer; transition: transform 0.05s; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
         #bitcoin:active { transform: scale(0.94); }
-        #bitcoin svg { width: 100%; height: 100%; filter: drop-shadow(0 0 25px rgba(242, 169, 0, 0.6)); }
+        #bitcoin img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 0 20px rgba(242, 169, 0, 0.5)); }
 
-        .store-header { background: #000; padding: 20px; text-align: center; color: #b58900; border-bottom: 4px solid #222; font-size: 0.8em; letter-spacing: 2px; }
-        #upgrades-section { padding: 12px; min-height: 90px; border-bottom: 4px solid #222; background: rgba(0, 0, 0, 0.4); }
+        .store-header { background: #000; padding: 20px; text-align: center; color: #b58900; border-bottom: 4px solid #222; font-size: 0.75em; letter-spacing: 1px; }
+        #upgrades-section { padding: 12px; min-height: 90px; border-bottom: 4px solid #222; background: rgba(0, 0, 0, 0.3); }
         .upgrade-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
-        .upgrade-item { aspect-ratio: 1/1; background: #111; border: 2px solid #555; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 4px; }
-        .upgrade-item:hover { border-color: #b58900; background: #161616; }
-        .upgrade-item svg { width: 24px; height: 24px; fill: #b58900; }
+        .upgrade-item { aspect-ratio: 1/1; background: #111; border: 2px solid #444; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 6px; }
+        .upgrade-item:hover { border-color: #b58900; background: #151515; }
+        .upgrade-item svg { width: 22px; height: 22px; fill: #b58900; }
         
         #miners-section { flex: 1; overflow-y: auto; padding: 12px; }
-        .item { display: flex; background: #0d0d0d; border: 2px solid #222; margin-bottom: 8px; padding: 12px; cursor: pointer; align-items: center; }
-        .item:not(.locked):hover { background: #141414; border-color: #00ff9d; }
-        .item.locked { opacity: 0.25; cursor: not-allowed; border-color: #333; }
-        .item-icon-frame { width: 36px; height: 36px; margin-right: 15px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .item-icon-frame svg { width: 100%; height: 100%; fill: #aaa; }
+        .item { display: flex; background: #0c0c0f; border: 2px solid #222; margin-bottom: 8px; padding: 12px; cursor: pointer; align-items: center; }
+        .item:not(.locked):hover { background: #131317; border-color: #00ff9d; }
+        .item.locked { opacity: 0.25; cursor: not-allowed; border-color: #252525; }
+        .item-icon-frame { width: 32px; height: 32px; margin-right: 15px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .item-icon-frame svg { width: 100%; height: 100%; fill: #666; }
         .item:not(.locked) .item-icon-frame svg { fill: #00ff9d; }
         .item-details { flex: 1; overflow: hidden; }
         .item-name { font-size: 0.5em; color: #b58900; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .item-cost { font-size: 0.45em; font-family: monospace; }
         .item-cost.can-afford { color: #00ff9d; }
         .item-cost.cannot-afford { color: #ff4d4d; }
-        .item-owned { font-size: 0.8em; color: #333; font-family: monospace; margin-left: 10px; font-weight: bold; }
-        .item:not(.locked) .item-owned { color: #555; }
+        .item-owned { font-size: 0.8em; color: #444; font-family: monospace; margin-left: 10px; font-weight: bold; }
+        .item:not(.locked) .item-owned { color: #666; }
 
-        .floating-text { position: absolute; color: #f2a900; font-family: monospace; font-weight: bold; pointer-events: none; z-index: 1000; animation: floatUp 0.7s ease-out forwards; font-size: 0.7em; text-shadow: 0 0 4px #000; }
+        .floating-text { position: absolute; color: #f2a900; font-family: monospace; font-weight: bold; pointer-events: none; z-index: 1000; animation: floatUp 0.7s ease-out forwards; font-size: 0.75em; text-shadow: 0 0 4px #000; }
         @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-100px); } }
 
         .tooltip { 
             position: absolute; display: none; background: #000; border: 2px solid #b58900; 
-            padding: 12px; color: #fff; font-size: 0.45em; z-index: 3000; pointer-events: none;
-            line-height: 1.6; max-width: 280px; box-shadow: 5px 5px 0px rgba(0,0,0,0.5);
+            padding: 10px; color: #fff; font-size: 0.45em; z-index: 3000; pointer-events: none;
+            line-height: 1.5; max-width: 260px; box-shadow: 4px 4px 0px rgba(0,0,0,0.5);
         }
 
         .news-ticker-container { width: 100%; height: 50px; background: #000; border-bottom: 4px solid #222; overflow: hidden; position: relative; display: flex; align-items: center; }
         #news-text { white-space: nowrap; position: absolute; font-family: monospace; font-size: 0.7em; color: #ff4d4d; padding-left: 20px; }
 
-        .rebirth-panel { margin-top: 20px; padding: 15px; border: 2px dashed #ff4d4d; background: rgba(255,77,77,0.02); text-align: center; width: 85%; }
-        .rebirth-btn { width: 100%; background: #000; color: #ff4d4d; border: 2px solid #ff4d4d; font-family: inherit; font-size: 0.45em; padding: 10px; cursor: pointer; margin-top: 8px; }
+        /* Integrated Center Panel Rebirth Module Placed Safely Out of the Way */
+        .rebirth-center-box {
+            margin: auto 20px 20px 20px;
+            padding: 20px;
+            border: 2px dashed #ff4d4d;
+            background: rgba(0, 0, 0, 0.4);
+            text-align: center;
+        }
+        .rebirth-title { font-size: 0.55em; color: #ff4d4d; letter-spacing: 1px; margin-bottom: 6px; }
+        .rebirth-desc { font-size: 0.45em; color: #aaa; line-height: 1.5; margin-bottom: 12px; }
+        .rebirth-btn { width: 100%; max-width: 350px; background: #000; color: #ff4d4d; border: 2px solid #ff4d4d; font-family: inherit; font-size: 0.5em; padding: 12px; cursor: pointer; transition: 0.2s; }
         .rebirth-btn:not(:disabled):hover { background: #ff4d4d; color: #000; }
-        .rebirth-btn:disabled { opacity: 0.3; cursor: not-allowed; border-color: #444; color: #444; }
+        .rebirth-btn:disabled { opacity: 0.25; cursor: not-allowed; border-color: #444; color: #444; }
     </style>
 </head>
 <body>
 
 <div class="game-container">
     <div class="left-panel">
-        <h1>BITCOIN MATRIX</h1>
-        <div style="position: relative; width: 240px; height: 240px; margin: 0 auto;">
-            <button onclick="toggleStats(true)" style="position: absolute; top: -20px; left: -10px; z-index: 101; padding: 6px 10px; font-family: inherit; font-size: 0.45em; background: #000; color: #b58900; border: 2px solid #b58900; cursor: pointer;">[SYS.LOG]</button>
+        <h1 id="minery-title">BITCOIN'S MINERY</h1>
+        <div style="position: relative; width: 250px; height: 250px; margin: 0 auto;">
+            <button onclick="toggleStats(true)" style="position: absolute; top: -25px; left: -15px; z-index: 101; padding: 6px 12px; font-family: inherit; font-size: 0.45em; background: #000; color: #b58900; border: 2px solid #b58900; cursor: pointer;">[STATS]</button>
             <div id="bitcoin">
-                <svg viewBox="0 0 64 64">
-                    <circle cx="32" cy="32" r="30" fill="#111" stroke="#f2a900" stroke-width="3"/>
-                    <path d="M38 24.5c2.2 0 4-1.8 4-4s-1.8-4-4-4h-8v8h8zm0 17c2.2 0 4-1.8 4-4s-1.8-4-4-4h-8v8h8z" fill="none"/>
-                    <path d="M43.7 26.8c.8-1.5 1.3-3.2 1.3-5.1 0-5-3.8-9.2-8.7-9.7V7h-4v5h-3V7h-4v5h-9v40h9v5h4v-5h3v5h4v-5.2c5.4-.2 9.8-4.5 9.8-10 0-2.8-1.1-5.3-2.9-7.2zM23.3 16h13.2c2.5 0 4.5 2 4.5 4.5S39 25 36.5 25H23.3V16zm15.4 27.5c0 2.5-2 4.5-4.5 4.5H23.3V35h10.9c2.5 0 4.5 2 4.5 4.5v4z" fill="#f2a900"/>
-                </svg>
+                <img src="imgs/Bitcoin.png" alt="Bitcoin" onerror="this.src='https://via.placeholder.com/250x250/f2a900/111111?text=BTC';">
             </div>
         </div>
-        <div style="margin-top: 25px;">
-            <div style="font-size: 0.9em; font-family: monospace; letter-spacing: -0.5px;"><span id="balance">0.00</span> BTC</div>
-            <div style="font-size: 0.5em; margin-top: 12px; color: #b58900; font-family: monospace;">HASH/SEC: <span id="bps">0.00</span></div>
-        </div>
-
-        <div class="rebirth-panel">
-            <div style="font-size: 0.45em; color: #aaa; line-height: 1.4;">QUANTUM REBIRTH LATTICE</div>
-            <div style="font-size: 0.4em; color: #ff4d4d; margin-top: 5px; font-family: monospace;">REQ: 1.00 Quintillion BTC</div>
-            <div style="font-size: 0.4em; color: #00ff9d; margin-top: 4px; font-family: monospace;">Lattice Factor: <span id="rebirth-mult">1.0</span>x</div>
-            <button id="rebirth-btn-action" class="rebirth-btn" disabled onclick="triggerRebirth()">RESTRUCTURE TIMELINE</button>
+        <div style="margin-top: 35px; width: 100%;">
+            <div style="font-size: 1.4em; font-family: monospace; letter-spacing: -0.5px; color: #ffffff; font-weight: bold;"><span id="balance">0.00</span> BTC</div>
+            <div style="font-size: 0.55em; margin-top: 15px; color: #b58900; font-family: monospace; letter-spacing: 0.5px;">PER SECOND: <span id="bps">0.00</span></div>
         </div>
     </div>
 
     <div class="center-panel">
         <div class="news-ticker-container">
-            <div id="news-text">INITIALIZING QUANTUM ENCRYPTION NETWORK DIALECT SYSTEM...</div>
+            <div id="news-text">CONNECTING TO GLOBAL CRYPTO BLOCK DATA FEED...</div>
+        </div>
+        
+        <div style="flex: 1;"></div>
+
+        <div class="rebirth-center-box">
+            <div class="rebirth-title">QUANTUM REBIRTH MACHINE</div>
+            <div class="rebirth-desc">Requires: 1.00 Quintillion BTC<br>Current Multiplier Bonus: <span id="rebirth-mult" style="color: #00ff9d;">1.0</span>x</div>
+            <button id="rebirth-btn-action" class="rebirth-btn" disabled onclick="triggerRebirth()">RESET TIMELINE FOR 5X SPEED BOOST</button>
         </div>
     </div>
 
     <div class="right-panel">
-        <div class="store-header">INFRASTRUCTURE ARCHITECTURE</div>
+        <div class="store-header">HARDWARE STORE</div>
         <div id="upgrades-section">
             <div class="upgrade-grid" id="upgrades-grid"></div>
         </div>
@@ -139,23 +146,27 @@
 
 <div id="modal-bg" class="modal-overlay" onclick="toggleStats(false)"></div>
 <div id="stats-modal">
-    <h2 style="color: #b58900; font-size: 0.6em; margin-bottom: 20px; letter-spacing: 1px;">CORE FILES [LOG]</h2>
-    <div class="stats-line">Liquid Assets: <span class="stats-val" id="stat-current">0</span></div>
-    <div class="stats-line">Cumulative Harvested: <span class="stats-val" id="stat-total">0</span></div>
-    <div class="stats-line">Mechanical Actuations: <span class="stats-val" id="stat-clicks">0</span></div>
-    <div class="stats-line">Active System Velocity: <span class="stats-val" id="stat-bps-modal">0</span></div>
-    <div class="stats-line">Timeline Resets: <span class="stats-val" id="stat-rebirths">0</span></div>
+    <h2 style="color: #b58900; font-size: 0.65em; margin-bottom: 25px; text-align: center;">GAME STATS</h2>
+    <div class="stats-line">Bitcoins in Bank: <span class="stats-val" id="stat-current">0</span></div>
+    <div class="stats-line">Total Bitcoins Ever Mined: <span class="stats-val" id="stat-total">0</span></div>
+    <div class="stats-line">Total Times Clicked: <span class="stats-val" id="stat-clicks">0</span></div>
+    <div class="stats-line">Current Speed Per Second: <span class="stats-val" id="stat-bps-modal">0</span></div>
+    <div class="stats-line">Times Rebirthed: <span class="stats-val" id="stat-rebirths">0</span></div>
     <div class="modal-btns">
-        <button onclick="saveGame(); alert('State Vector Committed to Cluster.')" style="background: #00ff9d;">COMMIT SAVE</button>
-        <button onclick="resetGame()" style="background: #ff4d4d;">PURGE NODE LOCAL STORAGE</button>
-        <button onclick="toggleStats(false)" style="background: #333; color: white;">DISMISS</button>
+        <button onclick="saveGame(); alert('Game saved successfully.')" style="background: #00ff9d;">SAVE GAME</button>
+        <button onclick="resetGame()" style="background: #ff4d4d;">WIPE SAVE DATA</button>
+        <button onclick="toggleStats(false)" style="background: #444; color: white;">CLOSE</button>
     </div>
 </div>
 
 <div id="tooltip" class="tooltip"></div>
 
 <script>
-    // System SVGs to substitute regular image assets cleanly
+    // Configurable Owner Designation Name
+    const ownerName = "Bitcoin"; // Change this word to change the header!
+    document.getElementById("minery-title").innerText = `${ownerName}'s Minery`;
+
+    // Sharp Material Vector Icons 
     const SVGS = {
         hardware: `<svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2zm-2-7H7v2h10V6zm2 12H5v-2h14v2zM21 2H3c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>`,
         network: `<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L12 15v5z"/></svg>`,
@@ -176,21 +187,19 @@
         boughtUpgrades: []
     };
 
-    const REBIRTH_REQUIREMENT = 1e18; // 1 Quintillion BTC (Extremely Hard to Beat)
+    const REBIRTH_REQUIREMENT = 1e18; // 1 Quintillion BTC 
 
-    const suffixes = ["", " K", " M", " B", " T", " Qd", " Qn", " Sx", " Sp", " Oc", " No", " Dc", " Un", " Du", " Tr", " Qt", " Qid", " Sxd", " Spd", " Ocd", " Nod", " Vg", " Uvg", " Dvg"];
+    const suffixes = ["", " K", " M", " B", " T", " Qd", " Qn", " Sx", " Sp", " Oc", " No", " Dc", " Un", " Du", " Tr", " Qt", " Qid"];
 
     const newsMessages = [
-        'NETWORK WARNING: Global SHA-256 difficulty setting reaches hazardous threshold limits.',
-        'MARKET VECTOR: ASICs inventory depletion reported across central continental tech markets.',
-        'REGULATORY: ASIC hardware integration frameworks face strict thermal emission compliance audits.',
-        'INFRASTRUCTURE: Global power distributors mandate direct renewable validation loops for compute clusters.',
-        'HARD FORK RISK: Core nodes detect synchronization anomalies; node operators advise system upgrades.',
-        'WHALE TRACKER: Extinct Genesis block wallet transactions awaken after decades of absolute dormancy.',
-        'SYSTEM STATUS: Matrix execution logs processing at non-isothermal equilibrium matrices.'
+        'MARKET UPDATE: Bitcoin network difficulty climbs higher as more mining warehouses go online.',
+        'HARDWARE ALERT: Next-gen high-performance mining microchips sell out globally within minutes.',
+        'TECH DAILY: Eco-friendly energy installations become standard practice for high-output setups.',
+        'IN THE NEWS: Massive whale wallet moves ancient coins mined over a decade ago.',
+        'NETWORK STATUS: Block synchronization running optimally across all globally distributed operational systems.'
     ];
 
-    // High performance engineering miner nomenclature
+    // Normalized hardware components list
     const minerNames = [
         "Resistive Logic Breadboard", "Low-Voltage Silicon Gate", "Refurbished Thin-Client Terminal", "Cascaded Copper Array", 
         "Synchronous Micro-Controller", "Dedicated Coprocessor Node", "Integrated Core Workstation", "High-Throughput Bus Array", 
@@ -199,21 +208,7 @@
         "Isolated Mainframe Sub-Grid", "Coherent Field-Programmable Gate", "Lithography Optical Engine", "Distributed Cluster Hub", 
         "Sub-Station Power Injector", "Hyperconverged Blade Array", "Supercooled Compute Module", "Optical Waveguide Pipeline", 
         "Autonomous Packet Relayer", "Stochastic Processing Matrix", "Multi-Phase Injection Cluster", "Vector Mathematical Accelerator", 
-        "Superscalar Microarchitecture Node", "Tectonic Low-Frequency Link", "Sub-Surface Thermal Siphon", "Deep-Water Submersed Frame", 
-        "Atmospheric Convection Array", "Volcanic Thermal Tap Core", "Low-Orbit Satellite Transceiver", "Exospheric Telemetry Uplink", 
-        "Lunar Surface Regolith Cell", "Asteroidal Core Telemetry Probe", "Solar Flux Radiant Siphon", "Orbital Lagrange Node Array", 
-        "Planetary Mesh-Topology Grid", "Stratospheric Siphon Link", "Magnetospheric Resonance Tap", "Crustal Waveform Transducer", 
-        "Subatomic Waveguide Conduit", "Quantum Particle Interleaver", "Entangled Quantum Pair Relayer", "Coherent Superposition Loop", 
-        "Superconducting Logic Framework", "Josephson Junction Switch Node", "Cryo-Magnetic Flux Storage", "Topological Quantum Braid Array", 
-        "Non-Abelian Anyon Processor", "Hyperdimensional Tesseract Siphon", "Closed Timelike Curve Grid", "Micro-Singularity Energy Tap", 
-        "Event Horizon Accretion Loop", "Hawking Radiation Energy Sifter", "Vacuum Fluctuations Interceptor", "Zero-Point Spatial Matrix", 
-        "Dark Matter Extraction Engine", "Antimatter Recombination Core", "Relativistic Plasma Jet Conduit", "Sub-Quark Gluon Lattice", 
-        "Quantum Chromodynamic Matrix", "Gauge Invariant Field Modulator", "Spacetime Micro-Fracture Siphon", "Gravitational Wave Interference Rig", 
-        "M-Theory Membrane Weaver", "Brane World Dimensional Interception Node", "Calabi-Yau Spatial Shifter", "Superstring Tension Regulator", 
-        "Cosmic String Resonator Array", "Planck Scale Geometry Sieve", "Local Entropy Inversion Core", "Causal Patch Horizon Link", 
-        "Multiverse Flux Interface Module", "Alternate Reality Vector Pipeline", "Timeline Branching Synchronizer", "Quantum Immortality Mesh", 
-        "Physical Law Static Synthesizer", "Universal Constants Variator", "Cosmic Horizon Anchor", "Meta-Simulation Overlord Framework", 
-        "Information Theoretic Reality Sieve", "Holographic Principle Projector", "Absolute Singularity Point Node"
+        "Superscalar Microarchitecture Node", "Tectonic Low-Frequency Link", "Sub-Surface Thermal Siphon", "Deep-Water Submersed Frame"
     ];
 
     const miners = [];
@@ -221,20 +216,18 @@
         miners.push({
             id: `miner_${i}`,
             name: minerNames[i],
-            // Extreme difficulty scaling (costs ramp up by 2.1x per tier, asset return stays low)
             baseCost: Math.floor(40 * Math.pow(2.1, i)), 
             production: Number((0.05 * Math.pow(1.35, i)).toFixed(4)),
-            svgType: i < 18 ? 'hardware' : i < 36 ? 'network' : i < 54 ? 'processor' : 'quantum'
+            svgType: i < 8 ? 'hardware' : i < 16 ? 'network' : i < 24 ? 'processor' : 'quantum'
         });
     }
 
     const upgrades = [
-        { id: "u1", name: "High-Tactility Actuator", cost: 2500, svg: 'boost', type: "click", boost: 1.15, desc: "Increases mechanical actuation capacity by 15%." },
-        { id: "u2", name: "Low-Resistance Phase Cabling", cost: 15000, svg: 'processor', type: "bps", boost: 1.05, desc: "System efficiency enhanced. Total HASH/SEC scales up by 5%." },
-        { id: "u3", name: "Solid-State Storage Arrays", cost: 500000, svg: 'hardware', type: "click", boost: 1.25, desc: "Improves execution read limits. Clicks are 25% stronger." },
-        { id: "u4", name: "Dedicated Bus Architecture", cost: 12000000, svg: 'network', type: "bps", boost: 1.08, desc: "Reduces data packet collisions. Total HASH/SEC scales up by 8%." },
-        { id: "u5", name: "Liquid Nitrogen Injection Nodes", cost: 950000000, svg: 'processor', type: "bps", boost: 1.1, desc: "Thermal stabilization yields 10% greater total execution speed." },
-        { id: "u6", name: "Crystalline Diamond Cursors", cost: 45000000000, svg: 'boost', type: "click", boost: 1.3, desc: "Physical component structure modification triples click capabilities." }
+        { id: "u1", name: "High-Tactility Actuator", cost: 2500, svg: 'boost', type: "click", boost: 1.15, desc: "Increases mechanical mouse capacity by 15%." },
+        { id: "u2", name: "Low-Resistance Cabling", cost: 15000, svg: 'processor', type: "bps", boost: 1.05, desc: "System efficiency enhanced. Total income drops up 5% higher." },
+        { id: "u3", name: "Solid-State Flash Array", cost: 500000, svg: 'hardware', type: "click", boost: 1.25, desc: "Improves execution read limits. Clicks are 25% stronger." },
+        { id: "u4", name: "Dedicated Bus Upgrades", cost: 12000000, svg: 'network', type: "bps", boost: 1.08, desc: "Reduces data packet bottlenecks. Total income bumps up 8%." },
+        { id: "u5", name: "Liquid Nitrogen Cooling", cost: 950000000, svg: 'processor', type: "bps", boost: 1.1, desc: "Thermal stabilization yields 10% greater execution speed overall." }
     ];
 
     function formatNum(n) {
@@ -248,7 +241,7 @@
     }
 
     function getRebirthMultiplier() {
-        return 1.0 + (gameData.rebirths * 5.0); // Each rebirth yields a 5x production scalar boost
+        return 1.0 + (gameData.rebirths * 5.0); 
     }
 
     function calculateCurrentBPS() {
@@ -256,8 +249,7 @@
         miners.forEach(m => {
             let count = gameData.ownedMiners[m.id] || 0;
             if (count > 0) {
-                let minerMult = 1;
-                totalBPS += (count * m.production * minerMult);
+                totalBPS += (count * m.production);
             }
         });
         return totalBPS * gameData.bpsMultiplier * getRebirthMultiplier();
@@ -265,7 +257,6 @@
 
     function getMinerCost(miner) {
         const owned = gameData.ownedMiners[miner.id] || 0;
-        // Punishing inflation rate factor (1.42x per unit owned)
         return Math.floor(miner.baseCost * Math.pow(1.42, owned));
     }
 
@@ -289,7 +280,7 @@
                     </div>
                     <div class="item-owned">${owned}</div>`;
                 
-                div.onmouseenter = (e) => showTooltip(e, `Yields +${m.production.toFixed(4)} base BTC/sec per node.`);
+                div.onmouseenter = (e) => showTooltip(e, `Generates +${m.production.toFixed(4)} base BTC per second.`);
                 div.onmouseleave = hideTooltip;
                 
                 div.onclick = () => {
@@ -341,14 +332,9 @@
         document.getElementById('rebirth-mult').innerText = getRebirthMultiplier().toFixed(1);
         
         const rebirthBtn = document.getElementById('rebirth-btn-action');
-        if (gameData.bitcoin >= REBIRTH_REQUIREMENT) {
-            rebirthBtn.disabled = false;
-        } else {
-            rebirthBtn.disabled = true;
-        }
+        rebirthBtn.disabled = gameData.bitcoin < REBIRTH_REQUIREMENT;
     }
 
-    // Floating text feedback generator
     document.getElementById('bitcoin').onclick = (e) => {
         let val = gameData.clickValue * getRebirthMultiplier();
         gameData.bitcoin += val;
@@ -369,7 +355,7 @@
     function triggerRebirth() {
         if (gameData.bitcoin < REBIRTH_REQUIREMENT) return;
         
-        if (confirm("Initiating timeline reset will purge all architecture nodes and liquid assets.\n\nPermanent sub-atomic multiplier scalar increments will be allocated. Proceed?")) {
+        if (confirm("Are you sure you want to rebirth?\n\nThis will reset your current hardware upgrades and total bitcoins, but you will receive a permanent 5x operational speed boost to speed up your next run!")) {
             gameData.bitcoin = 0;
             gameData.ownedMiners = {};
             gameData.boughtUpgrades = [];
@@ -381,11 +367,10 @@
             renderMiners();
             renderUpgrades();
             updateDisplay();
-            alert("Quantum lattice restabilized. Local timeline altered successfully.");
+            alert("Timeline reset complete! Welcome back to a faster minery.");
         }
     }
 
-    // Tooltip Engine Control
     const tooltip = document.getElementById('tooltip');
     function showTooltip(e, txt) {
         tooltip.innerHTML = txt;
@@ -402,7 +387,7 @@
             document.getElementById('stat-current').innerText = formatNum(gameData.bitcoin) + " BTC";
             document.getElementById('stat-total').innerText = formatNum(gameData.totalMined) + " BTC";
             document.getElementById('stat-clicks').innerText = gameData.totalClicks;
-            document.getElementById('stat-bps-modal').innerText = formatNum(calculateCurrentBPS()) + " HASH/S";
+            document.getElementById('stat-bps-modal').innerText = formatNum(calculateCurrentBPS()) + " BTC/S";
             document.getElementById('stat-rebirths').innerText = gameData.rebirths;
         }
     }
@@ -412,49 +397,47 @@
         const msg = newsMessages[Math.floor(Math.random() * newsMessages.length)];
         txt.innerText = msg;
         
-        // Dynamic animation duration calculation matching string data length properties
         const duration = Math.max(12, msg.length * 0.22);
         txt.style.animation = 'none';
-        txt.offsetHeight; // Trigger structural reflow pipeline loop natively
+        txt.offsetHeight; 
         txt.style.animation = `ticker ${duration}s linear infinite`;
     }
 
     function saveGame() {
         gameData.lastSaveTime = Date.now();
-        localStorage.setItem('btcMatrixSaveData', JSON.stringify(gameData));
+        localStorage.setItem('btcMinerySaveData', JSON.stringify(gameData));
     }
 
     function loadGame() {
-        const saved = localStorage.getItem('btcMatrixSaveData');
+        const saved = localStorage.getItem('btcMinerySaveData');
         if (saved) {
             try {
                 const parsed = JSON.parse(saved);
                 gameData = Object.assign({}, gameData, parsed);
-            } catch(e) { console.error("Corrupted save vector stream data discarded."); }
+            } catch(e) { console.error("Could not parse save file."); }
         }
         updateDisplay();
     }
 
     function resetGame() {
-        if (confirm("CRITICAL ACCREDITATION REQUIREMENT: Wipe out all node matrices permanently?")) {
-            localStorage.removeItem('btcMatrixSaveData');
+        if (confirm("WARNING: Are you sure you want to completely erase all of your progress and start fresh?")) {
+            localStorage.removeItem('btcMinerySaveData');
             window.location.reload();
         }
     }
 
-    // System initialization sequence execution 
     loadGame();
     renderMiners();
     renderUpgrades();
     updateNews();
 
-    // Secondary core computing loops
+    // 10 ticks per second execution loop for smooth numbers
     setInterval(() => {
         let bps = calculateCurrentBPS();
         gameData.bitcoin += (bps / 10);
         gameData.totalMined += (bps / 10);
         updateDisplay();
-    }, 100); // 10 ticks per second for smooth, responsive numerical rendering profiles
+    }, 100); 
 
     setInterval(() => {
         renderMiners();
