@@ -192,6 +192,24 @@
         .rebirth-btn { width: 100%; max-width: 380px; background: #000; color: #ff4d4d; border: 2px solid #ff4d4d; font-family: inherit; font-size: 0.5em; padding: 12px; cursor: pointer; transition: 0.2s; }
         .rebirth-btn:not(:disabled):hover { background: #ff4d4d; color: #000; }
         .rebirth-btn:disabled { opacity: 0.25; cursor: not-allowed; border-color: #444; color: #444; }
+
+        .effects-container {
+            margin-top: 10px;
+            background: rgba(0,0,0,0.4);
+            padding: 8px;
+            border-top: 1px solid #444;
+            text-align: left;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+        .effect-row {
+            font-size: 0.38em;
+            margin: 4px 0;
+            line-height: 1.3;
+            font-family: monospace;
+        }
+        .effect-row.active { color: #00ff9d; }
+        .effect-row.inactive { color: #555; text-decoration: line-through; }
     </style>
 </head>
 <body>
@@ -225,9 +243,12 @@
             <div class="rebirth-desc">
                 Requires: 1.00 Quintillion BTC<br>
                 Progress: <span id="rebirth-progress" style="color:#ffd700; font-weight:bold;">0.00%</span><br>
-                Current Bonus Multiplier: <span id="rebirth-mult" style="color: #00ff9d;">1.0</span>x
+                Current Rebirth Level: <span id="rebirth-count-txt" style="color: #ff4d4d;">0</span>
             </div>
-            <button id="rebirth-btn-action" class="rebirth-btn" disabled onclick="triggerRebirth()">RESET TIMELINE FOR 5X SPEED BOOST</button>
+            <button id="rebirth-btn-action" class="rebirth-btn" disabled onclick="triggerRebirth()">RESET TIMELINE FOR DYNAMIC TIMELINE EFFECTS</button>
+            
+            <div class="effects-container" id="effects-list">
+                </div>
         </div>
     </div>
 
@@ -349,7 +370,7 @@
         lastSaveTime: Date.now(),
         ownedMiners: {},
         upgradeLevels: {},
-        devMenuUnlocked: false // Special dynamic variable state track
+        devMenuUnlocked: false 
     };
 
     const REBIRTH_REQUIREMENT = 1e18; 
@@ -389,7 +410,15 @@
         { id: "u5", name: "Liquid Nitrogen Cooling", baseCost: 950000000, svg: 'processor', type: "bps", boost: 1.20, desc: "Supercools your system infrastructure, making miners 20% faster." }
     ];
 
-    // Placeholder keyword for unlocking cheat console: admin1337
+    // Dynamic Rebirth Perks Database Definition
+    const rebirthEffectsConfig = [
+        { level: 1, name: "Kinetic Overclock", desc: "Base click values gain a massive +300% boost." },
+        { level: 2, name: "Automated Hyperdrive", desc: "All automated miner base production yields scaled +150%." },
+        { level: 3, name: "Market Optimization", desc: "Hardware store purchase requirements slashed by 25% permanently." },
+        { level: 4, name: "Quantum Synergy", desc: "Click weights scale upwards by +5% for every running automatic hardware unit." },
+        { level: 5, name: "Singularity Engine", desc: "Every level achieved past Tier 4 accelerates total factory production by a compound 2.5x." }
+    ];
+
     function editMineryName() {
         const newName = prompt("Enter a new name for your minery:", gameData.mineryName);
         if (newName && newName.trim() !== "") {
@@ -455,8 +484,8 @@
     function devSetGlobalBpsMultiplier() {
         const input = document.getElementById("dev-speed-mult-input");
         const val = parseFloat(input.value) || 1;
-        // Map speed multiplier directly into the structural modifier stack
-        gameData.rebirths = Math.max(0, Math.floor((val - 1) / 5));
+        // Approximation logic for matching input multiplier with system configurations
+        gameData.rebirths = Math.max(0, Math.floor(val / 2.5));
         syncStatePostDevCheat();
     }
 
@@ -510,6 +539,7 @@
     function syncStatePostDevCheat() {
         updateDisplay();
         fastColorCheck();
+        renderRebirthEffectsList();
         saveGame();
     }
 
@@ -518,7 +548,6 @@
         toggleDevMenu(false);
     }
 
-    // Standard Math Formatters
     function formatNum(n) {
         if (n === 0) return "0.00";
         if (n < 1000) return n.toFixed(2);
@@ -529,17 +558,42 @@
         return (n / scale).toFixed(2) + suffix;
     }
 
-    function getRebirthMultiplier() {
-        return 1.0 + (gameData.rebirths * 5.0); 
+    // =======================================================
+    // ADVANCED REBIRTH ADVANTAGE METRIC SYSTEM ENGINES
+    // =======================================================
+    function getTotalMinersOwnedCount() {
+        let count = 0;
+        for (let key in gameData.ownedMiners) {
+            count += (gameData.ownedMiners[key] || 0);
+        }
+        return count;
     }
 
     function getUpgradeCost(u) {
         const lvl = gameData.upgradeLevels[u.id] || 0;
-        return Math.floor(u.baseCost * Math.pow(2.5, lvl));
+        let cost = Math.floor(u.baseCost * Math.pow(2.5, lvl));
+        
+        // Rebirth Effect 3: Market Optimization (25% discount)
+        if (gameData.rebirths >= 3) {
+            cost = Math.floor(cost * 0.75);
+        }
+        return cost;
     }
 
     function getClickValue() {
-        let totalClickVal = gameData.clickValue;
+        let baseVal = gameData.clickValue;
+        
+        // Rebirth Effect 1: Kinetic Overclock (+300% click strength)
+        if (gameData.rebirths >= 1) {
+            baseVal *= 4.0;
+        }
+
+        // Rebirth Effect 4: Quantum Synergy (+5% per owned miner setup)
+        if (gameData.rebirths >= 4) {
+            let minerCount = getTotalMinersOwnedCount();
+            baseVal *= (1.0 + (minerCount * 0.05));
+        }
+
         let clickMult = 1;
         upgrades.forEach(u => {
             if (u.type === 'click') {
@@ -549,7 +603,7 @@
                 }
             }
         });
-        return totalClickVal * clickMult * getRebirthMultiplier();
+        return baseVal * clickMult;
     }
 
     function calculateCurrentBPS() {
@@ -557,7 +611,12 @@
         miners.forEach(m => {
             let count = gameData.ownedMiners[m.id] || 0;
             if (count > 0) {
-                totalBPS += (count * m.production);
+                let productionYield = m.production;
+                // Rebirth Effect 2: Automated Hyperdrive (+150% miner base yield)
+                if (gameData.rebirths >= 2) {
+                    productionYield *= 2.5;
+                }
+                totalBPS += (count * productionYield);
             }
         });
         
@@ -570,7 +629,16 @@
                 }
             }
         });
-        return totalBPS * upMult * getRebirthMultiplier();
+
+        let finalBPS = totalBPS * upMult;
+
+        // Rebirth Effect 5+: Singularity Engine (Compounding 2.5x per level above 4)
+        if (gameData.rebirths >= 5) {
+            let extraLevels = gameData.rebirths - 4;
+            finalBPS *= Math.pow(2.5, extraLevels);
+        }
+
+        return finalBPS;
     }
 
     function getMinerCost(miner) {
@@ -599,7 +667,9 @@
                 </div>
                 <div class="item-owned" id="owned-${m.id}">${owned}</div>`;
             
-            div.onmouseenter = (e) => showTooltip(e, `Generates +${m.production.toFixed(4)} base BTC per second.`);
+            let currentProduction = m.production;
+            if (gameData.rebirths >= 2) currentProduction *= 2.5;
+            div.onmouseenter = (e) => showTooltip(e, `Generates +${currentProduction.toFixed(4)} active BTC per second.`);
             div.onmouseleave = hideTooltip;
             
             div.onclick = () => {
@@ -668,10 +738,31 @@
         });
     }
 
+    function renderRebirthEffectsList() {
+        const listContainer = document.getElementById('effects-list');
+        if (!listContainer) return;
+        listContainer.innerHTML = '';
+        
+        rebirthEffectsConfig.forEach(eff => {
+            const row = document.createElement('div');
+            const isActive = gameData.rebirths >= eff.level;
+            row.className = `effect-row ${isActive ? 'active' : 'inactive'}`;
+            
+            let prefix = isActive ? "[ACTIVE] " : "[LOCKED] ";
+            if (eff.level === 5 && gameData.rebirths >= 5) {
+                let currentStack = gameData.rebirths - 4;
+                prefix = `[ACTIVE x${currentStack}] `;
+            }
+            
+            row.innerText = `${prefix}Tier ${eff.level} - ${eff.name}: ${eff.desc}`;
+            listContainer.appendChild(row);
+        });
+    }
+
     function updateDisplay() {
         document.getElementById('balance').innerText = formatNum(gameData.bitcoin);
         document.getElementById('bps').innerText = formatNum(calculateCurrentBPS());
-        document.getElementById('rebirth-mult').innerText = getRebirthMultiplier().toFixed(1);
+        document.getElementById('rebirth-count-txt').innerText = gameData.rebirths;
         
         let progressPercent = (gameData.bitcoin / REBIRTH_REQUIREMENT) * 100;
         if (progressPercent > 100) progressPercent = 100;
@@ -702,7 +793,7 @@
     function triggerRebirth() {
         if (gameData.bitcoin < REBIRTH_REQUIREMENT) return;
         
-        if (confirm("Are you sure you want to rebirth?\n\nThis will reset your current hardware upgrades and total bitcoins, but you will receive a permanent 5x operational speed boost to speed up your next run!")) {
+        if (confirm("Are you sure you want to rebirth?\n\nThis resets upgrades, miners, and bank totals, but you will progress to the next historical loop level and unlock specialized operational benefits!")) {
             gameData.bitcoin = 0;
             gameData.ownedMiners = {};
             gameData.upgradeLevels = {};
@@ -711,9 +802,10 @@
             saveGame();
             renderMiners();
             renderUpgrades();
+            renderRebirthEffectsList();
             updateDisplay();
             fastColorCheck();
-            alert("Timeline reset complete! Welcome back to a faster minery.");
+            alert(`Timeline transformation operational! You are now level ${gameData.rebirths}.`);
         }
     }
 
@@ -764,6 +856,7 @@
         }
         document.getElementById("minery-title").innerText = gameData.mineryName.toUpperCase();
         evaluateDevTriggerVisibility();
+        renderRebirthEffectsList();
         updateDisplay();
     }
 
