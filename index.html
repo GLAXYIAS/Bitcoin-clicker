@@ -17,6 +17,158 @@
             height: 100vh;
         }
 
+        /* ========================================= */
+        /* CINEMATIC LOGO INTRO OVERLAY STYLES       */
+        /* ========================================= */
+        #intro-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #000000;
+            z-index: 99999; /* Higher than any modal to block everything */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        /* Ambient background texture - slow panning dark grid */
+        .intro-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 1px);
+            background-size: 60px 60px;
+            background-position: center;
+            z-index: 1;
+            animation: gridPan 20s linear infinite;
+        }
+
+        /* Center lighting vignette overlay */
+        .vignette {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, #000000 75%);
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        /* Main Intro Container */
+        .logo-container {
+            text-align: center;
+            z-index: 3;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; /* Smooth, modern look for branding */
+        }
+
+        /* The Logo Graphic Box */
+        .logo-graphic {
+            width: 110px;
+            height: 110px;
+            margin-bottom: 36px;
+            position: relative;
+            background: #030303;
+            border: 2px solid #d47a55; 
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.6rem;
+            font-weight: 800;
+            color: #ffffff;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 30px rgba(212, 122, 85, 0.2), inset 0 0 20px rgba(212, 122, 85, 0.15);
+            opacity: 0;
+            animation: elegantFadeIn 1.5s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards, logoGlowPulse 4s infinite alternate ease-in-out 1.7s;
+        }
+
+        /* Dynamic Expandable Copper Corner Brackets */
+        .logo-graphic::before, .logo-graphic::after {
+            content: '';
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            border: 3px solid #e59371;
+            animation: bracketSlide 1.2s cubic-bezier(0.25, 1, 0.5, 1) 0.6s forwards;
+        }
+        .logo-graphic::before { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+        .logo-graphic::after { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+
+        /* Prominent Stark White Brand Header */
+        .logo-text {
+            font-size: 3rem;
+            font-weight: 900;
+            color: #ffffff;
+            margin: 0;
+            text-transform: uppercase;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.85), 0 0 40px rgba(255, 255, 255, 0.4);
+            opacity: 0;
+            animation: textExposureReveal 2s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
+        }
+
+        /* Muted Off-White Subtitle Typography Layout */
+        .logo-subtitle {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 8px;
+            text-indent: 8px;
+            color: #a0a0a5;
+            margin-top: 18px;
+            text-transform: uppercase;
+            opacity: 0;
+            animation: subFadeIn 1s ease 1.6s forwards;
+        }
+
+        /* Futuristic Digital Loader Accent Line */
+        .loader-bar {
+            width: 0px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #e59371, #ffffff, #e59371, transparent);
+            margin-top: 24px;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+            animation: loadBarExtend 1.4s cubic-bezier(0.65, 0, 0.35, 1) 1s forwards;
+        }
+
+        /* ========================================= */
+        /* INTRO ANIMATION TIMELINES                 */
+        /* ========================================= */
+        @keyframes gridPan {
+            from { background-position: 0 0; }
+            to { background-position: 60px 60px; }
+        }
+        @keyframes elegantFadeIn {
+            0% { opacity: 0; transform: scale(0.85) translateY(15px); }
+            100% { opacity: 1; transform: scale(1) translateY(0px); }
+        }
+        @keyframes bracketSlide {
+            0% { top: 10px; left: 10px; bottom: 10px; right: 10px; }
+            100% { top: -8px; left: -8px; bottom: -8px; right: -8px; }
+        }
+        @keyframes textExposureReveal {
+            0% { opacity: 0; letter-spacing: 4px; text-indent: 4px; filter: blur(15px) brightness(3); transform: scale(0.96); }
+            40% { opacity: 1; filter: blur(6px) brightness(2); }
+            100% { opacity: 1; letter-spacing: 22px; text-indent: 22px; filter: blur(0px) brightness(1); transform: scale(1); }
+        }
+        @keyframes loadBarExtend { to { width: 240px; } }
+        @keyframes subFadeIn { to { opacity: 1; } }
+        @keyframes logoGlowPulse {
+            0% { box-shadow: 0 0 25px rgba(212, 122, 85, 0.2), inset 0 0 15px rgba(212, 122, 85, 0.15); border-color: #d47a55; transform: translateY(0px); }
+            100% { box-shadow: 0 0 45px rgba(212, 122, 85, 0.45), inset 0 0 25px rgba(212, 122, 85, 0.3); border-color: #e59371; transform: translateY(-3px); }
+        }
+
+        /* ========================================= */
+        /* MAIN CLICKER GAME INTERFACE STYLES        */
+        /* ========================================= */
         #stats-modal {
             display: none;
             position: fixed;
@@ -42,9 +194,6 @@
         .modal-btns { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; }
         .modal-btns button { padding: 10px; font-family: inherit; font-size: 0.55em; cursor: pointer; border: 2px solid #333; color: #000; font-weight: bold; }
 
-        /* ========================================= */
-        /* CHEAT / DEV MENU SPECIAL CUSTOM STYLES    */
-        /* ========================================= */
         #dev-trigger-btn {
             display: none;
             position: absolute;
@@ -74,63 +223,15 @@
             box-shadow: 0 0 30px rgba(188, 52, 250, 0.8);
             color: #fff;
         }
-        .dev-header {
-            color: #bc34fa;
-            font-size: 0.65em;
-            margin-bottom: 20px;
-            text-align: center;
-            text-shadow: 0 0 5px rgba(188, 52, 250, 0.5);
-            letter-spacing: 1px;
-        }
-        .dev-section-title {
-            font-size: 0.45em;
-            color: #ffd700;
-            margin: 15px 0 8px 0;
-            border-bottom: 2px solid #bc34fa;
-            padding-bottom: 4px;
-            text-transform: uppercase;
-        }
-        .dev-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 8px;
-            gap: 10px;
-        }
-        .dev-label {
-            font-size: 0.4em;
-            flex: 1;
-            color: #ddd;
-        }
-        .dev-input {
-            width: 130px;
-            background: #000;
-            border: 1px solid #bc34fa;
-            color: #00ff9d;
-            font-family: monospace;
-            font-size: 0.6em;
-            padding: 4px;
-        }
-        .dev-btn {
-            padding: 6px 10px;
-            font-family: inherit;
-            font-size: 0.45em;
-            background: #bc34fa;
-            color: #000;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .dev-btn:hover {
-            background: #d466ff;
-        }
-        .dev-close-btn {
-            width: 100%;
-            margin-top: 15px;
-            background: #444;
-            color: #fff;
-        }
+        .dev-header { color: #bc34fa; font-size: 0.65em; margin-bottom: 20px; text-align: center; text-shadow: 0 0 5px rgba(188, 52, 250, 0.5); letter-spacing: 1px; }
+        .dev-section-title { font-size: 0.45em; color: #ffd700; margin: 15px 0 8px 0; border-bottom: 2px solid #bc34fa; padding-bottom: 4px; text-transform: uppercase; }
+        .dev-row { display: flex; align-items: center; margin-bottom: 8px; gap: 10px; }
+        .dev-label { font-size: 0.4em; flex: 1; color: #ddd; }
+        .dev-input { width: 130px; background: #000; border: 1px solid #bc34fa; color: #00ff9d; font-family: monospace; font-size: 0.6em; padding: 4px; }
+        .dev-btn { padding: 6px 10px; font-family: inherit; font-size: 0.45em; background: #bc34fa; color: #000; border: none; cursor: pointer; font-weight: bold; }
+        .dev-btn:hover { background: #d466ff; }
+        .dev-close-btn { width: 100%; margin-top: 15px; background: #444; color: #fff; }
 
-        /* Standard Game Frame Structuring */
         .game-container { display: flex; height: 100vh; width: 100vw; }
         .left-panel { flex: 0 0 35%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; background: rgba(255,255,255,0.05); position: relative; }
         .center-panel { flex: 1; border-left: 4px solid #444; border-right: 4px solid #444; display: flex; flex-direction: column; background: rgba(0,0,0,0.3); }
@@ -202,17 +303,26 @@
             max-height: 120px;
             overflow-y: auto;
         }
-        .effect-row {
-            font-size: 0.38em;
-            margin: 4px 0;
-            line-height: 1.3;
-            font-family: monospace;
-        }
+        .effect-row { font-size: 0.38em; margin: 4px 0; line-height: 1.3; font-family: monospace; }
         .effect-row.active { color: #00ff9d; }
         .effect-row.inactive { color: #555; text-decoration: line-through; }
     </style>
 </head>
 <body>
+
+<div id="intro-overlay">
+    <div class="intro-bg"></div>
+    <div class="vignette"></div>
+
+    <div class="logo-container">
+        <div class="logo-graphic">Nx</div>
+        
+        <h1 class="logo-text">Glaxyias</h1>
+        <div class="logo-subtitle">Bringing You Unblocked Games Since 2026</div>
+        
+        <div class="loader-bar"></div>
+    </div>
+</div>
 
 <button id="dev-trigger-btn" onclick="toggleDevMenu(true)">[DEV MENU]</button>
 
@@ -247,8 +357,7 @@
             </div>
             <button id="rebirth-btn-action" class="rebirth-btn" disabled onclick="triggerRebirth()">RESET TIMELINE FOR DYNAMIC TIMELINE EFFECTS</button>
             
-            <div class="effects-container" id="effects-list">
-                </div>
+            <div class="effects-container" id="effects-list"></div>
         </div>
     </div>
 
@@ -410,7 +519,6 @@
         { id: "u5", name: "Liquid Nitrogen Cooling", baseCost: 950000000, svg: 'processor', type: "bps", boost: 1.20, desc: "Supercools your system infrastructure, making miners 20% faster." }
     ];
 
-    // Dynamic Rebirth Perks Database Definition
     const rebirthEffectsConfig = [
         { level: 1, name: "Kinetic Overclock", desc: "Base click values gain a massive +300% boost." },
         { level: 2, name: "Automated Hyperdrive", desc: "All automated miner base production yields scaled +150%." },
@@ -444,9 +552,6 @@
         }
     }
 
-    // =======================================================
-    // DEV CHEAT ACTIONS CORE CORE IMPLEMENTATION ENGINE       
-    // =======================================================
     function toggleDevMenu(open) {
         document.getElementById('modal-bg').style.display = open ? 'block' : 'none';
         document.getElementById('dev-menu-modal').style.display = open ? 'block' : 'none';
@@ -484,7 +589,6 @@
     function devSetGlobalBpsMultiplier() {
         const input = document.getElementById("dev-speed-mult-input");
         const val = parseFloat(input.value) || 1;
-        // Approximation logic for matching input multiplier with system configurations
         gameData.rebirths = Math.max(0, Math.floor(val / 2.5));
         syncStatePostDevCheat();
     }
@@ -558,9 +662,6 @@
         return (n / scale).toFixed(2) + suffix;
     }
 
-    // =======================================================
-    // ADVANCED REBIRTH ADVANTAGE METRIC SYSTEM ENGINES
-    // =======================================================
     function getTotalMinersOwnedCount() {
         let count = 0;
         for (let key in gameData.ownedMiners) {
@@ -572,8 +673,6 @@
     function getUpgradeCost(u) {
         const lvl = gameData.upgradeLevels[u.id] || 0;
         let cost = Math.floor(u.baseCost * Math.pow(2.5, lvl));
-        
-        // Rebirth Effect 3: Market Optimization (25% discount)
         if (gameData.rebirths >= 3) {
             cost = Math.floor(cost * 0.75);
         }
@@ -582,13 +681,7 @@
 
     function getClickValue() {
         let baseVal = gameData.clickValue;
-        
-        // Rebirth Effect 1: Kinetic Overclock (+300% click strength)
-        if (gameData.rebirths >= 1) {
-            baseVal *= 4.0;
-        }
-
-        // Rebirth Effect 4: Quantum Synergy (+5% per owned miner setup)
+        if (gameData.rebirths >= 1) baseVal *= 4.0;
         if (gameData.rebirths >= 4) {
             let minerCount = getTotalMinersOwnedCount();
             baseVal *= (1.0 + (minerCount * 0.05));
@@ -612,10 +705,7 @@
             let count = gameData.ownedMiners[m.id] || 0;
             if (count > 0) {
                 let productionYield = m.production;
-                // Rebirth Effect 2: Automated Hyperdrive (+150% miner base yield)
-                if (gameData.rebirths >= 2) {
-                    productionYield *= 2.5;
-                }
+                if (gameData.rebirths >= 2) productionYield *= 2.5;
                 totalBPS += (count * productionYield);
             }
         });
@@ -631,13 +721,10 @@
         });
 
         let finalBPS = totalBPS * upMult;
-
-        // Rebirth Effect 5+: Singularity Engine (Compounding 2.5x per level above 4)
         if (gameData.rebirths >= 5) {
             let extraLevels = gameData.rebirths - 4;
             finalBPS *= Math.pow(2.5, extraLevels);
         }
-
         return finalBPS;
     }
 
@@ -867,10 +954,25 @@
         }
     }
 
+    // =======================================================
+    // INITIALIZATION RUNTIME MECHANICS WITH INTRO LIFECYCLE  
+    // =======================================================
     loadGame();
     renderMiners();
     renderUpgrades();
     updateNews();
+
+    // 2.6 Seconds (Fade In / Draw Animations) + 3 Seconds Hold = 5600ms Total
+    setTimeout(() => {
+        const intro = document.getElementById('intro-overlay');
+        intro.style.opacity = '0';
+        intro.style.transform = 'scale(1.05)'; // Gives a smooth theatrical zooming out effect
+        
+        // Completely remove element from click layouts after CSS transitions complete
+        setTimeout(() => {
+            intro.style.display = 'none';
+        }, 800);
+    }, 5600);
 
     setInterval(() => {
         let bps = calculateCurrentBPS();
