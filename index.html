@@ -256,7 +256,7 @@
                 Current Rebirth Level: <span id="rebirth-count-txt" style="color: #ff4d4d;">0</span><br>
                 Rebirth Points: <span id="rebirth-points-txt" style="color: #00ff9d; font-weight: bold;">0</span>
             </div>
-            <button id="rebirth-btn-action" class="rebirth-btn" disabled onclick="triggerRebirth()">RESET TIMELINE (+5 RP)</button>
+            <button id="rebirth-btn-action" class="rebirth-btn" disabled onclick="triggerRebirth()">RESET TIMELINE (+1 RP)</button>
             <button class="rebirth-btn" style="margin-top: 10px; border-color: #bc34fa; color: #bc34fa;" onclick="toggleSkillTree(true)">OPEN SKILL TREE</button>
         </div>
     </div>
@@ -691,7 +691,7 @@
             window.gameData.ownedMiners = {};
             window.gameData.upgradeLevels = {};
             window.gameData.rebirths++;
-            window.gameData.rebirthPoints += 5; // Grant 5 RP
+            window.gameData.rebirthPoints += 1; // Grant 1 RP
             
             saveGame();
             renderMiners();
