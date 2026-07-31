@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bitcoin Clicker</title>
+    
+    <link rel="stylesheet" href="skillTree.css">
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
         * { -webkit-user-select: none; -ms-user-select: none; user-select: none; box-sizing: border-box; }
@@ -27,7 +30,7 @@
             width: 100vw;
             height: 100vh;
             background-color: #000000;
-            z-index: 99999; /* Higher than any modal to block everything */
+            z-index: 99999;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -35,13 +38,9 @@
             transition: opacity 0.8s ease, transform 0.8s ease;
         }
 
-        /* Ambient background texture - slow panning dark grid */
         .intro-bg {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             background-image: 
                 linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 1px);
@@ -51,109 +50,61 @@
             animation: gridPan 20s linear infinite;
         }
 
-        /* Center lighting vignette overlay */
         .vignette {
-            position: absolute;
-            width: 100%;
-            height: 100%;
+            position: absolute; width: 100%; height: 100%;
             background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, #000000 75%);
-            z-index: 2;
-            pointer-events: none;
+            z-index: 2; pointer-events: none;
         }
 
-        /* Main Intro Container */
         .logo-container {
-            text-align: center;
-            z-index: 3;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; /* Smooth, modern look for branding */
+            text-align: center; z-index: 3; display: flex; flex-direction: column;
+            align-items: center; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
 
-        /* The Logo Graphic Box */
         .logo-graphic {
-            width: 110px;
-            height: 110px;
-            margin-bottom: 36px;
-            position: relative;
-            background: #030303;
-            border: 2px solid #d47a55; 
-            border-radius: 12px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 2.6rem;
-            font-weight: 800;
-            color: #ffffff;
+            width: 110px; height: 110px; margin-bottom: 36px; position: relative;
+            background: #030303; border: 2px solid #d47a55; border-radius: 12px;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 2.6rem; font-weight: 800; color: #ffffff;
             text-shadow: 0 0 15px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.4);
             box-shadow: 0 0 30px rgba(212, 122, 85, 0.2), inset 0 0 20px rgba(212, 122, 85, 0.15);
             opacity: 0;
             animation: elegantFadeIn 1.5s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards, logoGlowPulse 4s infinite alternate ease-in-out 1.7s;
         }
 
-        /* Dynamic Expandable Copper Corner Brackets */
         .logo-graphic::before, .logo-graphic::after {
-            content: '';
-            position: absolute;
-            width: 14px;
-            height: 14px;
+            content: ''; position: absolute; width: 14px; height: 14px;
             border: 3px solid #e59371;
             animation: bracketSlide 1.2s cubic-bezier(0.25, 1, 0.5, 1) 0.6s forwards;
         }
         .logo-graphic::before { top: 10px; left: 10px; border-right: none; border-bottom: none; }
         .logo-graphic::after { bottom: 10px; right: 10px; border-left: none; border-top: none; }
 
-        /* Prominent Stark White Brand Header */
         .logo-text {
-            font-size: 3rem;
-            font-weight: 900;
-            color: #ffffff;
-            margin: 0;
+            font-size: 3rem; font-weight: 900; color: #ffffff; margin: 0;
             text-transform: uppercase;
             text-shadow: 0 0 20px rgba(255, 255, 255, 0.85), 0 0 40px rgba(255, 255, 255, 0.4);
             opacity: 0;
             animation: textExposureReveal 2s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
         }
 
-        /* Muted Off-White Subtitle Typography Layout */
         .logo-subtitle {
-            font-size: 0.75rem;
-            font-weight: 600;
-            letter-spacing: 8px;
-            text-indent: 8px;
-            color: #a0a0a5;
-            margin-top: 18px;
-            text-transform: uppercase;
+            font-size: 0.75rem; font-weight: 600; letter-spacing: 8px; text-indent: 8px;
+            color: #a0a0a5; margin-top: 18px; text-transform: uppercase;
             opacity: 0;
             animation: subFadeIn 1s ease 1.6s forwards;
         }
 
-        /* Futuristic Digital Loader Accent Line */
         .loader-bar {
-            width: 0px;
-            height: 2px;
+            width: 0px; height: 2px;
             background: linear-gradient(90deg, transparent, #e59371, #ffffff, #e59371, transparent);
-            margin-top: 24px;
-            box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+            margin-top: 24px; box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
             animation: loadBarExtend 1.4s cubic-bezier(0.65, 0, 0.35, 1) 1s forwards;
         }
 
-        /* ========================================= */
-        /* INTRO ANIMATION TIMELINES                 */
-        /* ========================================= */
-        @keyframes gridPan {
-            from { background-position: 0 0; }
-            to { background-position: 60px 60px; }
-        }
-        @keyframes elegantFadeIn {
-            0% { opacity: 0; transform: scale(0.85) translateY(15px); }
-            100% { opacity: 1; transform: scale(1) translateY(0px); }
-        }
-        @keyframes bracketSlide {
-            0% { top: 10px; left: 10px; bottom: 10px; right: 10px; }
-            100% { top: -8px; left: -8px; bottom: -8px; right: -8px; }
-        }
+        @keyframes gridPan { from { background-position: 0 0; } to { background-position: 60px 60px; } }
+        @keyframes elegantFadeIn { 0% { opacity: 0; transform: scale(0.85) translateY(15px); } 100% { opacity: 1; transform: scale(1) translateY(0px); } }
+        @keyframes bracketSlide { 0% { top: 10px; left: 10px; bottom: 10px; right: 10px; } 100% { top: -8px; left: -8px; bottom: -8px; right: -8px; } }
         @keyframes textExposureReveal {
             0% { opacity: 0; letter-spacing: 4px; text-indent: 4px; filter: blur(15px) brightness(3); transform: scale(0.96); }
             40% { opacity: 1; filter: blur(6px) brightness(2); }
@@ -169,60 +120,29 @@
         /* ========================================= */
         /* MAIN CLICKER GAME INTERFACE STYLES        */
         /* ========================================= */
-        #stats-modal {
-            display: none;
-            position: fixed;
-            top: 25%; left: 50%;
-            transform: translate(-50%, -20%);
-            background: #1f1f2e;
-            border: 4px solid #ffd700;
-            padding: 25px;
-            z-index: 2000;
-            width: 460px;
-            text-align: left;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.9);
-        }
         .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
-            z-index: 1999;
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 1999;
         }
+        
+        #stats-modal, #skill-tree-modal {
+            display: none; position: fixed; top: 15%; left: 50%;
+            transform: translate(-50%, 0);
+            background: #1f1f2e; border: 4px solid #ffd700; padding: 25px;
+            z-index: 2000; width: 460px; text-align: left; box-shadow: 0 15px 40px rgba(0,0,0,0.9);
+        }
+        #skill-tree-modal {
+            width: 650px; background: #120a1c; border-color: #bc34fa; max-height: 80vh; overflow-y: auto;
+        }
+
         .stats-line { margin: 12px 0; font-size: 0.6em; color: #fff; }
         .stats-val { color: #00ff9d; float: right; font-family: monospace; }
         .modal-btns { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; }
         .modal-btns button { padding: 10px; font-family: inherit; font-size: 0.55em; cursor: pointer; border: 2px solid #333; color: #000; font-weight: bold; }
 
-        #dev-trigger-btn {
-            display: none;
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            z-index: 2100;
-            padding: 8px 14px;
-            font-family: inherit;
-            font-size: 0.5em;
-            background: #000;
-            color: #bc34fa;
-            border: 2px solid #bc34fa;
-            box-shadow: 0 0 10px rgba(188, 52, 250, 0.6);
-            cursor: pointer;
-        }
-        #dev-menu-modal {
-            display: none;
-            position: fixed;
-            top: 10%; left: 5%;
-            background: #120a1c;
-            border: 4px solid #bc34fa;
-            padding: 20px;
-            z-index: 2500;
-            width: 480px;
-            max-height: 80vh;
-            overflow-y: auto;
-            box-shadow: 0 0 30px rgba(188, 52, 250, 0.8);
-            color: #fff;
-        }
+        /* DEV MENU */
+        #dev-trigger-btn { display: none; position: absolute; top: 15px; left: 15px; z-index: 2100; padding: 8px 14px; font-family: inherit; font-size: 0.5em; background: #000; color: #bc34fa; border: 2px solid #bc34fa; box-shadow: 0 0 10px rgba(188, 52, 250, 0.6); cursor: pointer; }
+        #dev-menu-modal { display: none; position: fixed; top: 10%; left: 5%; background: #120a1c; border: 4px solid #bc34fa; padding: 20px; z-index: 2500; width: 480px; max-height: 80vh; overflow-y: auto; box-shadow: 0 0 30px rgba(188, 52, 250, 0.8); color: #fff; }
         .dev-header { color: #bc34fa; font-size: 0.65em; margin-bottom: 20px; text-align: center; text-shadow: 0 0 5px rgba(188, 52, 250, 0.5); letter-spacing: 1px; }
         .dev-section-title { font-size: 0.45em; color: #ffd700; margin: 15px 0 8px 0; border-bottom: 2px solid #bc34fa; padding-bottom: 4px; text-transform: uppercase; }
         .dev-row { display: flex; align-items: center; margin-bottom: 8px; gap: 10px; }
@@ -232,6 +152,7 @@
         .dev-btn:hover { background: #d466ff; }
         .dev-close-btn { width: 100%; margin-top: 15px; background: #444; color: #fff; }
 
+        /* LAYOUT */
         .game-container { display: flex; height: 100vh; width: 100vw; }
         .left-panel { flex: 0 0 35%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; background: rgba(255,255,255,0.05); position: relative; }
         .center-panel { flex: 1; border-left: 4px solid #444; border-right: 4px solid #444; display: flex; flex-direction: column; background: rgba(0,0,0,0.3); }
@@ -281,31 +202,12 @@
         .news-ticker-container { width: 100%; height: 50px; background: #0c0c12; border-bottom: 4px solid #444; overflow: hidden; position: relative; display: flex; align-items: center; }
         #news-text { white-space: nowrap; position: absolute; font-family: monospace; font-size: 0.7em; color: #ff6666; padding-left: 20px; }
 
-        .rebirth-center-box {
-            margin: auto 20px 20px 20px;
-            padding: 20px;
-            border: 2px dashed #ff4d4d;
-            background: rgba(20, 20, 30, 0.7);
-            text-align: center;
-        }
+        .rebirth-center-box { margin: auto 20px 20px 20px; padding: 20px; border: 2px dashed #ff4d4d; background: rgba(20, 20, 30, 0.7); text-align: center; }
         .rebirth-title { font-size: 0.55em; color: #ff4d4d; letter-spacing: 1px; margin-bottom: 6px; }
         .rebirth-desc { font-size: 0.45em; color: #ccc; line-height: 1.5; margin-bottom: 12px; }
         .rebirth-btn { width: 100%; max-width: 380px; background: #000; color: #ff4d4d; border: 2px solid #ff4d4d; font-family: inherit; font-size: 0.5em; padding: 12px; cursor: pointer; transition: 0.2s; }
         .rebirth-btn:not(:disabled):hover { background: #ff4d4d; color: #000; }
         .rebirth-btn:disabled { opacity: 0.25; cursor: not-allowed; border-color: #444; color: #444; }
-
-        .effects-container {
-            margin-top: 10px;
-            background: rgba(0,0,0,0.4);
-            padding: 8px;
-            border-top: 1px solid #444;
-            text-align: left;
-            max-height: 120px;
-            overflow-y: auto;
-        }
-        .effect-row { font-size: 0.38em; margin: 4px 0; line-height: 1.3; font-family: monospace; }
-        .effect-row.active { color: #00ff9d; }
-        .effect-row.inactive { color: #555; text-decoration: line-through; }
     </style>
 </head>
 <body>
@@ -316,10 +218,8 @@
 
     <div class="logo-container">
         <div class="logo-graphic">Nx</div>
-        
         <h1 class="logo-text">Glaxyias</h1>
         <div class="logo-subtitle">Bringing You Unblocked Games Since 2025</div>
-        
         <div class="loader-bar"></div>
     </div>
 </div>
@@ -353,11 +253,11 @@
             <div class="rebirth-desc">
                 Requires: 1.00 Quintillion BTC<br>
                 Progress: <span id="rebirth-progress" style="color:#ffd700; font-weight:bold;">0.00%</span><br>
-                Current Rebirth Level: <span id="rebirth-count-txt" style="color: #ff4d4d;">0</span>
+                Current Rebirth Level: <span id="rebirth-count-txt" style="color: #ff4d4d;">0</span><br>
+                Rebirth Points: <span id="rebirth-points-txt" style="color: #00ff9d; font-weight: bold;">0</span>
             </div>
-            <button id="rebirth-btn-action" class="rebirth-btn" disabled onclick="triggerRebirth()">RESET TIMELINE FOR DYNAMIC TIMELINE EFFECTS</button>
-            
-            <div class="effects-container" id="effects-list"></div>
+            <button id="rebirth-btn-action" class="rebirth-btn" disabled onclick="triggerRebirth()">RESET TIMELINE (+5 RP)</button>
+            <button class="rebirth-btn" style="margin-top: 10px; border-color: #bc34fa; color: #bc34fa;" onclick="toggleSkillTree(true)">OPEN SKILL TREE</button>
         </div>
     </div>
 
@@ -388,9 +288,17 @@
     </div>
 </div>
 
+<div id="skill-tree-modal">
+    <h2 style="color: #bc34fa; font-size: 0.65em; margin-bottom: 15px; text-align: center;">REBIRTH SKILL TREE</h2>
+    <div style="text-align: center; font-size: 0.5em; margin-bottom: 10px;">Available Rebirth Points (RP): <span id="st-rp-display" style="color: #00ff9d; font-weight: bold;">0</span></div>
+    <div id="skill-tree-nodes" class="skill-tree-container"></div>
+    <div class="modal-btns">
+        <button onclick="toggleSkillTree(false)" style="background: #444; color: white;">CLOSE</button>
+    </div>
+</div>
+
 <div id="dev-menu-modal">
     <div class="dev-header">SYSTEM ADMINISTRATION MANIFEST</div>
-    
     <div class="dev-section-title">Currency Manipulation</div>
     <div class="dev-row">
         <div class="dev-label">Add Set Value:</div>
@@ -415,9 +323,9 @@
         <button class="dev-btn" onclick="devAddRebirths()">GRANT</button>
     </div>
     <div class="dev-row">
-        <div class="dev-label">Set Global Speed Multiplier:</div>
-        <input type="number" id="dev-speed-mult-input" class="dev-input" value="10">
-        <button class="dev-btn" onclick="devSetGlobalBpsMultiplier()">SET MULT</button>
+        <div class="dev-label">Add Rebirth Points (RP):</div>
+        <input type="number" id="dev-rp-input" class="dev-input" value="5">
+        <button class="dev-btn" onclick="devAddRebirthPoints()">GRANT RP</button>
     </div>
     <div class="dev-row">
         <div class="dev-label">Modify Lifetime Mined Value:</div>
@@ -431,25 +339,8 @@
         <button class="dev-btn" style="width:130px;" onclick="devMaxUpgrades()">MAX ALL</button>
     </div>
     <div class="dev-row">
-        <div class="dev-label">Set Level for All Upgrades:</div>
-        <input type="number" id="dev-upgrade-lvl-input" class="dev-input" value="5">
-        <button class="dev-btn" onclick="devSetUpgradeLevelsSpecific()">APPLY</button>
-    </div>
-    <div class="dev-row">
         <div class="dev-label">Instantly Add 10 of All Miners:</div>
         <button class="dev-btn" style="width:130px;" onclick="devAddMinersBulk()">GRANT 10x</button>
-    </div>
-
-    <div class="dev-section-title">Click Engine Metrics</div>
-    <div class="dev-row">
-        <div class="dev-label">Set Base Click Weight:</div>
-        <input type="number" id="dev-click-base-input" class="dev-input" value="500">
-        <button class="dev-btn" onclick="devSetBaseClickValue()">SET BASE</button>
-    </div>
-    <div class="dev-row">
-        <div class="dev-label">Increase Mouse Clicks Counter:</div>
-        <input type="number" id="dev-click-count-input" class="dev-input" value="1000">
-        <button class="dev-btn" onclick="devAddClickStats()">ADD STAT</button>
     </div>
 
     <div class="dev-section-title">System Execution</div>
@@ -460,6 +351,9 @@
 
 <div id="tooltip" class="tooltip"></div>
 
+<script src="achievements.js"></script>
+<script src="skillTree.js"></script>
+
 <script>
     const SVGS = {
         hardware: `<svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2zm-2-7H7v2h10V6zm2 12H5v-2h14v2zM21 2H3c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>`,
@@ -469,12 +363,16 @@
         quantum: `<svg viewBox="0 0 24 24"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zm0-2a8 8 0 1 1 0-16 8 8 0 0 1 0 16z"/></svg>`
     };
 
-    let gameData = {
+    // Make gameData available globally so achievements.js and skillTree.js can access it
+    window.gameData = {
         bitcoin: 0,
         totalMined: 0,
         totalClicks: 0,
         clickValue: 0.5, 
         rebirths: 0,
+        rebirthPoints: 0, 
+        unlockedAchievements: [], 
+        skillTreeLevels: {}, 
         mineryName: "Bitcoin's Minery",
         lastSaveTime: Date.now(),
         ownedMiners: {},
@@ -503,8 +401,7 @@
     const miners = [];
     for (let i = 0; i < minerNames.length; i++) {
         miners.push({
-            id: `miner_${i}`,
-            name: minerNames[i],
+            id: `miner_${i}`, name: minerNames[i],
             baseCost: Math.floor(40 * Math.pow(2.1, i)), 
             production: Number((0.05 * Math.pow(1.35, i)).toFixed(4)),
             svgType: i < 4 ? 'hardware' : i < 8 ? 'network' : i < 12 ? 'processor' : 'quantum'
@@ -519,37 +416,22 @@
         { id: "u5", name: "Liquid Nitrogen Cooling", baseCost: 950000000, svg: 'processor', type: "bps", boost: 1.20, desc: "Supercools your system infrastructure, making miners 20% faster." }
     ];
 
-    const rebirthEffectsConfig = [
-        { level: 1, name: "Kinetic Overclock", desc: "Base click values gain a massive +300% boost." },
-        { level: 2, name: "Automated Hyperdrive", desc: "All automated miner base production yields scaled +150%." },
-        { level: 3, name: "Market Optimization", desc: "Hardware store purchase requirements slashed by 25% permanently." },
-        { level: 4, name: "Quantum Synergy", desc: "Click weights scale upwards by +5% for every running automatic hardware unit." },
-        { level: 5, name: "Singularity Engine", desc: "Every level achieved past Tier 4 accelerates total factory production by a compound 2.5x." }
-    ];
-
     function editMineryName() {
-        const newName = prompt("Enter a new name for your minery:", gameData.mineryName);
+        const newName = prompt("Enter a new name for your minery:", window.gameData.mineryName);
         if (newName && newName.trim() !== "") {
-            gameData.mineryName = newName.trim();
-            document.getElementById("minery-title").innerText = gameData.mineryName.toUpperCase();
-            
-            if (gameData.mineryName.toLowerCase() === "haxforbitcoinplz") {
-                gameData.devMenuUnlocked = true;
+            window.gameData.mineryName = newName.trim();
+            document.getElementById("minery-title").innerText = window.gameData.mineryName.toUpperCase();
+            if (window.gameData.mineryName.toLowerCase() === "haxforbitcoinplz") {
+                window.gameData.devMenuUnlocked = true;
                 alert("ADMIN MODE CONFIRMED. Developer console trigger initialized.");
             }
-            
             evaluateDevTriggerVisibility();
             saveGame();
         }
     }
 
     function evaluateDevTriggerVisibility() {
-        const btn = document.getElementById("dev-trigger-btn");
-        if (gameData.devMenuUnlocked) {
-            btn.style.display = "block";
-        } else {
-            btn.style.display = "none";
-        }
+        document.getElementById("dev-trigger-btn").style.display = window.gameData.devMenuUnlocked ? "block" : "none";
     }
 
     function toggleDevMenu(open) {
@@ -557,143 +439,82 @@
         document.getElementById('dev-menu-modal').style.display = open ? 'block' : 'none';
     }
 
-    function devAddFunds() {
-        const input = document.getElementById("dev-add-funds-input");
-        const val = parseFloat(input.value) || 0;
-        gameData.bitcoin += val;
-        gameData.totalMined += val;
-        syncStatePostDevCheat();
+    function toggleSkillTree(open) {
+        document.getElementById('modal-bg').style.display = open ? 'block' : 'none';
+        document.getElementById('skill-tree-modal').style.display = open ? 'block' : 'none';
+        // Check if the external skill tree function is loaded before calling it
+        if (open && typeof renderSkillTree === "function") {
+            renderSkillTree();
+        }
     }
 
-    function devMultiplyFunds() {
-        const input = document.getElementById("dev-mult-funds-input");
-        const val = parseFloat(input.value) || 1;
-        gameData.bitcoin *= val;
-        syncStatePostDevCheat();
+    function devAddFunds() { window.gameData.bitcoin += parseFloat(document.getElementById("dev-add-funds-input").value) || 0; syncStatePostDevCheat(); }
+    function devMultiplyFunds() { window.gameData.bitcoin *= parseFloat(document.getElementById("dev-mult-funds-input").value) || 1; syncStatePostDevCheat(); }
+    function devSetAbsoluteFunds() { window.gameData.bitcoin = parseFloat(document.getElementById("dev-set-funds-input").value) || 0; syncStatePostDevCheat(); }
+    function devAddRebirths() { window.gameData.rebirths += parseInt(document.getElementById("dev-rebirth-input").value) || 0; syncStatePostDevCheat(); }
+    function devAddRebirthPoints() { window.gameData.rebirthPoints += parseInt(document.getElementById("dev-rp-input").value) || 0; syncStatePostDevCheat(); }
+    function devSetLifetimeMined() { window.gameData.totalMined = parseFloat(document.getElementById("dev-lifetime-input").value) || 0; syncStatePostDevCheat(); }
+    function devMaxUpgrades() { upgrades.forEach(u => window.gameData.upgradeLevels[u.id] = 100); renderUpgrades(); syncStatePostDevCheat(); }
+    function devAddMinersBulk() { miners.forEach(m => window.gameData.ownedMiners[m.id] = (window.gameData.ownedMiners[m.id] || 0) + 10); renderMiners(); syncStatePostDevCheat(); }
+    
+    function syncStatePostDevCheat() { 
+        updateDisplay(); 
+        fastColorCheck(); 
+        saveGame(); 
+        if (typeof checkAchievements === "function") checkAchievements(window.gameData); 
     }
 
-    function devSetAbsoluteFunds() {
-        const input = document.getElementById("dev-set-funds-input");
-        const val = parseFloat(input.value) || 0;
-        gameData.bitcoin = val;
-        syncStatePostDevCheat();
-    }
-
-    function devAddRebirths() {
-        const input = document.getElementById("dev-rebirth-input");
-        const val = parseInt(input.value) || 0;
-        gameData.rebirths += val;
-        syncStatePostDevCheat();
-    }
-
-    function devSetGlobalBpsMultiplier() {
-        const input = document.getElementById("dev-speed-mult-input");
-        const val = parseFloat(input.value) || 1;
-        gameData.rebirths = Math.max(0, Math.floor(val / 2.5));
-        syncStatePostDevCheat();
-    }
-
-    function devSetLifetimeMined() {
-        const input = document.getElementById("dev-lifetime-input");
-        const val = parseFloat(input.value) || 0;
-        gameData.totalMined = val;
-        syncStatePostDevCheat();
-    }
-
-    function devMaxUpgrades() {
-        upgrades.forEach(u => {
-            gameData.upgradeLevels[u.id] = 100;
-        });
-        renderUpgrades();
-        syncStatePostDevCheat();
-    }
-
-    function devSetUpgradeLevelsSpecific() {
-        const input = document.getElementById("dev-upgrade-lvl-input");
-        const val = parseInt(input.value) || 0;
-        upgrades.forEach(u => {
-            gameData.upgradeLevels[u.id] = val;
-        });
-        renderUpgrades();
-        syncStatePostDevCheat();
-    }
-
-    function devAddMinersBulk() {
-        miners.forEach(m => {
-            gameData.ownedMiners[m.id] = (gameData.ownedMiners[m.id] || 0) + 10;
-        });
-        renderMiners();
-        syncStatePostDevCheat();
-    }
-
-    function devSetBaseClickValue() {
-        const input = document.getElementById("dev-click-base-input");
-        const val = parseFloat(input.value) || 0.5;
-        gameData.clickValue = val;
-        syncStatePostDevCheat();
-    }
-
-    function devAddClickStats() {
-        const input = document.getElementById("dev-click-count-input");
-        const val = parseInt(input.value) || 0;
-        gameData.totalClicks += val;
-        syncStatePostDevCheat();
-    }
-
-    function syncStatePostDevCheat() {
-        updateDisplay();
-        fastColorCheck();
-        renderRebirthEffectsList();
-        saveGame();
-    }
-
-    function closeAllModals() {
-        toggleStats(false);
-        toggleDevMenu(false);
-    }
+    function closeAllModals() { toggleStats(false); toggleDevMenu(false); toggleSkillTree(false); }
 
     function formatNum(n) {
         if (n === 0) return "0.00";
         if (n < 1000) return n.toFixed(2);
         const tier = Math.floor(Math.log10(n) / 3);
         if (tier >= suffixes.length) return n.toExponential(2);
-        const suffix = suffixes[tier];
-        const scale = Math.pow(10, tier * 3);
-        return (n / scale).toFixed(2) + suffix;
-    }
-
-    function getTotalMinersOwnedCount() {
-        let count = 0;
-        for (let key in gameData.ownedMiners) {
-            count += (gameData.ownedMiners[key] || 0);
-        }
-        return count;
+        return (n / Math.pow(10, tier * 3)).toFixed(2) + suffixes[tier];
     }
 
     function getUpgradeCost(u) {
-        const lvl = gameData.upgradeLevels[u.id] || 0;
+        const lvl = window.gameData.upgradeLevels[u.id] || 0;
         let cost = Math.floor(u.baseCost * Math.pow(2.5, lvl));
-        if (gameData.rebirths >= 3) {
-            cost = Math.floor(cost * 0.75);
+        
+        // Calculate external skill tree discount if available
+        let discount = 1;
+        if (typeof SKILL_TREE !== 'undefined' && SKILL_TREE.node_discount) {
+            discount = SKILL_TREE.node_discount.getEffect(window.gameData.skillTreeLevels['node_discount'] || 0);
         }
-        return cost;
+        
+        return Math.floor(cost * discount);
+    }
+
+    function getMinerCost(miner) {
+        const owned = window.gameData.ownedMiners[miner.id] || 0;
+        let cost = Math.floor(miner.baseCost * Math.pow(1.42, owned));
+        
+        // Calculate external skill tree discount if available
+        let discount = 1;
+        if (typeof SKILL_TREE !== 'undefined' && SKILL_TREE.node_discount) {
+            discount = SKILL_TREE.node_discount.getEffect(window.gameData.skillTreeLevels['node_discount'] || 0);
+        }
+
+        return Math.floor(cost * discount);
     }
 
     function getClickValue() {
-        let baseVal = gameData.clickValue;
-        if (gameData.rebirths >= 1) baseVal *= 4.0;
-        if (gameData.rebirths >= 4) {
-            let minerCount = getTotalMinersOwnedCount();
-            baseVal *= (1.0 + (minerCount * 0.05));
+        let baseVal = window.gameData.clickValue;
+        
+        // Apply External Skill Tree Multiplier
+        let skillMult = 1;
+        if (typeof SKILL_TREE !== 'undefined' && SKILL_TREE.node_click_mult) {
+            skillMult = SKILL_TREE.node_click_mult.getEffect(window.gameData.skillTreeLevels['node_click_mult'] || 0);
         }
+        baseVal *= skillMult;
 
         let clickMult = 1;
         upgrades.forEach(u => {
             if (u.type === 'click') {
-                const lvl = gameData.upgradeLevels[u.id] || 0;
-                if (lvl > 0) {
-                    clickMult *= Math.pow(u.boost, lvl);
-                }
+                const lvl = window.gameData.upgradeLevels[u.id] || 0;
+                if (lvl > 0) clickMult *= Math.pow(u.boost, lvl);
             }
         });
         return baseVal * clickMult;
@@ -702,46 +523,38 @@
     function calculateCurrentBPS() {
         let totalBPS = 0;
         miners.forEach(m => {
-            let count = gameData.ownedMiners[m.id] || 0;
-            if (count > 0) {
-                let productionYield = m.production;
-                if (gameData.rebirths >= 2) productionYield *= 2.5;
-                totalBPS += (count * productionYield);
-            }
+            let count = window.gameData.ownedMiners[m.id] || 0;
+            if (count > 0) totalBPS += (count * m.production);
         });
         
         let upMult = 1;
         upgrades.forEach(u => {
             if (u.type === 'bps') {
-                const lvl = gameData.upgradeLevels[u.id] || 0;
-                if (lvl > 0) {
-                    upMult *= Math.pow(u.boost, lvl);
-                }
+                const lvl = window.gameData.upgradeLevels[u.id] || 0;
+                if (lvl > 0) upMult *= Math.pow(u.boost, lvl);
             }
         });
 
         let finalBPS = totalBPS * upMult;
-        if (gameData.rebirths >= 5) {
-            let extraLevels = gameData.rebirths - 4;
-            finalBPS *= Math.pow(2.5, extraLevels);
+        
+        // Apply External Skill Tree Idle Boost
+        let idleMult = 1;
+        if (typeof SKILL_TREE !== 'undefined' && SKILL_TREE.node_idle_boost) {
+            idleMult = SKILL_TREE.node_idle_boost.getEffect(window.gameData.skillTreeLevels['node_idle_boost'] || 0);
         }
-        return finalBPS;
-    }
+        finalBPS *= idleMult;
 
-    function getMinerCost(miner) {
-        const owned = gameData.ownedMiners[miner.id] || 0;
-        return Math.floor(miner.baseCost * Math.pow(1.42, owned));
+        return finalBPS;
     }
 
     function renderMiners() {
         const list = document.getElementById('miners-list');
         if (!list) return;
-        
         list.innerHTML = '';
         miners.forEach((m) => {
             const cost = getMinerCost(m);
-            const owned = gameData.ownedMiners[m.id] || 0;
-            const canAfford = gameData.bitcoin >= cost;
+            const owned = window.gameData.ownedMiners[m.id] || 0;
+            const canAfford = window.gameData.bitcoin >= cost;
             
             const div = document.createElement('div');
             div.id = `el-${m.id}`;
@@ -754,23 +567,19 @@
                 </div>
                 <div class="item-owned" id="owned-${m.id}">${owned}</div>`;
             
-            let currentProduction = m.production;
-            if (gameData.rebirths >= 2) currentProduction *= 2.5;
-            div.onmouseenter = (e) => showTooltip(e, `Generates +${currentProduction.toFixed(4)} active BTC per second.`);
+            div.onmouseenter = (e) => showTooltip(e, `Generates +${m.production.toFixed(4)} active BTC per second.`);
             div.onmouseleave = hideTooltip;
             
             div.onclick = () => {
                 const updatedCost = getMinerCost(m); 
-                if (gameData.bitcoin >= updatedCost) {
-                    gameData.bitcoin -= updatedCost;
-                    gameData.ownedMiners[m.id] = (gameData.ownedMiners[m.id] || 0) + 1;
-                    
-                    const newCost = getMinerCost(m);
-                    document.getElementById(`owned-${m.id}`).innerText = gameData.ownedMiners[m.id];
-                    document.getElementById(`cost-${m.id}`).innerText = formatNum(newCost) + " BTC";
-                    
-                    updateDisplay();
-                    fastColorCheck();
+                if (window.gameData.bitcoin >= updatedCost) {
+                    window.gameData.bitcoin -= updatedCost;
+                    window.gameData.ownedMiners[m.id] = (window.gameData.ownedMiners[m.id] || 0) + 1;
+                    document.getElementById(`owned-${m.id}`).innerText = window.gameData.ownedMiners[m.id];
+                    document.getElementById(`cost-${m.id}`).innerText = formatNum(getMinerCost(m)) + " BTC";
+                    updateDisplay(); 
+                    fastColorCheck(); 
+                    if (typeof checkAchievements === "function") checkAchievements(window.gameData);
                 }
             };
             list.appendChild(div);
@@ -784,14 +593,12 @@
             const costText = document.getElementById(`cost-${m.id}`);
             if (!div || !costText) return;
             
-            if (gameData.bitcoin >= cost) {
+            if (window.gameData.bitcoin >= cost) {
                 div.classList.remove('locked');
-                costText.classList.remove('cannot-afford');
-                costText.classList.add('can-afford');
+                costText.classList.replace('cannot-afford', 'can-afford');
             } else {
                 div.classList.add('locked');
-                costText.classList.remove('can-afford');
-                costText.classList.add('cannot-afford');
+                costText.classList.replace('can-afford', 'cannot-afford');
             }
         });
     }
@@ -801,7 +608,7 @@
         grid.innerHTML = '';
         upgrades.forEach((u) => {
             const cost = getUpgradeCost(u);
-            const lvl = gameData.upgradeLevels[u.id] || 0;
+            const lvl = window.gameData.upgradeLevels[u.id] || 0;
             
             const div = document.createElement('div');
             div.className = 'upgrade-item';
@@ -812,108 +619,103 @@
             
             div.onclick = () => {
                 const activeCost = getUpgradeCost(u);
-                if (gameData.bitcoin >= activeCost) {
-                    gameData.bitcoin -= activeCost;
-                    gameData.upgradeLevels[u.id] = (gameData.upgradeLevels[u.id] || 0) + 1;
-                    hideTooltip();
-                    renderUpgrades();
-                    updateDisplay();
-                    fastColorCheck();
+                if (window.gameData.bitcoin >= activeCost) {
+                    window.gameData.bitcoin -= activeCost;
+                    window.gameData.upgradeLevels[u.id] = (window.gameData.upgradeLevels[u.id] || 0) + 1;
+                    hideTooltip(); 
+                    renderUpgrades(); 
+                    updateDisplay(); 
+                    fastColorCheck(); 
+                    if (typeof checkAchievements === "function") checkAchievements(window.gameData);
                 }
             };
             grid.appendChild(div);
         });
     }
 
-    function renderRebirthEffectsList() {
-        const listContainer = document.getElementById('effects-list');
-        if (!listContainer) return;
-        listContainer.innerHTML = '';
-        
-        rebirthEffectsConfig.forEach(eff => {
-            const row = document.createElement('div');
-            const isActive = gameData.rebirths >= eff.level;
-            row.className = `effect-row ${isActive ? 'active' : 'inactive'}`;
-            
-            let prefix = isActive ? "[ACTIVE] " : "[LOCKED] ";
-            if (eff.level === 5 && gameData.rebirths >= 5) {
-                let currentStack = gameData.rebirths - 4;
-                prefix = `[ACTIVE x${currentStack}] `;
-            }
-            
-            row.innerText = `${prefix}Tier ${eff.level} - ${eff.name}: ${eff.desc}`;
-            listContainer.appendChild(row);
-        });
-    }
-
     function updateDisplay() {
-        document.getElementById('balance').innerText = formatNum(gameData.bitcoin);
+        document.getElementById('balance').innerText = formatNum(window.gameData.bitcoin);
         document.getElementById('bps').innerText = formatNum(calculateCurrentBPS());
-        document.getElementById('rebirth-count-txt').innerText = gameData.rebirths;
+        document.getElementById('rebirth-count-txt').innerText = window.gameData.rebirths;
+        document.getElementById('rebirth-points-txt').innerText = window.gameData.rebirthPoints;
         
-        let progressPercent = (gameData.bitcoin / REBIRTH_REQUIREMENT) * 100;
-        if (progressPercent > 100) progressPercent = 100;
+        let progressPercent = Math.min((window.gameData.bitcoin / REBIRTH_REQUIREMENT) * 100, 100);
         document.getElementById('rebirth-progress').innerText = progressPercent.toFixed(4) + "%";
-        
-        const rebirthBtn = document.getElementById('rebirth-btn-action');
-        rebirthBtn.disabled = gameData.bitcoin < REBIRTH_REQUIREMENT;
+        document.getElementById('rebirth-btn-action').disabled = window.gameData.bitcoin < REBIRTH_REQUIREMENT;
     }
 
+    // MAIN CLICK EVENT & EXTERNAL CRIT LOGIC
     document.getElementById('bitcoin').onclick = (e) => {
         let val = getClickValue();
-        gameData.bitcoin += val;
-        gameData.totalMined += val;
-        gameData.totalClicks++;
+        let isCrit = false;
+
+        let critChance = 0;
+        if (typeof SKILL_TREE !== 'undefined' && SKILL_TREE.node_crit_chance) {
+            critChance = SKILL_TREE.node_crit_chance.getEffect(window.gameData.skillTreeLevels['node_crit_chance'] || 0);
+        }
+
+        if (critChance > 0 && Math.random() < critChance) {
+            val *= 10;
+            isCrit = true;
+        }
+
+        window.gameData.bitcoin += val;
+        window.gameData.totalMined += val;
+        window.gameData.totalClicks++;
         
         const f = document.createElement('div');
         f.className = 'floating-text';
-        f.innerText = `+${formatNum(val)}`;
+        if (isCrit) {
+            f.innerText = `CRIT! +${formatNum(val)}`;
+            f.style.color = '#ff4d4d'; // Red crit text
+            f.style.transform = 'scale(1.5)';
+        } else {
+            f.innerText = `+${formatNum(val)}`;
+        }
+        
         f.style.left = `${e.clientX}px`;
         f.style.top = `${e.clientY}px`;
         document.body.appendChild(f);
         setTimeout(() => f.remove(), 700);
         
+        if (typeof checkAchievements === "function") checkAchievements(window.gameData);
         updateDisplay();
         fastColorCheck(); 
     };
 
     function triggerRebirth() {
-        if (gameData.bitcoin < REBIRTH_REQUIREMENT) return;
+        if (window.gameData.bitcoin < REBIRTH_REQUIREMENT) return;
         
-        if (confirm("Are you sure you want to rebirth?\n\nThis resets upgrades, miners, and bank totals, but you will progress to the next historical loop level and unlock specialized operational benefits!")) {
-            gameData.bitcoin = 0;
-            gameData.ownedMiners = {};
-            gameData.upgradeLevels = {};
-            gameData.rebirths++;
+        if (confirm("Are you sure you want to rebirth?\n\nThis resets upgrades, miners, and bank totals, but you will progress to the next loop level and earn 5 Rebirth Points!")) {
+            window.gameData.bitcoin = 0;
+            window.gameData.ownedMiners = {};
+            window.gameData.upgradeLevels = {};
+            window.gameData.rebirths++;
+            window.gameData.rebirthPoints += 5; // Grant 5 RP
             
             saveGame();
             renderMiners();
             renderUpgrades();
-            renderRebirthEffectsList();
             updateDisplay();
             fastColorCheck();
-            alert(`Timeline transformation operational! You are now level ${gameData.rebirths}.`);
+            if (typeof checkAchievements === "function") checkAchievements(window.gameData);
+            alert(`Timeline transformation operational! You earned 5 Rebirth Points.`);
         }
     }
 
     const tooltip = document.getElementById('tooltip');
-    function showTooltip(e, txt) {
-        tooltip.innerHTML = txt;
-        tooltip.style.display = 'block';
-        tooltip.style.left = `${e.clientX + 15}px`;
-        tooltip.style.top = `${e.clientY + 15}px`;
-    }
+    function showTooltip(e, txt) { tooltip.innerHTML = txt; tooltip.style.display = 'block'; tooltip.style.left = `${e.clientX + 15}px`; tooltip.style.top = `${e.clientY + 15}px`; }
     function hideTooltip() { tooltip.style.display = 'none'; }
 
     function toggleStats(open) {
         document.getElementById('modal-bg').style.display = open ? 'block' : 'none';
         document.getElementById('stats-modal').style.display = open ? 'block' : 'none';
         if (open) {
-            document.getElementById('stat-current').innerText = formatNum(gameData.bitcoin) + " BTC";
-            document.getElementById('stat-total').innerText = formatNum(gameData.totalMined) + " BTC";
-            document.getElementById('stat-clicks').innerText = gameData.totalClicks;
+            document.getElementById('stat-current').innerText = formatNum(window.gameData.bitcoin) + " BTC";
+            document.getElementById('stat-total').innerText = formatNum(window.gameData.totalMined) + " BTC";
+            document.getElementById('stat-clicks').innerText = window.gameData.totalClicks;
             document.getElementById('stat-bps-modal').innerText = formatNum(calculateCurrentBPS()) + " BTC/S";
-            document.getElementById('stat-rebirths').innerText = gameData.rebirths;
+            document.getElementById('stat-rebirths').innerText = window.gameData.rebirths;
         }
     }
 
@@ -921,16 +723,13 @@
         const txt = document.getElementById('news-text');
         const msg = newsMessages[Math.floor(Math.random() * newsMessages.length)];
         txt.innerText = msg;
-        
-        const duration = Math.max(12, msg.length * 0.22);
-        txt.style.animation = 'none';
-        txt.offsetHeight; 
-        txt.style.animation = `ticker ${duration}s linear infinite`;
+        txt.style.animation = 'none'; txt.offsetHeight; 
+        txt.style.animation = `ticker ${Math.max(12, msg.length * 0.22)}s linear infinite`;
     }
 
     function saveGame() {
-        gameData.lastSaveTime = Date.now();
-        localStorage.setItem('btcMinerySaveData', JSON.stringify(gameData));
+        window.gameData.lastSaveTime = Date.now();
+        localStorage.setItem('btcMinerySaveData', JSON.stringify(window.gameData));
     }
 
     function loadGame() {
@@ -938,12 +737,16 @@
         if (saved) {
             try {
                 const parsed = JSON.parse(saved);
-                gameData = Object.assign({}, gameData, parsed);
+                // Ensure new features don't break old saves
+                if (!parsed.unlockedAchievements) parsed.unlockedAchievements = [];
+                if (!parsed.skillTreeLevels) parsed.skillTreeLevels = {};
+                if (!parsed.rebirthPoints) parsed.rebirthPoints = 0;
+                
+                window.gameData = Object.assign({}, window.gameData, parsed);
             } catch(e) { console.error("Could not parse save data file."); }
         }
-        document.getElementById("minery-title").innerText = gameData.mineryName.toUpperCase();
+        document.getElementById("minery-title").innerText = window.gameData.mineryName.toUpperCase();
         evaluateDevTriggerVisibility();
-        renderRebirthEffectsList();
         updateDisplay();
     }
 
@@ -954,32 +757,28 @@
         }
     }
 
-    // =======================================================
-    // INITIALIZATION RUNTIME MECHANICS WITH INTRO LIFECYCLE  
-    // =======================================================
+    // GAME LOOP START
     loadGame();
     renderMiners();
     renderUpgrades();
     updateNews();
+    if (typeof loadAchievements === "function") loadAchievements();
+    if (typeof loadSkillTree === "function") loadSkillTree();
 
-    // 2.6 Seconds (Fade In / Draw Animations) + 3 Seconds Hold = 5600ms Total
     setTimeout(() => {
         const intro = document.getElementById('intro-overlay');
         intro.style.opacity = '0';
-        intro.style.transform = 'scale(1.05)'; // Gives a smooth theatrical zooming out effect
-        
-        // Completely remove element from click layouts after CSS transitions complete
-        setTimeout(() => {
-            intro.style.display = 'none';
-        }, 800);
+        intro.style.transform = 'scale(1.05)';
+        setTimeout(() => { intro.style.display = 'none'; }, 800);
     }, 5600);
 
     setInterval(() => {
         let bps = calculateCurrentBPS();
-        gameData.bitcoin += (bps / 10);
-        gameData.totalMined += (bps / 10);
+        window.gameData.bitcoin += (bps / 10);
+        window.gameData.totalMined += (bps / 10);
         updateDisplay();
         fastColorCheck(); 
+        if (typeof checkAchievements === "function") checkAchievements(window.gameData);
     }, 100); 
 
     setInterval(saveGame, 20000); 
