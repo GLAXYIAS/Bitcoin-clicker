@@ -402,18 +402,21 @@
     for (let i = 0; i < minerNames.length; i++) {
         miners.push({
             id: `miner_${i}`, name: minerNames[i],
-            baseCost: Math.floor(40 * Math.pow(2.1, i)), 
-            production: Number((0.05 * Math.pow(1.35, i)).toFixed(4)),
+            // NEW BALANCED MATH: Starts at 25 cost, 1 production.
+            // Cost scales by 9.5x per tier, Production scales by 8.0x per tier.
+            baseCost: Math.floor(25 * Math.pow(9.5, i)), 
+            production: Math.floor(1 * Math.pow(8, i)),
             svgType: i < 4 ? 'hardware' : i < 8 ? 'network' : i < 12 ? 'processor' : 'quantum'
         });
     }
 
+    // Upgrades also needed a massive buff to match the new economy
     const upgrades = [
-        { id: "u1", name: "High-Tactility Actuator", baseCost: 2500, svg: 'boost', type: "click", boost: 1.25, desc: "Increases mouse click harvest by 25%." },
-        { id: "u2", name: "Low-Resistance Cabling", baseCost: 15000, svg: 'processor', type: "bps", boost: 1.10, desc: "Boosts all your automatic miner speed by 10%." },
-        { id: "u3", name: "Solid-State Flash Array", baseCost: 500000, svg: 'hardware', type: "click", boost: 1.40, desc: "Upgrades storage read pipelines. Clicks gain +40% power." },
-        { id: "u4", name: "Dedicated Bus Upgrades", baseCost: 12000000, svg: 'network', type: "bps", boost: 1.15, desc: "Reduces server traffic jams. Total miner output rises 15%." },
-        { id: "u5", name: "Liquid Nitrogen Cooling", baseCost: 950000000, svg: 'processor', type: "bps", boost: 1.20, desc: "Supercools your system infrastructure, making miners 20% faster." }
+        { id: "u1", name: "High-Tactility Actuator", baseCost: 1000, svg: 'boost', type: "click", boost: 1.50, desc: "Increases mouse click harvest by 50%." },
+        { id: "u2", name: "Low-Resistance Cabling", baseCost: 25000, svg: 'processor', type: "bps", boost: 1.50, desc: "Boosts all your automatic miner speed by 50%." },
+        { id: "u3", name: "Solid-State Flash Array", baseCost: 5000000, svg: 'hardware', type: "click", boost: 2.00, desc: "Upgrades storage read pipelines. Clicks gain +100% power." },
+        { id: "u4", name: "Dedicated Bus Upgrades", baseCost: 2500000000, svg: 'network', type: "bps", boost: 2.00, desc: "Reduces server traffic jams. Total miner output rises +100%." },
+        { id: "u5", name: "Liquid Nitrogen Cooling", baseCost: 1000000000000, svg: 'processor', type: "bps", boost: 3.00, desc: "Supercools your system infrastructure, making miners +200% faster." }
     ];
 
     function editMineryName() {
