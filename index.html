@@ -6,13 +6,21 @@
     <title>Bitcoin Clicker</title>
     
     <link rel="stylesheet" href="skillTree.css">
+    <link rel="stylesheet" href="events/events.css">
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-        * { -webkit-user-select: none; -ms-user-select: none; user-select: none; box-sizing: border-box; }
+        
+        * { 
+            -webkit-user-select: none; 
+            -ms-user-select: none; 
+            user-select: none; 
+            box-sizing: border-box; 
+        }
         
         body {
-            margin: 0; padding: 0;
+            margin: 0; 
+            padding: 0;
             background: linear-gradient(#14141c, #2a2a45); 
             color: #00ff9d;
             font-family: 'Press Start 2P', cursive;
@@ -40,7 +48,10 @@
 
         .intro-bg {
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%;
             background-image: 
                 linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 1px);
@@ -51,21 +62,37 @@
         }
 
         .vignette {
-            position: absolute; width: 100%; height: 100%;
+            position: absolute; 
+            width: 100%; 
+            height: 100%;
             background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, #000000 75%);
-            z-index: 2; pointer-events: none;
+            z-index: 2; 
+            pointer-events: none;
         }
 
         .logo-container {
-            text-align: center; z-index: 3; display: flex; flex-direction: column;
-            align-items: center; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            text-align: center; 
+            z-index: 3; 
+            display: flex; 
+            flex-direction: column;
+            align-items: center; 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
 
         .logo-graphic {
-            width: 110px; height: 110px; margin-bottom: 36px; position: relative;
-            background: #030303; border: 2px solid #d47a55; border-radius: 12px;
-            display: flex; justify-content: center; align-items: center;
-            font-size: 2.6rem; font-weight: 800; color: #ffffff;
+            width: 110px; 
+            height: 110px; 
+            margin-bottom: 36px; 
+            position: relative;
+            background: #030303; 
+            border: 2px solid #d47a55; 
+            border-radius: 12px;
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            font-size: 2.6rem; 
+            font-weight: 800; 
+            color: #ffffff;
             text-shadow: 0 0 15px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.4);
             box-shadow: 0 0 30px rgba(212, 122, 85, 0.2), inset 0 0 20px rgba(212, 122, 85, 0.15);
             opacity: 0;
@@ -73,15 +100,22 @@
         }
 
         .logo-graphic::before, .logo-graphic::after {
-            content: ''; position: absolute; width: 14px; height: 14px;
+            content: ''; 
+            position: absolute; 
+            width: 14px; 
+            height: 14px;
             border: 3px solid #e59371;
             animation: bracketSlide 1.2s cubic-bezier(0.25, 1, 0.5, 1) 0.6s forwards;
         }
+        
         .logo-graphic::before { top: 10px; left: 10px; border-right: none; border-bottom: none; }
         .logo-graphic::after { bottom: 10px; right: 10px; border-left: none; border-top: none; }
 
         .logo-text {
-            font-size: 3rem; font-weight: 900; color: #ffffff; margin: 0;
+            font-size: 3rem; 
+            font-weight: 900; 
+            color: #ffffff; 
+            margin: 0;
             text-transform: uppercase;
             text-shadow: 0 0 20px rgba(255, 255, 255, 0.85), 0 0 40px rgba(255, 255, 255, 0.4);
             opacity: 0;
@@ -89,16 +123,23 @@
         }
 
         .logo-subtitle {
-            font-size: 0.75rem; font-weight: 600; letter-spacing: 8px; text-indent: 8px;
-            color: #a0a0a5; margin-top: 18px; text-transform: uppercase;
+            font-size: 0.75rem; 
+            font-weight: 600; 
+            letter-spacing: 8px; 
+            text-indent: 8px;
+            color: #a0a0a5; 
+            margin-top: 18px; 
+            text-transform: uppercase;
             opacity: 0;
             animation: subFadeIn 1s ease 1.6s forwards;
         }
 
         .loader-bar {
-            width: 0px; height: 2px;
+            width: 0px; 
+            height: 2px;
             background: linear-gradient(90deg, transparent, #e59371, #ffffff, #e59371, transparent);
-            margin-top: 24px; box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+            margin-top: 24px; 
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
             animation: loadBarExtend 1.4s cubic-bezier(0.65, 0, 0.35, 1) 1s forwards;
         }
 
@@ -121,44 +162,117 @@
         /* MAIN CLICKER GAME INTERFACE STYLES        */
         /* ========================================= */
         .modal-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); z-index: 1999;
+            display: none; 
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); 
+            z-index: 1999;
         }
         
         #stats-modal, #skill-tree-modal {
-            display: none; position: fixed; top: 15%; left: 50%;
+            display: none; 
+            position: fixed; 
+            top: 15%; left: 50%;
             transform: translate(-50%, 0);
-            background: #1f1f2e; border: 4px solid #ffd700; padding: 25px;
-            z-index: 2000; width: 460px; text-align: left; box-shadow: 0 15px 40px rgba(0,0,0,0.9);
+            background: #1f1f2e; 
+            border: 4px solid #ffd700; 
+            padding: 25px;
+            z-index: 2000; 
+            width: 460px; 
+            text-align: left; 
+            box-shadow: 0 15px 40px rgba(0,0,0,0.9);
         }
+
         #skill-tree-modal {
-            width: 650px; background: #120a1c; border-color: #bc34fa; max-height: 80vh; overflow-y: auto;
+            width: 650px; 
+            background: #120a1c; 
+            border-color: #bc34fa; 
+            max-height: 80vh; 
+            overflow-y: auto;
         }
 
         .stats-line { margin: 12px 0; font-size: 0.6em; color: #fff; }
         .stats-val { color: #00ff9d; float: right; font-family: monospace; }
-        .modal-btns { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; }
-        .modal-btns button { padding: 10px; font-family: inherit; font-size: 0.55em; cursor: pointer; border: 2px solid #333; color: #000; font-weight: bold; }
+        
+        .modal-btns { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 8px; 
+            margin-top: 20px; 
+        }
+        
+        .modal-btns button { 
+            padding: 10px; 
+            font-family: inherit; 
+            font-size: 0.55em; 
+            cursor: pointer; 
+            border: 2px solid #333; 
+            color: #000; 
+            font-weight: bold; 
+        }
 
         /* DEV MENU */
-        #dev-trigger-btn { display: none; position: absolute; top: 15px; left: 15px; z-index: 2100; padding: 8px 14px; font-family: inherit; font-size: 0.5em; background: #000; color: #bc34fa; border: 2px solid #bc34fa; box-shadow: 0 0 10px rgba(188, 52, 250, 0.6); cursor: pointer; }
-        #dev-menu-modal { display: none; position: fixed; top: 10%; left: 5%; background: #120a1c; border: 4px solid #bc34fa; padding: 20px; z-index: 2500; width: 480px; max-height: 80vh; overflow-y: auto; box-shadow: 0 0 30px rgba(188, 52, 250, 0.8); color: #fff; }
+        #dev-trigger-btn { 
+            display: none; 
+            position: absolute; 
+            top: 15px; left: 15px; 
+            z-index: 2100; padding: 8px 14px; 
+            font-family: inherit; font-size: 0.5em; 
+            background: #000; color: #bc34fa; 
+            border: 2px solid #bc34fa; 
+            box-shadow: 0 0 10px rgba(188, 52, 250, 0.6); 
+            cursor: pointer; 
+        }
+        
+        #dev-menu-modal { 
+            display: none; 
+            position: fixed; 
+            top: 10%; left: 5%; 
+            background: #120a1c; 
+            border: 4px solid #bc34fa; 
+            padding: 20px; 
+            z-index: 2500; width: 480px; 
+            max-height: 80vh; overflow-y: auto; 
+            box-shadow: 0 0 30px rgba(188, 52, 250, 0.8); 
+            color: #fff; 
+        }
+
         .dev-header { color: #bc34fa; font-size: 0.65em; margin-bottom: 20px; text-align: center; text-shadow: 0 0 5px rgba(188, 52, 250, 0.5); letter-spacing: 1px; }
         .dev-section-title { font-size: 0.45em; color: #ffd700; margin: 15px 0 8px 0; border-bottom: 2px solid #bc34fa; padding-bottom: 4px; text-transform: uppercase; }
         .dev-row { display: flex; align-items: center; margin-bottom: 8px; gap: 10px; }
         .dev-label { font-size: 0.4em; flex: 1; color: #ddd; }
         .dev-input { width: 130px; background: #000; border: 1px solid #bc34fa; color: #00ff9d; font-family: monospace; font-size: 0.6em; padding: 4px; }
+        
         .dev-btn { padding: 6px 10px; font-family: inherit; font-size: 0.45em; background: #bc34fa; color: #000; border: none; cursor: pointer; font-weight: bold; }
         .dev-btn:hover { background: #d466ff; }
         .dev-close-btn { width: 100%; margin-top: 15px; background: #444; color: #fff; }
 
         /* LAYOUT */
         .game-container { display: flex; height: 100vh; width: 100vw; }
-        .left-panel { flex: 0 0 35%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; background: rgba(255,255,255,0.05); position: relative; }
-        .center-panel { flex: 1; border-left: 4px solid #444; border-right: 4px solid #444; display: flex; flex-direction: column; background: rgba(0,0,0,0.3); }
-        .right-panel { flex: 0 0 450px; background: #1a1a26; display: flex; flex-direction: column; height: 100%; }
+        
+        .left-panel { 
+            flex: 0 0 35%; display: flex; flex-direction: column; align-items: center; 
+            justify-content: center; padding: 20px; text-align: center; 
+            background: rgba(255,255,255,0.05); position: relative; 
+        }
+        
+        .center-panel { 
+            flex: 1; border-left: 4px solid #444; border-right: 4px solid #444; 
+            display: flex; flex-direction: column; background: rgba(0,0,0,0.3); 
+        }
+        
+        .right-panel { 
+            flex: 0 0 450px; background: #1a1a26; display: flex; 
+            flex-direction: column; height: 100%; 
+        }
 
-        h1 { color: #ffd700; font-size: 0.85em; margin-bottom: 30px; text-shadow: 0 0 6px rgba(255, 215, 0, 0.6); text-transform: uppercase; line-height: 1.4; cursor: pointer; border-bottom: 2px dashed rgba(255,215,0,0.3); padding-bottom: 4px; }
+        h1 { 
+            color: #ffd700; font-size: 0.85em; margin-bottom: 30px; 
+            text-shadow: 0 0 6px rgba(255, 215, 0, 0.6); text-transform: uppercase; 
+            line-height: 1.4; cursor: pointer; border-bottom: 2px dashed rgba(255,215,0,0.3); 
+            padding-bottom: 4px; 
+        }
         h1:hover { color: #ffffff; border-color: #ffffff; }
 
         #bitcoin { width: 250px; height: 250px; cursor: pointer; transition: transform 0.05s; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
@@ -180,9 +294,9 @@
         .item-icon-frame { width: 32px; height: 32px; margin-right: 15px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .item-icon-frame svg { width: 100%; height: 100%; fill: #888; }
         .item:not(.locked) .item-icon-frame svg { fill: #00ff9d; }
+        
         .item-details { flex: 1; overflow: hidden; }
         .item-name { font-size: 0.5em; color: #ffd700; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        
         .item-cost { font-size: 0.65em; font-family: monospace; font-weight: bold; letter-spacing: 0.5px; }
         .item-cost.can-afford { color: #00ff9d; text-shadow: 0 0 2px rgba(0,255,157,0.3); }
         .item-cost.cannot-afford { color: #ff6666; }
@@ -190,7 +304,11 @@
         .item-owned { font-size: 0.9em; color: #555577; font-family: monospace; margin-left: 10px; font-weight: bold; }
         .item:not(.locked) .item-owned { color: #8888ba; }
 
-        .floating-text { position: absolute; color: #ffd700; font-family: monospace; font-weight: bold; pointer-events: none; z-index: 1000; animation: floatUp 0.7s ease-out forwards; font-size: 0.75em; text-shadow: 0 0 4px #000; }
+        .floating-text { 
+            position: absolute; color: #ffd700; font-family: monospace; font-weight: bold; 
+            pointer-events: none; z-index: 1000; animation: floatUp 0.7s ease-out forwards; 
+            font-size: 0.75em; text-shadow: 0 0 4px #000; 
+        }
         @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-100px); } }
 
         .tooltip { 
@@ -205,6 +323,7 @@
         .rebirth-center-box { margin: auto 20px 20px 20px; padding: 20px; border: 2px dashed #ff4d4d; background: rgba(20, 20, 30, 0.7); text-align: center; }
         .rebirth-title { font-size: 0.55em; color: #ff4d4d; letter-spacing: 1px; margin-bottom: 6px; }
         .rebirth-desc { font-size: 0.45em; color: #ccc; line-height: 1.5; margin-bottom: 12px; }
+        
         .rebirth-btn { width: 100%; max-width: 380px; background: #000; color: #ff4d4d; border: 2px solid #ff4d4d; font-family: inherit; font-size: 0.5em; padding: 12px; cursor: pointer; transition: 0.2s; }
         .rebirth-btn:not(:disabled):hover { background: #ff4d4d; color: #000; }
         .rebirth-btn:disabled { opacity: 0.25; cursor: not-allowed; border-color: #444; color: #444; }
@@ -262,7 +381,7 @@
     </div>
 
     <div class="right-panel">
-        <div class="store-header">SOFTWARE STORE</div>
+        <div class="store-header">HARDWARE STORE</div>
         <div id="upgrades-section">
             <div class="upgrade-grid" id="upgrades-grid"></div>
         </div>
@@ -353,6 +472,7 @@
 
 <script src="achievements.js"></script>
 <script src="skillTree.js"></script>
+<script src="events/events.js"></script>
 
 <script>
     const SVGS = {
@@ -401,7 +521,8 @@
     const miners = [];
     for (let i = 0; i < minerNames.length; i++) {
         miners.push({
-            id: `miner_${i}`, name: minerNames[i],
+            id: `miner_${i}`, 
+            name: minerNames[i],
             // NEW BALANCED MATH: Starts at 25 cost, 1 production.
             // Cost scales by 9.5x per tier, Production scales by 8.0x per tier.
             baseCost: Math.floor(25 * Math.pow(9.5, i)), 
@@ -445,29 +566,74 @@
     function toggleSkillTree(open) {
         document.getElementById('modal-bg').style.display = open ? 'block' : 'none';
         document.getElementById('skill-tree-modal').style.display = open ? 'block' : 'none';
+        
         // Check if the external skill tree function is loaded before calling it
         if (open && typeof renderSkillTree === "function") {
             renderSkillTree();
         }
     }
 
-    function devAddFunds() { window.gameData.bitcoin += parseFloat(document.getElementById("dev-add-funds-input").value) || 0; syncStatePostDevCheat(); }
-    function devMultiplyFunds() { window.gameData.bitcoin *= parseFloat(document.getElementById("dev-mult-funds-input").value) || 1; syncStatePostDevCheat(); }
-    function devSetAbsoluteFunds() { window.gameData.bitcoin = parseFloat(document.getElementById("dev-set-funds-input").value) || 0; syncStatePostDevCheat(); }
-    function devAddRebirths() { window.gameData.rebirths += parseInt(document.getElementById("dev-rebirth-input").value) || 0; syncStatePostDevCheat(); }
-    function devAddRebirthPoints() { window.gameData.rebirthPoints += parseInt(document.getElementById("dev-rp-input").value) || 0; syncStatePostDevCheat(); }
-    function devSetLifetimeMined() { window.gameData.totalMined = parseFloat(document.getElementById("dev-lifetime-input").value) || 0; syncStatePostDevCheat(); }
-    function devMaxUpgrades() { upgrades.forEach(u => window.gameData.upgradeLevels[u.id] = 100); renderUpgrades(); syncStatePostDevCheat(); }
-    function devAddMinersBulk() { miners.forEach(m => window.gameData.ownedMiners[m.id] = (window.gameData.ownedMiners[m.id] || 0) + 10); renderMiners(); syncStatePostDevCheat(); }
+    // --- DEV MENU FUNCTIONS ---
+    function devAddFunds() { 
+        window.gameData.bitcoin += parseFloat(document.getElementById("dev-add-funds-input").value) || 0; 
+        syncStatePostDevCheat(); 
+    }
+
+    function devMultiplyFunds() { 
+        window.gameData.bitcoin *= parseFloat(document.getElementById("dev-mult-funds-input").value) || 1; 
+        syncStatePostDevCheat(); 
+    }
+
+    function devSetAbsoluteFunds() { 
+        window.gameData.bitcoin = parseFloat(document.getElementById("dev-set-funds-input").value) || 0; 
+        syncStatePostDevCheat(); 
+    }
+
+    function devAddRebirths() { 
+        window.gameData.rebirths += parseInt(document.getElementById("dev-rebirth-input").value) || 0; 
+        syncStatePostDevCheat(); 
+    }
+
+    function devAddRebirthPoints() { 
+        window.gameData.rebirthPoints += parseInt(document.getElementById("dev-rp-input").value) || 0; 
+        syncStatePostDevCheat(); 
+    }
+
+    function devSetLifetimeMined() { 
+        window.gameData.totalMined = parseFloat(document.getElementById("dev-lifetime-input").value) || 0; 
+        syncStatePostDevCheat(); 
+    }
+
+    function devMaxUpgrades() { 
+        upgrades.forEach(u => {
+            window.gameData.upgradeLevels[u.id] = 100;
+        }); 
+        renderUpgrades(); 
+        syncStatePostDevCheat(); 
+    }
+
+    function devAddMinersBulk() { 
+        miners.forEach(m => {
+            window.gameData.ownedMiners[m.id] = (window.gameData.ownedMiners[m.id] || 0) + 10;
+        }); 
+        renderMiners(); 
+        syncStatePostDevCheat(); 
+    }
     
     function syncStatePostDevCheat() { 
         updateDisplay(); 
         fastColorCheck(); 
         saveGame(); 
-        if (typeof checkAchievements === "function") checkAchievements(window.gameData); 
+        if (typeof checkAchievements === "function") {
+            checkAchievements(window.gameData); 
+        }
     }
 
-    function closeAllModals() { toggleStats(false); toggleDevMenu(false); toggleSkillTree(false); }
+    function closeAllModals() { 
+        toggleStats(false); 
+        toggleDevMenu(false); 
+        toggleSkillTree(false); 
+    }
 
     function formatNum(n) {
         if (n === 0) return "0.00";
@@ -520,6 +686,7 @@
                 if (lvl > 0) clickMult *= Math.pow(u.boost, lvl);
             }
         });
+        
         return baseVal * clickMult;
     }
 
@@ -527,7 +694,9 @@
         let totalBPS = 0;
         miners.forEach(m => {
             let count = window.gameData.ownedMiners[m.id] || 0;
-            if (count > 0) totalBPS += (count * m.production);
+            if (count > 0) {
+                totalBPS += (count * m.production);
+            }
         });
         
         let upMult = 1;
@@ -547,13 +716,20 @@
         }
         finalBPS *= idleMult;
 
+        // Apply Random Event (Bull Market) Multiplier
+        if (typeof window.eventMultiplier !== 'undefined') {
+            finalBPS *= window.eventMultiplier;
+        }
+
         return finalBPS;
     }
 
     function renderMiners() {
         const list = document.getElementById('miners-list');
         if (!list) return;
+        
         list.innerHTML = '';
+        
         miners.forEach((m) => {
             const cost = getMinerCost(m);
             const owned = window.gameData.ownedMiners[m.id] || 0;
@@ -578,11 +754,16 @@
                 if (window.gameData.bitcoin >= updatedCost) {
                     window.gameData.bitcoin -= updatedCost;
                     window.gameData.ownedMiners[m.id] = (window.gameData.ownedMiners[m.id] || 0) + 1;
+                    
                     document.getElementById(`owned-${m.id}`).innerText = window.gameData.ownedMiners[m.id];
                     document.getElementById(`cost-${m.id}`).innerText = formatNum(getMinerCost(m)) + " BTC";
+                    
                     updateDisplay(); 
                     fastColorCheck(); 
-                    if (typeof checkAchievements === "function") checkAchievements(window.gameData);
+                    
+                    if (typeof checkAchievements === "function") {
+                        checkAchievements(window.gameData);
+                    }
                 }
             };
             list.appendChild(div);
@@ -594,6 +775,7 @@
             const cost = getMinerCost(m);
             const div = document.getElementById(`el-${m.id}`);
             const costText = document.getElementById(`cost-${m.id}`);
+            
             if (!div || !costText) return;
             
             if (window.gameData.bitcoin >= cost) {
@@ -609,6 +791,7 @@
     function renderUpgrades() {
         const grid = document.getElementById('upgrades-grid');
         grid.innerHTML = '';
+        
         upgrades.forEach((u) => {
             const cost = getUpgradeCost(u);
             const lvl = window.gameData.upgradeLevels[u.id] || 0;
@@ -625,11 +808,15 @@
                 if (window.gameData.bitcoin >= activeCost) {
                     window.gameData.bitcoin -= activeCost;
                     window.gameData.upgradeLevels[u.id] = (window.gameData.upgradeLevels[u.id] || 0) + 1;
+                    
                     hideTooltip(); 
                     renderUpgrades(); 
                     updateDisplay(); 
                     fastColorCheck(); 
-                    if (typeof checkAchievements === "function") checkAchievements(window.gameData);
+                    
+                    if (typeof checkAchievements === "function") {
+                        checkAchievements(window.gameData);
+                    }
                 }
             };
             grid.appendChild(div);
@@ -644,6 +831,7 @@
         
         let progressPercent = Math.min((window.gameData.bitcoin / REBIRTH_REQUIREMENT) * 100, 100);
         document.getElementById('rebirth-progress').innerText = progressPercent.toFixed(4) + "%";
+        
         document.getElementById('rebirth-btn-action').disabled = window.gameData.bitcoin < REBIRTH_REQUIREMENT;
     }
 
@@ -678,10 +866,13 @@
         
         f.style.left = `${e.clientX}px`;
         f.style.top = `${e.clientY}px`;
+        
         document.body.appendChild(f);
         setTimeout(() => f.remove(), 700);
         
-        if (typeof checkAchievements === "function") checkAchievements(window.gameData);
+        if (typeof checkAchievements === "function") {
+            checkAchievements(window.gameData);
+        }
         updateDisplay();
         fastColorCheck(); 
     };
@@ -689,7 +880,7 @@
     function triggerRebirth() {
         if (window.gameData.bitcoin < REBIRTH_REQUIREMENT) return;
         
-        if (confirm("Are you sure you want to rebirth?\n\nThis resets upgrades, miners, and bank totals, but you will progress to the next loop level and earn 5 Rebirth Points!")) {
+        if (confirm("Are you sure you want to rebirth?\n\nThis resets upgrades, miners, and bank totals, but you will progress to the next loop level and earn 1 Rebirth Point!")) {
             window.gameData.bitcoin = 0;
             window.gameData.ownedMiners = {};
             window.gameData.upgradeLevels = {};
@@ -701,18 +892,32 @@
             renderUpgrades();
             updateDisplay();
             fastColorCheck();
-            if (typeof checkAchievements === "function") checkAchievements(window.gameData);
-            alert(`Timeline transformation operational! You earned 5 Rebirth Points.`);
+            
+            if (typeof checkAchievements === "function") {
+                checkAchievements(window.gameData);
+            }
+            
+            alert(`Timeline transformation operational! You earned 1 Rebirth Point.`);
         }
     }
 
     const tooltip = document.getElementById('tooltip');
-    function showTooltip(e, txt) { tooltip.innerHTML = txt; tooltip.style.display = 'block'; tooltip.style.left = `${e.clientX + 15}px`; tooltip.style.top = `${e.clientY + 15}px`; }
-    function hideTooltip() { tooltip.style.display = 'none'; }
+    
+    function showTooltip(e, txt) { 
+        tooltip.innerHTML = txt; 
+        tooltip.style.display = 'block'; 
+        tooltip.style.left = `${e.clientX + 15}px`; 
+        tooltip.style.top = `${e.clientY + 15}px`; 
+    }
+    
+    function hideTooltip() { 
+        tooltip.style.display = 'none'; 
+    }
 
     function toggleStats(open) {
         document.getElementById('modal-bg').style.display = open ? 'block' : 'none';
         document.getElementById('stats-modal').style.display = open ? 'block' : 'none';
+        
         if (open) {
             document.getElementById('stat-current').innerText = formatNum(window.gameData.bitcoin) + " BTC";
             document.getElementById('stat-total').innerText = formatNum(window.gameData.totalMined) + " BTC";
@@ -726,7 +931,8 @@
         const txt = document.getElementById('news-text');
         const msg = newsMessages[Math.floor(Math.random() * newsMessages.length)];
         txt.innerText = msg;
-        txt.style.animation = 'none'; txt.offsetHeight; 
+        txt.style.animation = 'none'; 
+        txt.offsetHeight; 
         txt.style.animation = `ticker ${Math.max(12, msg.length * 0.22)}s linear infinite`;
     }
 
@@ -740,13 +946,16 @@
         if (saved) {
             try {
                 const parsed = JSON.parse(saved);
+                
                 // Ensure new features don't break old saves
                 if (!parsed.unlockedAchievements) parsed.unlockedAchievements = [];
                 if (!parsed.skillTreeLevels) parsed.skillTreeLevels = {};
                 if (!parsed.rebirthPoints) parsed.rebirthPoints = 0;
                 
                 window.gameData = Object.assign({}, window.gameData, parsed);
-            } catch(e) { console.error("Could not parse save data file."); }
+            } catch(e) { 
+                console.error("Could not parse save data file."); 
+            }
         }
         document.getElementById("minery-title").innerText = window.gameData.mineryName.toUpperCase();
         evaluateDevTriggerVisibility();
@@ -760,13 +969,20 @@
         }
     }
 
+    // =======================================================
     // GAME LOOP START
+    // =======================================================
     loadGame();
     renderMiners();
     renderUpgrades();
     updateNews();
+    
+    // Load external systems if they exist
     if (typeof loadAchievements === "function") loadAchievements();
     if (typeof loadSkillTree === "function") loadSkillTree();
+    
+    // Initialize the Random Events loop
+    if (typeof startEventLoop === "function") startEventLoop();
 
     setTimeout(() => {
         const intro = document.getElementById('intro-overlay');
@@ -781,7 +997,9 @@
         window.gameData.totalMined += (bps / 10);
         updateDisplay();
         fastColorCheck(); 
-        if (typeof checkAchievements === "function") checkAchievements(window.gameData);
+        if (typeof checkAchievements === "function") {
+            checkAchievements(window.gameData);
+        }
     }, 100); 
 
     setInterval(saveGame, 20000); 
