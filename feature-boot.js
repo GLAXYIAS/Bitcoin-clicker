@@ -32,6 +32,7 @@
     load('tabs-collapse-patch.js', 'data-tabs-collapse');
     load('dense-ui-patch.js', 'data-dense-ui');
     load('casino.js', 'data-casino');
+    load('ui-fix.js', 'data-ui-fix');
     patchUnlock();
     setTimeout(function () {
       if (typeof window.renderUpgrades === 'function') try { window.renderUpgrades(); } catch (e) {}
