@@ -1,4 +1,3 @@
-// Feature boot: load center panel + achievement upgrades + unlock by achievement
 (function () {
   function load(src, attr) {
     if (document.querySelector('script[' + attr + ']')) return null;
@@ -22,15 +21,23 @@
       return true;
     };
   }
-  function boot() {
+  function afterData() {
+    load('extra-miners.js', 'data-extra-miners');
     load('achievement-upgrades.js', 'data-ach-upgrades');
+    load('game-engine-patch.js', 'data-engine-patch');
     load('center-panel.js', 'data-center-panel');
+    load('dense-ui-patch.js', 'data-dense-ui');
+    load('casino.js', 'data-casino');
     patchUnlock();
     setTimeout(function () {
-      if (typeof window.renderUpgrades === 'function') {
-        try { window.renderUpgrades(); } catch (e) {}
-      }
-    }, 600);
+      if (typeof window.renderUpgrades === 'function') try { window.renderUpgrades(); } catch (e) {}
+      if (typeof window.renderMiners === 'function') try { window.renderMiners(); } catch (e) {}
+    }, 900);
+  }
+  function boot() {
+    var gd = load('game-data.js', 'data-game-data');
+    if (gd) gd.onload = afterData;
+    else afterData();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(boot, 250); });
   else setTimeout(boot, 250);
