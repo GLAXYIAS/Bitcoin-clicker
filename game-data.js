@@ -1,4 +1,5 @@
-// Miners + Cookie Clicker-style one-time upgrades (SVG icons only, no emojis)
+// Miners + Cookie Clicker-style one-time upgrades (no emojis, SVG icons only)
+// 32 hardware tiers — costs and production scale exponentially
 window.minerDefs = [
     { name: "Resistive Logic Breadboard", baseCost: 15, production: 0.1, svg: "hardware" },
     { name: "Low-Voltage Silicon Gate", baseCost: 100, production: 0.5, svg: "chip" },
@@ -44,20 +45,20 @@ window.miners = window.minerDefs.map(function (d, i) {
     };
 });
 
-// Unlock tiers like Cookie Clicker: 1 / 5 / 25 / 50 / 100 of that building
+// Cookie Clicker style: one-time upgrades unlocked by owning N of a miner
+// Tiers unlock at 1, 5, 25, 50, 100 owned of that miner; each doubles that miner's output
 window.UPGRADE_TIERS = [
-    { count: 1, costMul: 10, label: 'Prototype' },
-    { count: 5, costMul: 50, label: 'Calibrated' },
-    { count: 25, costMul: 500, label: 'Industrial' },
-    { count: 50, costMul: 50000, label: 'Enterprise' },
-    { count: 100, costMul: 5e6, label: 'Planetary' }
+    { count: 1,   costMul: 10,    label: "Prototype" },
+    { count: 5,   costMul: 50,    label: "Calibrated" },
+    { count: 25,  costMul: 500,   label: "Industrial" },
+    { count: 50,  costMul: 50000, label: "Enterprise" },
+    { count: 100, costMul: 5e6,   label: "Planetary" }
 ];
 
 window.upgrades = [];
-window.miners.forEach(function (m) {
+window.miners.forEach(function (m, mi) {
     window.UPGRADE_TIERS.forEach(function (tier, ti) {
-        var words = m.name.split(' ');
-        var shortName = words.slice(-2).join(' ');
+        var shortName = m.name.split(' ').slice(-2).join(' ');
         window.upgrades.push({
             id: 'up_' + m.id + '_t' + ti,
             name: tier.label + ' ' + shortName,
@@ -73,14 +74,18 @@ window.miners.forEach(function (m) {
     });
 });
 
-[
+// Global one-time upgrades unlocked by total buildings owned
+var globalTiers = [
     { id: 'g_click1', name: 'Reinforced Actuator', desc: 'Clicks produce +50% more BTC.', cost: 1000, needTotal: 10, effect: 'click_mult', mult: 1.5, svg: 'boost' },
     { id: 'g_click2', name: 'Servo Feedback Loop', desc: 'Clicks produce +100% more BTC.', cost: 100000, needTotal: 50, effect: 'click_mult', mult: 2, svg: 'boost' },
     { id: 'g_click3', name: 'Neural Trigger Matrix', desc: 'Clicks produce +200% more BTC.', cost: 5e9, needTotal: 150, effect: 'click_mult', mult: 3, svg: 'bolt' },
     { id: 'g_bps1', name: 'Facility Power Grid', desc: 'All miner production +25%.', cost: 50000, needTotal: 25, effect: 'global_bps', mult: 1.25, svg: 'server' },
     { id: 'g_bps2', name: 'Continental Backbone', desc: 'All miner production +50%.', cost: 5e8, needTotal: 100, effect: 'global_bps', mult: 1.5, svg: 'network' },
-    { id: 'g_bps3', name: 'Orbital Power Relay', desc: 'All miner production +100%.', cost: 1e15, needTotal: 250, effect: 'global_bps', mult: 2, svg: 'satellite' }
-].forEach(function (g) {
+    { id: 'g_bps3', name: 'Orbital Power Relay', desc: 'All miner production +100%.', cost: 1e15, needTotal: 250, effect: 'global_bps', mult: 2, svg: 'satellite' },
+    { id: 'g_bps4', name: 'Planetary Hash Grid', desc: 'All miner production +150%.', cost: 1e18, needTotal: 400, effect: 'global_bps', mult: 2.5, svg: 'quantum' },
+    { id: 'g_click4', name: 'Causal Click Buffer', desc: 'Clicks produce +400% more BTC.', cost: 1e16, needTotal: 300, effect: 'click_mult', mult: 5, svg: 'atom' }
+];
+globalTiers.forEach(function (g) {
     window.upgrades.push({
         id: g.id,
         name: g.name,
