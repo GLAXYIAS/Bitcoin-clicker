@@ -27,7 +27,9 @@
     load('click-power-upgrades.js', 'data-click-power');
     load('achievement-upgrades.js', 'data-ach-upgrades');
     load('game-engine-patch.js', 'data-engine-patch');
+    load('click-engine-hook.js', 'data-click-hook');
     load('center-panel.js', 'data-center-panel');
+    load('tabs-collapse-patch.js', 'data-tabs-collapse');
     load('dense-ui-patch.js', 'data-dense-ui');
     load('casino.js', 'data-casino');
     patchUnlock();
