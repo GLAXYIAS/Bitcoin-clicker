@@ -669,15 +669,12 @@
         miners.push({
             id: `miner_${i}`, 
             name: minerNames[i],
-            // NEW BALANCED MATH: Starts at 25 cost, 1 production.
-            // Cost scales by 9.5x per tier, Production scales by 8.0x per tier.
             baseCost: Math.floor(25 * Math.pow(9.5, i)), 
             production: Math.floor(1 * Math.pow(8, i)),
             svgType: i < 4 ? 'hardware' : i < 8 ? 'network' : i < 12 ? 'processor' : 'quantum'
         });
     }
 
-    // Upgrades also needed a massive buff to match the new economy
     const upgrades = [
         { id: "u1", name: "High-Tactility Actuator", baseCost: 1000, svg: 'boost', type: "click", boost: 1.50, desc: "Increases mouse click harvest by 50%." },
         { id: "u2", name: "Low-Resistance Cabling", baseCost: 25000, svg: 'processor', type: "bps", boost: 1.50, desc: "Boosts all your automatic miner speed by 50%." },
@@ -712,8 +709,6 @@
     function toggleSkillTree(open) {
         document.getElementById('modal-bg').style.display = open ? 'block' : 'none';
         document.getElementById('skill-tree-modal').style.display = open ? 'block' : 'none';
-        
-        // Check if the external skill tree function is loaded before calling it
         if (open && typeof renderSkillTree === "function") {
             renderSkillTree();
         }
@@ -751,7 +746,6 @@
             return;
         }
 
-        // Deduct bet first
         window.gameData.bitcoin -= bet;
 
         const won = Math.random() < winChance;
@@ -763,7 +757,6 @@
             resultEl.innerText = `YOU WON! +${formatNum(winnings - bet)} BTC (${multiplier}×)`;
             resultEl.style.color = '#00ff9d';
 
-            // Floating feedback near center
             const f = document.createElement('div');
             f.className = 'floating-text';
             f.innerText = `🎰 WIN +${formatNum(winnings - bet)}`;
@@ -788,7 +781,6 @@
             setTimeout(() => f.remove(), 900);
         }
 
-        // Refresh displays
         document.getElementById('gamble-balance').innerText = formatNum(window.gameData.bitcoin);
         updateDisplay();
         fastColorCheck();
@@ -873,39 +865,30 @@
     function getUpgradeCost(u) {
         const lvl = window.gameData.upgradeLevels[u.id] || 0;
         let cost = Math.floor(u.baseCost * Math.pow(2.5, lvl));
-        
-        // Calculate external skill tree discount if available
         let discount = 1;
         if (typeof SKILL_TREE !== 'undefined' && SKILL_TREE.node_discount) {
             discount = SKILL_TREE.node_discount.getEffect(window.gameData.skillTreeLevels['node_discount'] || 0);
         }
-        
         return Math.floor(cost * discount);
     }
 
     function getMinerCost(miner) {
         const owned = window.gameData.ownedMiners[miner.id] || 0;
         let cost = Math.floor(miner.baseCost * Math.pow(1.42, owned));
-        
-        // Calculate external skill tree discount if available
         let discount = 1;
         if (typeof SKILL_TREE !== 'undefined' && SKILL_TREE.node_discount) {
             discount = SKILL_TREE.node_discount.getEffect(window.gameData.skillTreeLevels['node_discount'] || 0);
         }
-
         return Math.floor(cost * discount);
     }
 
     function getClickValue() {
         let baseVal = window.gameData.clickValue;
-        
-        // Apply External Skill Tree Multiplier
         let skillMult = 1;
         if (typeof SKILL_TREE !== 'undefined' && SKILL_TREE.node_click_mult) {
             skillMult = SKILL_TREE.node_click_mult.getEffect(window.gameData.skillTreeLevels['node_click_mult'] || 0);
         }
         baseVal *= skillMult;
-
         let clickMult = 1;
         upgrades.forEach(u => {
             if (u.type === 'click') {
@@ -913,7 +896,6 @@
                 if (lvl > 0) clickMult *= Math.pow(u.boost, lvl);
             }
         });
-        
         return baseVal * clickMult;
     }
 
@@ -925,7 +907,6 @@
                 totalBPS += (count * m.production);
             }
         });
-        
         let upMult = 1;
         upgrades.forEach(u => {
             if (u.type === 'bps') {
@@ -933,35 +914,26 @@
                 if (lvl > 0) upMult *= Math.pow(u.boost, lvl);
             }
         });
-
         let finalBPS = totalBPS * upMult;
-        
-        // Apply External Skill Tree Idle Boost
         let idleMult = 1;
         if (typeof SKILL_TREE !== 'undefined' && SKILL_TREE.node_idle_boost) {
             idleMult = SKILL_TREE.node_idle_boost.getEffect(window.gameData.skillTreeLevels['node_idle_boost'] || 0);
         }
         finalBPS *= idleMult;
-
-        // Apply Random Event (Bull Market) Multiplier
         if (typeof window.eventMultiplier !== 'undefined') {
             finalBPS *= window.eventMultiplier;
         }
-
         return finalBPS;
     }
 
     function renderMiners() {
         const list = document.getElementById('miners-list');
         if (!list) return;
-        
         list.innerHTML = '';
-        
         miners.forEach((m) => {
             const cost = getMinerCost(m);
             const owned = window.gameData.ownedMiners[m.id] || 0;
             const canAfford = window.gameData.bitcoin >= cost;
-            
             const div = document.createElement('div');
             div.id = `el-${m.id}`;
             div.className = `item ${!canAfford ? 'locked' : ''}`;
@@ -972,22 +944,17 @@
                     <div class="item-cost ${canAfford ? 'can-afford' : 'cannot-afford'}" id="cost-${m.id}">${formatNum(cost)} BTC</div>
                 </div>
                 <div class="item-owned" id="owned-${m.id}">${owned}</div>`;
-            
             div.onmouseenter = (e) => showTooltip(e, `Generates +${m.production.toFixed(4)} active BTC per second.`);
             div.onmouseleave = hideTooltip;
-            
             div.onclick = () => {
                 const updatedCost = getMinerCost(m); 
                 if (window.gameData.bitcoin >= updatedCost) {
                     window.gameData.bitcoin -= updatedCost;
                     window.gameData.ownedMiners[m.id] = (window.gameData.ownedMiners[m.id] || 0) + 1;
-                    
                     document.getElementById(`owned-${m.id}`).innerText = window.gameData.ownedMiners[m.id];
                     document.getElementById(`cost-${m.id}`).innerText = formatNum(getMinerCost(m)) + " BTC";
-                    
                     updateDisplay(); 
                     fastColorCheck(); 
-                    
                     if (typeof checkAchievements === "function") {
                         checkAchievements(window.gameData);
                     }
@@ -1002,9 +969,7 @@
             const cost = getMinerCost(m);
             const div = document.getElementById(`el-${m.id}`);
             const costText = document.getElementById(`cost-${m.id}`);
-            
             if (!div || !costText) return;
-            
             if (window.gameData.bitcoin >= cost) {
                 div.classList.remove('locked');
                 costText.classList.replace('cannot-afford', 'can-afford');
@@ -1018,29 +983,23 @@
     function renderUpgrades() {
         const grid = document.getElementById('upgrades-grid');
         grid.innerHTML = '';
-        
         upgrades.forEach((u) => {
             const cost = getUpgradeCost(u);
             const lvl = window.gameData.upgradeLevels[u.id] || 0;
-            
             const div = document.createElement('div');
             div.className = 'upgrade-item';
             div.innerHTML = SVGS[u.svg || 'boost'] + `<div class="upgrade-level">L${lvl}</div>`;
-            
             div.onmouseenter = (e) => showTooltip(e, `<strong>${u.name} (Lvl ${lvl})</strong><br>${u.desc}<br>Next Cost: ${formatNum(cost)} BTC`);
             div.onmouseleave = hideTooltip;
-            
             div.onclick = () => {
                 const activeCost = getUpgradeCost(u);
                 if (window.gameData.bitcoin >= activeCost) {
                     window.gameData.bitcoin -= activeCost;
                     window.gameData.upgradeLevels[u.id] = (window.gameData.upgradeLevels[u.id] || 0) + 1;
-                    
                     hideTooltip(); 
                     renderUpgrades(); 
                     updateDisplay(); 
                     fastColorCheck(); 
-                    
                     if (typeof checkAchievements === "function") {
                         checkAchievements(window.gameData);
                     }
@@ -1055,48 +1014,38 @@
         document.getElementById('bps').innerText = formatNum(calculateCurrentBPS());
         document.getElementById('rebirth-count-txt').innerText = window.gameData.rebirths;
         document.getElementById('rebirth-points-txt').innerText = window.gameData.rebirthPoints;
-        
         let progressPercent = Math.min((window.gameData.bitcoin / REBIRTH_REQUIREMENT) * 100, 100);
         document.getElementById('rebirth-progress').innerText = progressPercent.toFixed(4) + "%";
-        
         document.getElementById('rebirth-btn-action').disabled = window.gameData.bitcoin < REBIRTH_REQUIREMENT;
     }
 
-    // MAIN CLICK EVENT & EXTERNAL CRIT LOGIC
     document.getElementById('bitcoin').onclick = (e) => {
         let val = getClickValue();
         let isCrit = false;
-
         let critChance = 0;
         if (typeof SKILL_TREE !== 'undefined' && SKILL_TREE.node_crit_chance) {
             critChance = SKILL_TREE.node_crit_chance.getEffect(window.gameData.skillTreeLevels['node_crit_chance'] || 0);
         }
-
         if (critChance > 0 && Math.random() < critChance) {
             val *= 10;
             isCrit = true;
         }
-
         window.gameData.bitcoin += val;
         window.gameData.totalMined += val;
         window.gameData.totalClicks++;
-        
         const f = document.createElement('div');
         f.className = 'floating-text';
         if (isCrit) {
             f.innerText = `CRIT! +${formatNum(val)}`;
-            f.style.color = '#ff4d4d'; // Red crit text
+            f.style.color = '#ff4d4d';
             f.style.transform = 'scale(1.5)';
         } else {
             f.innerText = `+${formatNum(val)}`;
         }
-        
         f.style.left = `${e.clientX}px`;
         f.style.top = `${e.clientY}px`;
-        
         document.body.appendChild(f);
         setTimeout(() => f.remove(), 700);
-        
         if (typeof checkAchievements === "function") {
             checkAchievements(window.gameData);
         }
@@ -1106,37 +1055,31 @@
 
     function triggerRebirth() {
         if (window.gameData.bitcoin < REBIRTH_REQUIREMENT) return;
-        
         if (confirm("Are you sure you want to rebirth?\n\nThis resets upgrades, miners, and bank totals, but you will progress to the next loop level and earn 1 Rebirth Point!")) {
             window.gameData.bitcoin = 0;
             window.gameData.ownedMiners = {};
             window.gameData.upgradeLevels = {};
             window.gameData.rebirths++;
-            window.gameData.rebirthPoints += 1; // Grant 1 RP
-            
+            window.gameData.rebirthPoints += 1;
             saveGame();
             renderMiners();
             renderUpgrades();
             updateDisplay();
             fastColorCheck();
-            
             if (typeof checkAchievements === "function") {
                 checkAchievements(window.gameData);
             }
-            
             alert(`Timeline transformation operational! You earned 1 Rebirth Point.`);
         }
     }
 
     const tooltip = document.getElementById('tooltip');
-    
     function showTooltip(e, txt) { 
         tooltip.innerHTML = txt; 
         tooltip.style.display = 'block'; 
         tooltip.style.left = `${e.clientX + 15}px`; 
         tooltip.style.top = `${e.clientY + 15}px`; 
     }
-    
     function hideTooltip() { 
         tooltip.style.display = 'none'; 
     }
@@ -1144,7 +1087,6 @@
     function toggleStats(open) {
         document.getElementById('modal-bg').style.display = open ? 'block' : 'none';
         document.getElementById('stats-modal').style.display = open ? 'block' : 'none';
-        
         if (open) {
             document.getElementById('stat-current').innerText = formatNum(window.gameData.bitcoin) + " BTC";
             document.getElementById('stat-total').innerText = formatNum(window.gameData.totalMined) + " BTC";
@@ -1168,17 +1110,57 @@
         localStorage.setItem('btcMinerySaveData', JSON.stringify(window.gameData));
     }
 
+    function applyOfflineProgress() {
+        if (!window.gameData.lastSaveTime) return;
+
+        const now = Date.now();
+        let secondsOffline = (now - window.gameData.lastSaveTime) / 1000;
+
+        // Ignore very short absences (tab switches, etc.)
+        if (secondsOffline < 30) return;
+
+        // Cap at 24 hours so long absences don't explode the economy
+        const MAX_OFFLINE_SECONDS = 24 * 60 * 60;
+        const wasCapped = secondsOffline > MAX_OFFLINE_SECONDS;
+        const cappedSeconds = Math.min(secondsOffline, MAX_OFFLINE_SECONDS);
+
+        const onlineBPS = calculateCurrentBPS();
+        // 10% efficiency while offline
+        const offlineRate = onlineBPS * 0.10;
+        const earned = offlineRate * cappedSeconds;
+
+        if (earned <= 0) return;
+
+        window.gameData.bitcoin += earned;
+        window.gameData.totalMined += earned;
+
+        const hours = Math.floor(cappedSeconds / 3600);
+        const mins = Math.floor((cappedSeconds % 3600) / 60);
+        let timeStr = "";
+        if (hours > 0) timeStr += hours + "h ";
+        timeStr += mins + "m";
+        if (wasCapped) timeStr += " (capped at 24h)";
+
+        // Show after the intro overlay fades
+        setTimeout(() => {
+            alert(
+                "While you were away (" + timeStr + ")...\n\n" +
+                "Your miners kept running at 10% efficiency and produced\n" +
+                formatNum(earned) + " BTC!"
+            );
+            updateDisplay();
+            fastColorCheck();
+        }, 6200);
+    }
+
     function loadGame() {
         const saved = localStorage.getItem('btcMinerySaveData');
         if (saved) {
             try {
                 const parsed = JSON.parse(saved);
-                
-                // Ensure new features don't break old saves
                 if (!parsed.unlockedAchievements) parsed.unlockedAchievements = [];
                 if (!parsed.skillTreeLevels) parsed.skillTreeLevels = {};
                 if (!parsed.rebirthPoints) parsed.rebirthPoints = 0;
-                
                 window.gameData = Object.assign({}, window.gameData, parsed);
             } catch(e) { 
                 console.error("Could not parse save data file."); 
@@ -1186,6 +1168,7 @@
         }
         document.getElementById("minery-title").innerText = window.gameData.mineryName.toUpperCase();
         evaluateDevTriggerVisibility();
+        applyOfflineProgress();
         updateDisplay();
     }
 
@@ -1204,11 +1187,8 @@
     renderUpgrades();
     updateNews();
     
-    // Load external systems if they exist
     if (typeof loadAchievements === "function") loadAchievements();
     if (typeof loadSkillTree === "function") loadSkillTree();
-    
-    // Initialize the Random Events loop
     if (typeof startEventLoop === "function") startEventLoop();
 
     setTimeout(() => {
