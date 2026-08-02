@@ -1,1 +1,1228 @@
-WILL_REPLACE
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin Clicker</title>
+    
+    <link rel="stylesheet" href="skillTree.css">
+    <link rel="stylesheet" href="events/events.css">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        
+        * { 
+            -webkit-user-select: none; 
+            -ms-user-select: none; 
+            user-select: none; 
+            box-sizing: border-box; 
+        }
+        
+        body {
+            margin: 0; 
+            padding: 0;
+            background: linear-gradient(#14141c, #2a2a45); 
+            color: #00ff9d;
+            font-family: 'Press Start 2P', cursive;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        #intro-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #000000;
+            z-index: 99999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .intro-bg {
+            position: absolute;
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 1px);
+            background-size: 60px 60px;
+            background-position: center;
+            z-index: 1;
+            animation: gridPan 20s linear infinite;
+        }
+
+        .vignette {
+            position: absolute; 
+            width: 100%; 
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, #000000 75%);
+            z-index: 2; 
+            pointer-events: none;
+        }
+
+        .logo-container {
+            text-align: center; 
+            z-index: 3; 
+            display: flex; 
+            flex-direction: column;
+            align-items: center; 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        .logo-graphic {
+            width: 110px; 
+            height: 110px; 
+            margin-bottom: 36px; 
+            position: relative;
+            background: #030303; 
+            border: 2px solid #d47a55; 
+            border-radius: 12px;
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            font-size: 2.6rem; 
+            font-weight: 800; 
+            color: #ffffff;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 30px rgba(212, 122, 85, 0.2), inset 0 0 20px rgba(212, 122, 85, 0.15);
+            opacity: 0;
+            animation: elegantFadeIn 1.5s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards, logoGlowPulse 4s infinite alternate ease-in-out 1.7s;
+        }
+
+        .logo-graphic::before, .logo-graphic::after {
+            content: ''; 
+            position: absolute; 
+            width: 14px; 
+            height: 14px;
+            border: 3px solid #e59371;
+            animation: bracketSlide 1.2s cubic-bezier(0.25, 1, 0.5, 1) 0.6s forwards;
+        }
+        
+        .logo-graphic::before { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+        .logo-graphic::after { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+
+        .logo-text {
+            font-size: 3rem; 
+            font-weight: 900; 
+            color: #ffffff; 
+            margin: 0;
+            text-transform: uppercase;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.85), 0 0 40px rgba(255, 255, 255, 0.4);
+            opacity: 0;
+            animation: textExposureReveal 2s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
+        }
+
+        .logo-subtitle {
+            font-size: 0.75rem; 
+            font-weight: 600; 
+            letter-spacing: 8px; 
+            text-indent: 8px;
+            color: #a0a0a5; 
+            margin-top: 18px; 
+            text-transform: uppercase;
+            opacity: 0;
+            animation: subFadeIn 1s ease 1.6s forwards;
+        }
+
+        .loader-bar {
+            width: 0px; 
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #e59371, #ffffff, #e59371, transparent);
+            margin-top: 24px; 
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+            animation: loadBarExtend 1.4s cubic-bezier(0.65, 0, 0.35, 1) 1s forwards;
+        }
+
+        @keyframes gridPan { from { background-position: 0 0; } to { background-position: 60px 60px; } }
+        @keyframes elegantFadeIn { 0% { opacity: 0; transform: scale(0.85) translateY(15px); } 100% { opacity: 1; transform: scale(1) translateY(0px); } }
+        @keyframes bracketSlide { 0% { top: 10px; left: 10px; bottom: 10px; right: 10px; } 100% { top: -8px; left: -8px; bottom: -8px; right: -8px; } }
+        @keyframes textExposureReveal {
+            0% { opacity: 0; letter-spacing: 4px; text-indent: 4px; filter: blur(15px) brightness(3); transform: scale(0.96); }
+            40% { opacity: 1; filter: blur(6px) brightness(2); }
+            100% { opacity: 1; letter-spacing: 22px; text-indent: 22px; filter: blur(0px) brightness(1); transform: scale(1); }
+        }
+        @keyframes loadBarExtend { to { width: 240px; } }
+        @keyframes subFadeIn { to { opacity: 1; } }
+        @keyframes logoGlowPulse {
+            0% { box-shadow: 0 0 25px rgba(212, 122, 85, 0.2), inset 0 0 15px rgba(212, 122, 85, 0.15); border-color: #d47a55; transform: translateY(0px); }
+            100% { box-shadow: 0 0 45px rgba(212, 122, 85, 0.45), inset 0 0 25px rgba(212, 122, 85, 0.3); border-color: #e59371; transform: translateY(-3px); }
+        }
+
+        .modal-overlay {
+            display: none; 
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); 
+            z-index: 1999;
+        }
+        
+        #stats-modal, #skill-tree-modal, #gamble-modal {
+            display: none; 
+            position: fixed; 
+            top: 15%; left: 50%;
+            transform: translate(-50%, 0);
+            background: #1f1f2e; 
+            border: 4px solid #ffd700; 
+            padding: 25px;
+            z-index: 2000; 
+            width: 460px; 
+            text-align: left; 
+            box-shadow: 0 15px 40px rgba(0,0,0,0.9);
+        }
+
+        #skill-tree-modal {
+            width: 650px; 
+            background: #120a1c; 
+            border-color: #bc34fa; 
+            max-height: 80vh; 
+            overflow-y: auto;
+        }
+
+        #gamble-modal {
+            border-color: #ff4d4d;
+            background: #1a0a12;
+            width: 420px;
+        }
+
+        .stats-line { margin: 12px 0; font-size: 0.6em; color: #fff; }
+        .stats-val { color: #00ff9d; float: right; font-family: monospace; }
+        
+        .modal-btns { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 8px; 
+            margin-top: 20px; 
+        }
+        
+        .modal-btns button { 
+            padding: 10px; 
+            font-family: inherit; 
+            font-size: 0.55em; 
+            cursor: pointer; 
+            border: 2px solid #333; 
+            color: #000; 
+            font-weight: bold; 
+        }
+
+        #dev-trigger-btn { 
+            display: none; 
+            position: absolute; 
+            top: 15px; left: 15px; 
+            z-index: 2100; padding: 8px 14px; 
+            font-family: inherit; font-size: 0.5em; 
+            background: #000; color: #bc34fa; 
+            border: 2px solid #bc34fa; 
+            box-shadow: 0 0 10px rgba(188, 52, 250, 0.6); 
+            cursor: pointer; 
+        }
+        
+        #dev-menu-modal { 
+            display: none; 
+            position: fixed; 
+            top: 10%; left: 5%; 
+            background: #120a1c; 
+            border: 4px solid #bc34fa; 
+            padding: 20px; 
+            z-index: 2500; width: 480px; 
+            max-height: 80vh; overflow-y: auto; 
+            box-shadow: 0 0 30px rgba(188, 52, 250, 0.8); 
+            color: #fff; 
+        }
+
+        .dev-header { color: #bc34fa; font-size: 0.65em; margin-bottom: 20px; text-align: center; text-shadow: 0 0 5px rgba(188, 52, 250, 0.5); letter-spacing: 1px; }
+        .dev-section-title { font-size: 0.45em; color: #ffd700; margin: 15px 0 8px 0; border-bottom: 2px solid #bc34fa; padding-bottom: 4px; text-transform: uppercase; }
+        .dev-row { display: flex; align-items: center; margin-bottom: 8px; gap: 10px; }
+        .dev-label { font-size: 0.4em; flex: 1; color: #ddd; }
+        .dev-input { width: 130px; background: #000; border: 1px solid #bc34fa; color: #00ff9d; font-family: monospace; font-size: 0.6em; padding: 4px; }
+        
+        .dev-btn { padding: 6px 10px; font-family: inherit; font-size: 0.45em; background: #bc34fa; color: #000; border: none; cursor: pointer; font-weight: bold; }
+        .dev-btn:hover { background: #d466ff; }
+        .dev-close-btn { width: 100%; margin-top: 15px; background: #444; color: #fff; }
+
+        .game-container { display: flex; height: 100vh; width: 100vw; }
+        
+        .left-panel { 
+            flex: 0 0 35%; display: flex; flex-direction: column; align-items: center; 
+            justify-content: center; padding: 20px; text-align: center; 
+            background: rgba(255,255,255,0.05); position: relative; 
+        }
+        
+        .center-panel { 
+            flex: 1; border-left: 4px solid #444; border-right: 4px solid #444; 
+            display: flex; flex-direction: column; background: rgba(0,0,0,0.3); 
+        }
+        
+        .right-panel { 
+            flex: 0 0 450px; background: #1a1a26; display: flex; 
+            flex-direction: column; height: 100%; 
+        }
+
+        h1 { 
+            color: #ffd700; font-size: 0.85em; margin-bottom: 30px; 
+            text-shadow: 0 0 6px rgba(255, 215, 0, 0.6); text-transform: uppercase; 
+            line-height: 1.4; cursor: pointer; border-bottom: 2px dashed rgba(255,215,0,0.3); 
+            padding-bottom: 4px; 
+        }
+        h1:hover { color: #ffffff; border-color: #ffffff; }
+
+        #bitcoin { width: 250px; height: 250px; cursor: pointer; transition: transform 0.05s; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
+        #bitcoin:active { transform: scale(0.94); }
+        #bitcoin img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 0 25px rgba(242, 169, 0, 0.7)); }
+
+        .store-header { background: #0c0c12; padding: 20px; text-align: center; color: #ffd700; border-bottom: 4px solid #444; font-size: 0.75em; letter-spacing: 1px; }
+        #upgrades-section { padding: 12px; min-height: 90px; border-bottom: 4px solid #444; background: rgba(255, 255, 255, 0.05); }
+        .upgrade-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+        .upgrade-item { aspect-ratio: 1/1; background: #252538; border: 2px solid #666; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 6px; position: relative; }
+        .upgrade-item:hover { border-color: #ffd700; background: #32324d; }
+        .upgrade-item svg { width: 22px; height: 22px; fill: #ffd700; }
+        .upgrade-level { position: absolute; bottom: 2px; right: 2px; font-size: 0.35em; color: #00ff9d; font-family: monospace; }
+        
+        #miners-section { flex: 1; overflow-y: auto; padding: 12px; }
+        .item { display: flex; background: #222230; border: 2px solid #444; margin-bottom: 8px; padding: 14px; cursor: pointer; align-items: center; }
+        .item:not(.locked):hover { background: #2d2d42; border-color: #00ff9d; }
+        .item.locked { opacity: 0.35; cursor: not-allowed; border-color: #333; }
+        .item-icon-frame { width: 32px; height: 32px; margin-right: 15px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .item-icon-frame svg { width: 100%; height: 100%; fill: #888; }
+        .item:not(.locked) .item-icon-frame svg { fill: #00ff9d; }
+        
+        .item-details { flex: 1; overflow: hidden; }
+        .item-name { font-size: 0.5em; color: #ffd700; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .item-cost { font-size: 0.65em; font-family: monospace; font-weight: bold; letter-spacing: 0.5px; }
+        .item-cost.can-afford { color: #00ff9d; text-shadow: 0 0 2px rgba(0,255,157,0.3); }
+        .item-cost.cannot-afford { color: #ff6666; }
+        
+        .item-owned { font-size: 0.9em; color: #555577; font-family: monospace; margin-left: 10px; font-weight: bold; }
+        .item:not(.locked) .item-owned { color: #8888ba; }
+
+        .floating-text { 
+            position: absolute; color: #ffd700; font-family: monospace; font-weight: bold; 
+            pointer-events: none; z-index: 1000; animation: floatUp 0.7s ease-out forwards; 
+            font-size: 0.75em; text-shadow: 0 0 4px #000; 
+        }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-100px); } }
+
+        .tooltip { 
+            position: absolute; display: none; background: #111; border: 2px solid #ffd700; 
+            padding: 10px; color: #fff; font-size: 0.45em; z-index: 3000; pointer-events: none;
+            line-height: 1.5; max-width: 260px; box-shadow: 4px 4px 0px rgba(0,0,0,0.5);
+        }
+
+        .news-ticker-container { width: 100%; height: 50px; background: #0c0c12; border-bottom: 4px solid #444; overflow: hidden; position: relative; display: flex; align-items: center; }
+        #news-text { white-space: nowrap; position: absolute; font-family: monospace; font-size: 0.7em; color: #ff6666; padding-left: 20px; }
+
+        .rebirth-center-box { margin: auto 20px 20px 20px; padding: 20px; border: 2px dashed #ff4d4d; background: rgba(20, 20, 30, 0.7); text-align: center; }
+        .rebirth-title { font-size: 0.55em; color: #ff4d4d; letter-spacing: 1px; margin-bottom: 6px; }
+        .rebirth-desc { font-size: 0.45em; color: #ccc; line-height: 1.5; margin-bottom: 12px; }
+        
+        .rebirth-btn { width: 100%; max-width: 380px; background: #000; color: #ff4d4d; border: 2px solid #ff4d4d; font-family: inherit; font-size: 0.5em; padding: 12px; cursor: pointer; transition: 0.2s; }
+        .rebirth-btn:not(:disabled):hover { background: #ff4d4d; color: #000; }
+        .rebirth-btn:disabled { opacity: 0.25; cursor: not-allowed; border-color: #444; color: #444; }
+
+        .gamble-btn {
+            margin-top: 18px;
+            width: 100%;
+            max-width: 220px;
+            background: #000;
+            color: #ff4d4d;
+            border: 2px solid #ff4d4d;
+            font-family: inherit;
+            font-size: 0.5em;
+            padding: 10px 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 0 12px rgba(255, 77, 77, 0.35);
+        }
+        .gamble-btn:hover {
+            background: #ff4d4d;
+            color: #000;
+            box-shadow: 0 0 20px rgba(255, 77, 77, 0.7);
+        }
+
+        .gamble-section-title {
+            font-size: 0.55em;
+            color: #ff4d4d;
+            margin: 12px 0 8px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .gamble-input {
+            width: 100%;
+            background: #000;
+            border: 2px solid #ff4d4d;
+            color: #00ff9d;
+            font-family: monospace;
+            font-size: 0.7em;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+
+        .gamble-quick {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+        .gamble-quick button {
+            flex: 1;
+            padding: 6px;
+            font-family: inherit;
+            font-size: 0.4em;
+            background: #2a1520;
+            color: #ffaaaa;
+            border: 1px solid #ff4d4d;
+            cursor: pointer;
+        }
+        .gamble-quick button:hover {
+            background: #ff4d4d;
+            color: #000;
+        }
+
+        .gamble-mult-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .gamble-mult-btn {
+            flex: 1;
+            padding: 12px 6px;
+            font-family: inherit;
+            font-size: 0.45em;
+            background: #1a0a12;
+            color: #ffd700;
+            border: 2px solid #ffd700;
+            cursor: pointer;
+            text-align: center;
+            line-height: 1.4;
+        }
+        .gamble-mult-btn:hover {
+            background: #ffd700;
+            color: #000;
+        }
+        .gamble-mult-btn .odds {
+            display: block;
+            font-size: 0.85em;
+            color: #aaa;
+            margin-top: 4px;
+        }
+        .gamble-mult-btn:hover .odds {
+            color: #333;
+        }
+
+        #gamble-result {
+            text-align: center;
+            font-size: 0.55em;
+            min-height: 28px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div id="intro-overlay">
+    <div class="intro-bg"></div>
+    <div class="vignette"></div>
+
+    <div class="logo-container">
+        <div class="logo-graphic">Nx</div>
+        <h1 class="logo-text">Glaxyias</h1>
+        <div class="logo-subtitle">Bringing You Unblocked Games Since 2025</div>
+        <div class="loader-bar"></div>
+    </div>
+</div>
+
+<button id="dev-trigger-btn" onclick="toggleDevMenu(true)">[DEV MENU]</button>
+
+<div class="game-container">
+    <div class="left-panel">
+        <h1 id="minery-title" onclick="editMineryName()">BITCOIN'S MINERY</h1>
+        <div style="position: relative; width: 250px; height: 250px; margin: 0 auto;">
+            <button onclick="toggleStats(true)" style="position: absolute; top: -25px; left: -15px; z-index: 101; padding: 6px 12px; font-family: inherit; font-size: 0.45em; background: #111; color: #ffd700; border: 2px solid #ffd700; cursor: pointer;">[STATS]</button>
+            <div id="bitcoin">
+                <img src="imgs/Bitcoin.png" alt="Bitcoin" onerror="this.src='https://via.placeholder.com/250x250/f2a900/111111?text=BTC';">
+            </div>
+        </div>
+        <div style="margin-top: 35px; width: 100%;">
+            <div style="font-size: 1.4em; font-family: monospace; letter-spacing: -0.5px; color: #ffffff; font-weight: bold;"><span id="balance">0.00</span> BTC</div>
+            <div style="font-size: 0.55em; margin-top: 15px; color: #ffd700; font-family: monospace; letter-spacing: 0.5px;">PER SECOND: <span id="bps">0.00</span></div>
+            <button class="gamble-btn" onclick="toggleGamble(true)">🎰 GAMBLE BTC</button>
+        </div>
+    </div>
+
+    <div class="center-panel">
+        <div class="news-ticker-container">
+            <div id="news-text">CONNECTING TO GLOBAL CRYPTO BLOCK DATA FEED...</div>
+        </div>
+        
+        <div style="flex: 1;"></div>
+
+        <div class="rebirth-center-box">
+            <div class="rebirth-title">QUANTUM REBIRTH MACHINE</div>
+            <div class="rebirth-desc">
+                Requires: 1.00 Quintillion BTC<br>
+                Progress: <span id="rebirth-progress" style="color:#ffd700; font-weight:bold;">0.00%</span><br>
+                Current Rebirth Level: <span id="rebirth-count-txt" style="color: #ff4d4d;">0</span><br>
+                Rebirth Points: <span id="rebirth-points-txt" style="color: #00ff9d; font-weight: bold;">0</span>
+            </div>
+            <button id="rebirth-btn-action" class="rebirth-btn" disabled onclick="triggerRebirth()">RESET TIMELINE (+1 RP)</button>
+            <button class="rebirth-btn" style="margin-top: 10px; border-color: #bc34fa; color: #bc34fa;" onclick="toggleSkillTree(true)">OPEN SKILL TREE</button>
+        </div>
+    </div>
+
+    <div class="right-panel">
+        <div class="store-header">HARDWARE STORE</div>
+        <div id="upgrades-section">
+            <div class="upgrade-grid" id="upgrades-grid"></div>
+        </div>
+        <div id="miners-section">
+            <div id="miners-list"></div>
+        </div>
+    </div>
+</div>
+
+<div id="modal-bg" class="modal-overlay" onclick="closeAllModals()"></div>
+
+<div id="stats-modal">
+    <h2 style="color: #ffd700; font-size: 0.65em; margin-bottom: 25px; text-align: center;">GAME STATS</h2>
+    <div class="stats-line">Bitcoins in Bank: <span class="stats-val" id="stat-current">0</span></div>
+    <div class="stats-line">Total Bitcoins Ever Mined: <span class="stats-val" id="stat-total">0</span></div>
+    <div class="stats-line">Total Times Clicked: <span class="stats-val" id="stat-clicks">0</span></div>
+    <div class="stats-line">Current Speed Per Second: <span class="stats-val" id="stat-bps-modal">0</span></div>
+    <div class="stats-line">Times Rebirthed: <span class="stats-val" id="stat-rebirths">0</span></div>
+    <div class="modal-btns">
+        <button onclick="saveGame(); alert('Game saved successfully.')" style="background: #00ff9d;">SAVE GAME</button>
+        <button onclick="resetGame()" style="background: #ff4d4d;">WIPE SAVE DATA</button>
+        <button onclick="toggleStats(false)" style="background: #444; color: white;">CLOSE</button>
+    </div>
+</div>
+
+<div id="skill-tree-modal">
+    <h2 style="color: #bc34fa; font-size: 0.65em; margin-bottom: 15px; text-align: center;">REBIRTH SKILL TREE</h2>
+    <div style="text-align: center; font-size: 0.5em; margin-bottom: 10px;">Available Rebirth Points (RP): <span id="st-rp-display" style="color: #00ff9d; font-weight: bold;">0</span></div>
+    <div id="skill-tree-nodes" class="skill-tree-container"></div>
+    <div class="modal-btns">
+        <button onclick="toggleSkillTree(false)" style="background: #444; color: white;">CLOSE</button>
+    </div>
+</div>
+
+<div id="gamble-modal">
+    <h2 style="color: #ff4d4d; font-size: 0.65em; margin-bottom: 12px; text-align: center;">CRYPTO CASINO</h2>
+    <div style="text-align: center; font-size: 0.45em; color: #ccc; margin-bottom: 14px;">
+        Balance: <span id="gamble-balance" style="color:#00ff9d; font-weight:bold;">0</span> BTC
+    </div>
+
+    <div class="gamble-section-title">Bet Amount</div>
+    <input type="number" id="gamble-amount" class="gamble-input" placeholder="Enter BTC to risk..." min="0" step="any">
+    <div class="gamble-quick">
+        <button onclick="setGamblePercent(0.1)">10%</button>
+        <button onclick="setGamblePercent(0.25)">25%</button>
+        <button onclick="setGamblePercent(0.5)">50%</button>
+        <button onclick="setGamblePercent(1)">ALL IN</button>
+    </div>
+
+    <div class="gamble-section-title">Choose Your Risk</div>
+    <div class="gamble-mult-row">
+        <button class="gamble-mult-btn" onclick="placeBet(2, 0.48)">
+            2×
+            <span class="odds">~48% win</span>
+        </button>
+        <button class="gamble-mult-btn" onclick="placeBet(5, 0.18)">
+            5×
+            <span class="odds">~18% win</span>
+        </button>
+        <button class="gamble-mult-btn" onclick="placeBet(10, 0.09)">
+            10×
+            <span class="odds">~9% win</span>
+        </button>
+    </div>
+
+    <div id="gamble-result"></div>
+
+    <div class="modal-btns">
+        <button onclick="toggleGamble(false)" style="background: #444; color: white;">CLOSE</button>
+    </div>
+</div>
+
+<div id="dev-menu-modal">
+    <div class="dev-header">SYSTEM ADMINISTRATION MANIFEST</div>
+    <div class="dev-section-title">Currency Manipulation</div>
+    <div class="dev-row">
+        <div class="dev-label">Add Set Value:</div>
+        <input type="number" id="dev-add-funds-input" class="dev-input" value="1000">
+        <button class="dev-btn" onclick="devAddFunds()">EXECUTE</button>
+    </div>
+    <div class="dev-row">
+        <div class="dev-label">Multiply Current Wallet:</div>
+        <input type="number" id="dev-mult-funds-input" class="dev-input" value="2">
+        <button class="dev-btn" onclick="devMultiplyFunds()">EXECUTE</button>
+    </div>
+    <div class="dev-row">
+        <div class="dev-label">Set Bank Total Absolute:</div>
+        <input type="number" id="dev-set-funds-input" class="dev-input" value="500000">
+        <button class="dev-btn" onclick="devSetAbsoluteFunds()">EXECUTE</button>
+    </div>
+
+    <div class="dev-section-title">Timeline & Progression</div>
+    <div class="dev-row">
+        <div class="dev-label">Increment Rebirth Count:</div>
+        <input type="number" id="dev-rebirth-input" class="dev-input" value="1">
+        <button class="dev-btn" onclick="devAddRebirths()">GRANT</button>
+    </div>
+    <div class="dev-row">
+        <div class="dev-label">Add Rebirth Points (RP):</div>
+        <input type="number" id="dev-rp-input" class="dev-input" value="5">
+        <button class="dev-btn" onclick="devAddRebirthPoints()">GRANT RP</button>
+    </div>
+    <div class="dev-row">
+        <div class="dev-label">Modify Lifetime Mined Value:</div>
+        <input type="number" id="dev-lifetime-input" class="dev-input" value="1000000">
+        <button class="dev-btn" onclick="devSetLifetimeMined()">OVERWRITE</button>
+    </div>
+
+    <div class="dev-section-title">Hardware & Store Hack</div>
+    <div class="dev-row">
+        <div class="dev-label">Max Out Upgrade Levels:</div>
+        <button class="dev-btn" style="width:130px;" onclick="devMaxUpgrades()">MAX ALL</button>
+    </div>
+    <div class="dev-row">
+        <div class="dev-label">Instantly Add 10 of All Miners:</div>
+        <button class="dev-btn" style="width:130px;" onclick="devAddMinersBulk()">GRANT 10x</button>
+    </div>
+
+    <div class="dev-section-title">System Execution</div>
+    <div class="dev-row">
+        <button class="dev-btn dev-close-btn" onclick="toggleDevMenu(false)">DISMISS DASHBOARD</button>
+    </div>
+</div>
+
+<div id="tooltip" class="tooltip"></div>
+
+<script src="achievements.js"></script>
+<script src="skillTree.js"></script>
+<script src="events/events.js"></script>
+
+<script>
+    const SVGS = {
+        hardware: `<svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2zm-2-7H7v2h10V6zm2 12H5v-2h14v2zM21 2H3c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>`,
+        network: `<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L12 15v5z"/></svg>`,
+        boost: `<svg viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm0 4l7.5 13h-15L12 6zm-1 5h2v4h-2v-4zm0 5h2v2h-2v-2z"/></svg>`,
+        processor: `<svg viewBox="0 0 24 24"><path d="M4 6H2v2h2v2H2v2h2v2H2v2h2v2h2v2h2v2h2v-2h2v2h2v-2h2v2h2v-2h2v2h2v-2h2v-2h-2v-2h2v-2h-2v-2h2v-2h-2V6h-2V4h-2v2h-2V4h-2v2h-2V4H8v2H6V4H4v2zm14 14H6V6h12v14z"/></svg>`,
+        quantum: `<svg viewBox="0 0 24 24"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zm0-2a8 8 0 1 1 0-16 8 8 0 0 1 0 16z"/></svg>`
+    };
+
+    window.gameData = {
+        bitcoin: 0,
+        totalMined: 0,
+        totalClicks: 0,
+        clickValue: 0.5, 
+        rebirths: 0,
+        rebirthPoints: 0, 
+        unlockedAchievements: [], 
+        skillTreeLevels: {}, 
+        mineryName: "Bitcoin's Minery",
+        lastSaveTime: Date.now(),
+        ownedMiners: {},
+        upgradeLevels: {},
+        devMenuUnlocked: false 
+    };
+
+    const REBIRTH_REQUIREMENT = 1e18; 
+    const suffixes = ["", " K", " M", " B", " T", " Qd", " Qn", " Sx", " Sp", " Oc", " No", " Dc", " Un", " Du", " Tr", " Qt", " Qid"];
+
+    const newsMessages = [
+        'MARKET UPDATE: Bitcoin network difficulty climbs higher as more mining warehouses go online.',
+        'HARDWARE ALERT: Next-gen high-performance mining microchips sell out globally within minutes.',
+        'TECH DAILY: Eco-friendly energy installations become standard practice for high-output setups.',
+        'IN THE NEWS: Massive whale wallet moves ancient coins mined over a decade ago.',
+        'NETWORK STATUS: Block synchronization running optimally across all globally distributed operational systems.',
+        'CASINO RUMOR: Underground hash dens report record double-or-nothing payouts this cycle.'
+    ];
+
+    const minerNames = [
+        "Resistive Logic Breadboard", "Low-Voltage Silicon Gate", "Refurbished Thin-Client Terminal", "Cascaded Copper Array", 
+        "Synchronous Micro-Controller", "Dedicated Coprocessor Node", "Integrated Core Workstation", "High-Throughput Bus Array", 
+        "Overclocked Logic Cluster", "Regulated Multi-Thread Rig", "Direct-Injected Silicon Matrix", "Monolithic ASIC Die", 
+        "Parallel Processing Engine", "Cryogenic Storage Interconnect", "Modular Enterprise Node", "High-Density Storage Cluster"
+    ];
+
+    const miners = [];
+    for (let i = 0; i < minerNames.length; i++) {
+        miners.push({
+            id: `miner_${i}`, 
+            name: minerNames[i],
+            baseCost: Math.floor(25 * Math.pow(9.5, i)), 
+            production: Math.floor(1 * Math.pow(8, i)),
+            svgType: i < 4 ? 'hardware' : i < 8 ? 'network' : i < 12 ? 'processor' : 'quantum'
+        });
+    }
+
+    const upgrades = [
+        { id: "u1", name: "High-Tactility Actuator", baseCost: 1000, svg: 'boost', type: "click", boost: 1.50, desc: "Increases mouse click harvest by 50%." },
+        { id: "u2", name: "Low-Resistance Cabling", baseCost: 25000, svg: 'processor', type: "bps", boost: 1.50, desc: "Boosts all your automatic miner speed by 50%." },
+        { id: "u3", name: "Solid-State Flash Array", baseCost: 5000000, svg: 'hardware', type: "click", boost: 2.00, desc: "Upgrades storage read pipelines. Clicks gain +100% power." },
+        { id: "u4", name: "Dedicated Bus Upgrades", baseCost: 2500000000, svg: 'network', type: "bps", boost: 2.00, desc: "Reduces server traffic jams. Total miner output rises +100%." },
+        { id: "u5", name: "Liquid Nitrogen Cooling", baseCost: 1000000000000, svg: 'processor', type: "bps", boost: 3.00, desc: "Supercools your system infrastructure, making miners +200% faster." }
+    ];
+
+    function editMineryName() {
+        const newName = prompt("Enter a new name for your minery:", window.gameData.mineryName);
+        if (newName && newName.trim() !== "") {
+            window.gameData.mineryName = newName.trim();
+            document.getElementById("minery-title").innerText = window.gameData.mineryName.toUpperCase();
+            if (window.gameData.mineryName.toLowerCase() === "haxforbitcoinplz") {
+                window.gameData.devMenuUnlocked = true;
+                alert("ADMIN MODE CONFIRMED. Developer console trigger initialized.");
+            }
+            evaluateDevTriggerVisibility();
+            saveGame();
+        }
+    }
+
+    function evaluateDevTriggerVisibility() {
+        document.getElementById("dev-trigger-btn").style.display = window.gameData.devMenuUnlocked ? "block" : "none";
+    }
+
+    function toggleDevMenu(open) {
+        document.getElementById('modal-bg').style.display = open ? 'block' : 'none';
+        document.getElementById('dev-menu-modal').style.display = open ? 'block' : 'none';
+    }
+
+    function toggleSkillTree(open) {
+        document.getElementById('modal-bg').style.display = open ? 'block' : 'none';
+        document.getElementById('skill-tree-modal').style.display = open ? 'block' : 'none';
+        if (open && typeof renderSkillTree === "function") {
+            renderSkillTree();
+        }
+    }
+
+    function toggleGamble(open) {
+        document.getElementById('modal-bg').style.display = open ? 'block' : 'none';
+        document.getElementById('gamble-modal').style.display = open ? 'block' : 'none';
+        if (open) {
+            document.getElementById('gamble-balance').innerText = formatNum(window.gameData.bitcoin);
+            document.getElementById('gamble-result').innerText = '';
+            document.getElementById('gamble-result').style.color = '#fff';
+            document.getElementById('gamble-amount').value = '';
+        }
+    }
+
+    function setGamblePercent(pct) {
+        const amount = window.gameData.bitcoin * pct;
+        document.getElementById('gamble-amount').value = amount > 0 ? amount.toFixed(8).replace(/\.?0+$/, '') : '0';
+    }
+
+    function placeBet(multiplier, winChance) {
+        const input = document.getElementById('gamble-amount');
+        let bet = parseFloat(input.value);
+
+        if (isNaN(bet) || bet <= 0) {
+            document.getElementById('gamble-result').innerText = 'Enter a valid bet amount.';
+            document.getElementById('gamble-result').style.color = '#ff6666';
+            return;
+        }
+        if (bet > window.gameData.bitcoin) {
+            document.getElementById('gamble-result').innerText = 'Not enough BTC!';
+            document.getElementById('gamble-result').style.color = '#ff6666';
+            return;
+        }
+
+        window.gameData.bitcoin -= bet;
+
+        const won = Math.random() < winChance;
+        const resultEl = document.getElementById('gamble-result');
+
+        if (won) {
+            const winnings = bet * multiplier;
+            window.gameData.bitcoin += winnings;
+            resultEl.innerText = `YOU WON! +${formatNum(winnings - bet)} BTC (${multiplier}×)`;
+            resultEl.style.color = '#00ff9d';
+
+            const f = document.createElement('div');
+            f.className = 'floating-text';
+            f.innerText = `🎰 WIN +${formatNum(winnings - bet)}`;
+            f.style.color = '#00ff9d';
+            f.style.left = '50%';
+            f.style.top = '40%';
+            f.style.transform = 'translateX(-50%) scale(1.3)';
+            document.body.appendChild(f);
+            setTimeout(() => f.remove(), 900);
+        } else {
+            resultEl.innerText = `BUST! Lost ${formatNum(bet)} BTC`;
+            resultEl.style.color = '#ff4d4d';
+
+            const f = document.createElement('div');
+            f.className = 'floating-text';
+            f.innerText = `💀 -${formatNum(bet)}`;
+            f.style.color = '#ff4d4d';
+            f.style.left = '50%';
+            f.style.top = '40%';
+            f.style.transform = 'translateX(-50%) scale(1.3)';
+            document.body.appendChild(f);
+            setTimeout(() => f.remove(), 900);
+        }
+
+        document.getElementById('gamble-balance').innerText = formatNum(window.gameData.bitcoin);
+        updateDisplay();
+        fastColorCheck();
+        saveGame();
+
+        if (typeof checkAchievements === "function") {
+            checkAchievements(window.gameData);
+        }
+    }
+
+    function devAddFunds() { 
+        window.gameData.bitcoin += parseFloat(document.getElementById("dev-add-funds-input").value) || 0; 
+        syncStatePostDevCheat(); 
+    }
+
+    function devMultiplyFunds() { 
+        window.gameData.bitcoin *= parseFloat(document.getElementById("dev-mult-funds-input").value) || 1; 
+        syncStatePostDevCheat(); 
+    }
+
+    function devSetAbsoluteFunds() { 
+        window.gameData.bitcoin = parseFloat(document.getElementById("dev-set-funds-input").value) || 0; 
+        syncStatePostDevCheat(); 
+    }
+
+    function devAddRebirths() { 
+        window.gameData.rebirths += parseInt(document.getElementById("dev-rebirth-input").value) || 0; 
+        syncStatePostDevCheat(); 
+    }
+
+    function devAddRebirthPoints() { 
+        window.gameData.rebirthPoints += parseInt(document.getElementById("dev-rp-input").value) || 0; 
+        syncStatePostDevCheat(); 
+    }
+
+    function devSetLifetimeMined() { 
+        window.gameData.totalMined = parseFloat(document.getElementById("dev-lifetime-input").value) || 0; 
+        syncStatePostDevCheat(); 
+    }
+
+    function devMaxUpgrades() { 
+        upgrades.forEach(u => {
+            window.gameData.upgradeLevels[u.id] = 100;
+        }); 
+        renderUpgrades(); 
+        syncStatePostDevCheat(); 
+    }
+
+    function devAddMinersBulk() { 
+        miners.forEach(m => {
+            window.gameData.ownedMiners[m.id] = (window.gameData.ownedMiners[m.id] || 0) + 10;
+        }); 
+        renderMiners(); 
+        syncStatePostDevCheat(); 
+    }
+    
+    function syncStatePostDevCheat() { 
+        updateDisplay(); 
+        fastColorCheck(); 
+        saveGame(); 
+        if (typeof checkAchievements === "function") {
+            checkAchievements(window.gameData); 
+        }
+    }
+
+    function closeAllModals() { 
+        toggleStats(false); 
+        toggleDevMenu(false); 
+        toggleSkillTree(false); 
+        toggleGamble(false);
+    }
+
+    function formatNum(n) {
+        if (n === 0) return "0.00";
+        if (n < 1000) return n.toFixed(2);
+        const tier = Math.floor(Math.log10(n) / 3);
+        if (tier >= suffixes.length) return n.toExponential(2);
+        return (n / Math.pow(10, tier * 3)).toFixed(2) + suffixes[tier];
+    }
+
+    function getUpgradeCost(u) {
+        const lvl = window.gameData.upgradeLevels[u.id] || 0;
+        let cost = Math.floor(u.baseCost * Math.pow(2.5, lvl));
+        let discount = 1;
+        if (typeof SKILL_TREE !== 'undefined' && SKILL_TREE.node_discount) {
+            discount = SKILL_TREE.node_discount.getEffect(window.gameData.skillTreeLevels['node_discount'] || 0);
+        }
+        return Math.floor(cost * discount);
+    }
+
+    function getMinerCost(miner) {
+        const owned = window.gameData.ownedMiners[miner.id] || 0;
+        let cost = Math.floor(miner.baseCost * Math.pow(1.42, owned));
+        let discount = 1;
+        if (typeof SKILL_TREE !== 'undefined' && SKILL_TREE.node_discount) {
+            discount = SKILL_TREE.node_discount.getEffect(window.gameData.skillTreeLevels['node_discount'] || 0);
+        }
+        return Math.floor(cost * discount);
+    }
+
+    function getClickValue() {
+        let baseVal = window.gameData.clickValue;
+        let skillMult = 1;
+        if (typeof SKILL_TREE !== 'undefined' && SKILL_TREE.node_click_mult) {
+            skillMult = SKILL_TREE.node_click_mult.getEffect(window.gameData.skillTreeLevels['node_click_mult'] || 0);
+        }
+        baseVal *= skillMult;
+        let clickMult = 1;
+        upgrades.forEach(u => {
+            if (u.type === 'click') {
+                const lvl = window.gameData.upgradeLevels[u.id] || 0;
+                if (lvl > 0) clickMult *= Math.pow(u.boost, lvl);
+            }
+        });
+        return baseVal * clickMult;
+    }
+
+    function calculateCurrentBPS() {
+        let totalBPS = 0;
+        miners.forEach(m => {
+            let count = window.gameData.ownedMiners[m.id] || 0;
+            if (count > 0) {
+                totalBPS += (count * m.production);
+            }
+        });
+        let upMult = 1;
+        upgrades.forEach(u => {
+            if (u.type === 'bps') {
+                const lvl = window.gameData.upgradeLevels[u.id] || 0;
+                if (lvl > 0) upMult *= Math.pow(u.boost, lvl);
+            }
+        });
+        let finalBPS = totalBPS * upMult;
+        let idleMult = 1;
+        if (typeof SKILL_TREE !== 'undefined' && SKILL_TREE.node_idle_boost) {
+            idleMult = SKILL_TREE.node_idle_boost.getEffect(window.gameData.skillTreeLevels['node_idle_boost'] || 0);
+        }
+        finalBPS *= idleMult;
+        if (typeof window.eventMultiplier !== 'undefined') {
+            finalBPS *= window.eventMultiplier;
+        }
+        return finalBPS;
+    }
+
+    function renderMiners() {
+        const list = document.getElementById('miners-list');
+        if (!list) return;
+        list.innerHTML = '';
+        miners.forEach((m) => {
+            const cost = getMinerCost(m);
+            const owned = window.gameData.ownedMiners[m.id] || 0;
+            const canAfford = window.gameData.bitcoin >= cost;
+            const div = document.createElement('div');
+            div.id = `el-${m.id}`;
+            div.className = `item ${!canAfford ? 'locked' : ''}`;
+            div.innerHTML = `
+                <div class="item-icon-frame">${SVGS[m.svgType]}</div>
+                <div class="item-details">
+                    <div class="item-name">${m.name}</div>
+                    <div class="item-cost ${canAfford ? 'can-afford' : 'cannot-afford'}" id="cost-${m.id}">${formatNum(cost)} BTC</div>
+                </div>
+                <div class="item-owned" id="owned-${m.id}">${owned}</div>`;
+            div.onmouseenter = (e) => showTooltip(e, `Generates +${m.production.toFixed(4)} active BTC per second.`);
+            div.onmouseleave = hideTooltip;
+            div.onclick = () => {
+                const updatedCost = getMinerCost(m); 
+                if (window.gameData.bitcoin >= updatedCost) {
+                    window.gameData.bitcoin -= updatedCost;
+                    window.gameData.ownedMiners[m.id] = (window.gameData.ownedMiners[m.id] || 0) + 1;
+                    document.getElementById(`owned-${m.id}`).innerText = window.gameData.ownedMiners[m.id];
+                    document.getElementById(`cost-${m.id}`).innerText = formatNum(getMinerCost(m)) + " BTC";
+                    updateDisplay(); 
+                    fastColorCheck(); 
+                    if (typeof checkAchievements === "function") {
+                        checkAchievements(window.gameData);
+                    }
+                }
+            };
+            list.appendChild(div);
+        });
+    }
+
+    function fastColorCheck() {
+        miners.forEach((m) => {
+            const cost = getMinerCost(m);
+            const div = document.getElementById(`el-${m.id}`);
+            const costText = document.getElementById(`cost-${m.id}`);
+            if (!div || !costText) return;
+            if (window.gameData.bitcoin >= cost) {
+                div.classList.remove('locked');
+                costText.classList.replace('cannot-afford', 'can-afford');
+            } else {
+                div.classList.add('locked');
+                costText.classList.replace('can-afford', 'cannot-afford');
+            }
+        });
+    }
+
+    function renderUpgrades() {
+        const grid = document.getElementById('upgrades-grid');
+        grid.innerHTML = '';
+        upgrades.forEach((u) => {
+            const cost = getUpgradeCost(u);
+            const lvl = window.gameData.upgradeLevels[u.id] || 0;
+            const div = document.createElement('div');
+            div.className = 'upgrade-item';
+            div.innerHTML = SVGS[u.svg || 'boost'] + `<div class="upgrade-level">L${lvl}</div>`;
+            div.onmouseenter = (e) => showTooltip(e, `<strong>${u.name} (Lvl ${lvl})</strong><br>${u.desc}<br>Next Cost: ${formatNum(cost)} BTC`);
+            div.onmouseleave = hideTooltip;
+            div.onclick = () => {
+                const activeCost = getUpgradeCost(u);
+                if (window.gameData.bitcoin >= activeCost) {
+                    window.gameData.bitcoin -= activeCost;
+                    window.gameData.upgradeLevels[u.id] = (window.gameData.upgradeLevels[u.id] || 0) + 1;
+                    hideTooltip(); 
+                    renderUpgrades(); 
+                    updateDisplay(); 
+                    fastColorCheck(); 
+                    if (typeof checkAchievements === "function") {
+                        checkAchievements(window.gameData);
+                    }
+                }
+            };
+            grid.appendChild(div);
+        });
+    }
+
+    function updateDisplay() {
+        document.getElementById('balance').innerText = formatNum(window.gameData.bitcoin);
+        document.getElementById('bps').innerText = formatNum(calculateCurrentBPS());
+        document.getElementById('rebirth-count-txt').innerText = window.gameData.rebirths;
+        document.getElementById('rebirth-points-txt').innerText = window.gameData.rebirthPoints;
+        let progressPercent = Math.min((window.gameData.bitcoin / REBIRTH_REQUIREMENT) * 100, 100);
+        document.getElementById('rebirth-progress').innerText = progressPercent.toFixed(4) + "%";
+        document.getElementById('rebirth-btn-action').disabled = window.gameData.bitcoin < REBIRTH_REQUIREMENT;
+    }
+
+    document.getElementById('bitcoin').onclick = (e) => {
+        let val = getClickValue();
+        let isCrit = false;
+        let critChance = 0;
+        if (typeof SKILL_TREE !== 'undefined' && SKILL_TREE.node_crit_chance) {
+            critChance = SKILL_TREE.node_crit_chance.getEffect(window.gameData.skillTreeLevels['node_crit_chance'] || 0);
+        }
+        if (critChance > 0 && Math.random() < critChance) {
+            val *= 10;
+            isCrit = true;
+        }
+        window.gameData.bitcoin += val;
+        window.gameData.totalMined += val;
+        window.gameData.totalClicks++;
+        const f = document.createElement('div');
+        f.className = 'floating-text';
+        if (isCrit) {
+            f.innerText = `CRIT! +${formatNum(val)}`;
+            f.style.color = '#ff4d4d';
+            f.style.transform = 'scale(1.5)';
+        } else {
+            f.innerText = `+${formatNum(val)}`;
+        }
+        f.style.left = `${e.clientX}px`;
+        f.style.top = `${e.clientY}px`;
+        document.body.appendChild(f);
+        setTimeout(() => f.remove(), 700);
+        if (typeof checkAchievements === "function") {
+            checkAchievements(window.gameData);
+        }
+        updateDisplay();
+        fastColorCheck(); 
+    };
+
+    function triggerRebirth() {
+        if (window.gameData.bitcoin < REBIRTH_REQUIREMENT) return;
+        if (confirm("Are you sure you want to rebirth?\n\nThis resets upgrades, miners, and bank totals, but you will progress to the next loop level and earn 1 Rebirth Point!")) {
+            window.gameData.bitcoin = 0;
+            window.gameData.ownedMiners = {};
+            window.gameData.upgradeLevels = {};
+            window.gameData.rebirths++;
+            window.gameData.rebirthPoints += 1;
+            saveGame();
+            renderMiners();
+            renderUpgrades();
+            updateDisplay();
+            fastColorCheck();
+            if (typeof checkAchievements === "function") {
+                checkAchievements(window.gameData);
+            }
+            alert(`Timeline transformation operational! You earned 1 Rebirth Point.`);
+        }
+    }
+
+    const tooltip = document.getElementById('tooltip');
+    function showTooltip(e, txt) { 
+        tooltip.innerHTML = txt; 
+        tooltip.style.display = 'block'; 
+        tooltip.style.left = `${e.clientX + 15}px`; 
+        tooltip.style.top = `${e.clientY + 15}px`; 
+    }
+    function hideTooltip() { 
+        tooltip.style.display = 'none'; 
+    }
+
+    function toggleStats(open) {
+        document.getElementById('modal-bg').style.display = open ? 'block' : 'none';
+        document.getElementById('stats-modal').style.display = open ? 'block' : 'none';
+        if (open) {
+            document.getElementById('stat-current').innerText = formatNum(window.gameData.bitcoin) + " BTC";
+            document.getElementById('stat-total').innerText = formatNum(window.gameData.totalMined) + " BTC";
+            document.getElementById('stat-clicks').innerText = window.gameData.totalClicks;
+            document.getElementById('stat-bps-modal').innerText = formatNum(calculateCurrentBPS()) + " BTC/S";
+            document.getElementById('stat-rebirths').innerText = window.gameData.rebirths;
+        }
+    }
+
+    function updateNews() {
+        const txt = document.getElementById('news-text');
+        const msg = newsMessages[Math.floor(Math.random() * newsMessages.length)];
+        txt.innerText = msg;
+        txt.style.animation = 'none'; 
+        txt.offsetHeight; 
+        txt.style.animation = `ticker ${Math.max(12, msg.length * 0.22)}s linear infinite`;
+    }
+
+    const SAVE_KEY = 'btcMinerySaveData';
+    const SAVE_VERSION = 2;
+
+    function saveGame() {
+        try {
+            window.gameData.lastSaveTime = Date.now();
+            window.gameData.saveVersion = SAVE_VERSION;
+            localStorage.setItem(SAVE_KEY, JSON.stringify(window.gameData));
+        } catch (e) {
+            console.error('Save failed (storage full or blocked):', e);
+        }
+    }
+
+    function applyOfflineProgress() {
+        if (!window.gameData.lastSaveTime) return;
+
+        const now = Date.now();
+        let secondsOffline = (now - window.gameData.lastSaveTime) / 1000;
+
+        if (secondsOffline < 30) return;
+
+        const MAX_OFFLINE_SECONDS = 24 * 60 * 60;
+        const wasCapped = secondsOffline > MAX_OFFLINE_SECONDS;
+        const cappedSeconds = Math.min(secondsOffline, MAX_OFFLINE_SECONDS);
+
+        const onlineBPS = calculateCurrentBPS();
+        const offlineRate = onlineBPS * 0.10;
+        const earned = offlineRate * cappedSeconds;
+
+        if (earned <= 0) return;
+
+        window.gameData.bitcoin += earned;
+        window.gameData.totalMined += earned;
+
+        const hours = Math.floor(cappedSeconds / 3600);
+        const mins = Math.floor((cappedSeconds % 3600) / 60);
+        let timeStr = "";
+        if (hours > 0) timeStr += hours + "h ";
+        timeStr += mins + "m";
+        if (wasCapped) timeStr += " (capped at 24h)";
+
+        setTimeout(() => {
+            alert(
+                "While you were away (" + timeStr + ")...\n\n" +
+                "Your miners kept running at 10% efficiency and produced\n" +
+                formatNum(earned) + " BTC!"
+            );
+            updateDisplay();
+            fastColorCheck();
+        }, 6200);
+    }
+
+    function loadGame() {
+        // NEVER wipe or ignore a valid save when code changes.
+        // Always merge saved fields on top of defaults so new features
+        // get defaults while existing progress is preserved.
+        const saved = localStorage.getItem(SAVE_KEY);
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                if (parsed && typeof parsed === 'object') {
+                    if (!Array.isArray(parsed.unlockedAchievements)) parsed.unlockedAchievements = [];
+                    if (!parsed.skillTreeLevels || typeof parsed.skillTreeLevels !== 'object') parsed.skillTreeLevels = {};
+                    if (typeof parsed.rebirthPoints !== 'number') parsed.rebirthPoints = 0;
+                    if (!parsed.ownedMiners || typeof parsed.ownedMiners !== 'object') parsed.ownedMiners = {};
+                    if (!parsed.upgradeLevels || typeof parsed.upgradeLevels !== 'object') parsed.upgradeLevels = {};
+                    if (typeof parsed.bitcoin !== 'number') parsed.bitcoin = 0;
+                    if (typeof parsed.totalMined !== 'number') parsed.totalMined = 0;
+                    if (typeof parsed.totalClicks !== 'number') parsed.totalClicks = 0;
+                    if (typeof parsed.rebirths !== 'number') parsed.rebirths = 0;
+                    if (typeof parsed.clickValue !== 'number') parsed.clickValue = 0.5;
+                    if (typeof parsed.devMenuUnlocked !== 'boolean') parsed.devMenuUnlocked = false;
+                    if (!parsed.mineryName) parsed.mineryName = "Bitcoin's Minery";
+                    window.gameData = Object.assign({}, window.gameData, parsed);
+                }
+            } catch (e) {
+                console.error("Could not parse save data; keeping raw save intact.", e);
+            }
+        }
+        document.getElementById("minery-title").innerText = (window.gameData.mineryName || "Bitcoin's Minery").toUpperCase();
+        evaluateDevTriggerVisibility();
+        applyOfflineProgress();
+        updateDisplay();
+    }
+
+    function resetGame() {
+        if (confirm("WARNING: Are you sure you want to completely erase all of your progress and start fresh?")) {
+            localStorage.removeItem(SAVE_KEY);
+            window.location.reload();
+        }
+    }
+
+    // Force-save on tab close / refresh / hide so code edits & reloads never lose progress
+    window.addEventListener('beforeunload', function () {
+        saveGame();
+    });
+    document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'hidden') {
+            saveGame();
+        }
+    });
+
+    loadGame();
+    renderMiners();
+    renderUpgrades();
+    updateNews();
+    
+    if (typeof loadAchievements === "function") loadAchievements();
+    if (typeof loadSkillTree === "function") loadSkillTree();
+    if (typeof startEventLoop === "function") startEventLoop();
+
+    setTimeout(() => {
+        const intro = document.getElementById('intro-overlay');
+        intro.style.opacity = '0';
+        intro.style.transform = 'scale(1.05)';
+        setTimeout(() => { intro.style.display = 'none'; }, 800);
+    }, 5600);
+
+    setInterval(() => {
+        let bps = calculateCurrentBPS();
+        window.gameData.bitcoin += (bps / 10);
+        window.gameData.totalMined += (bps / 10);
+        updateDisplay();
+        fastColorCheck(); 
+        if (typeof checkAchievements === "function") {
+            checkAchievements(window.gameData);
+        }
+    }, 100); 
+
+    setInterval(saveGame, 5000);
+    setInterval(updateNews, 14000);
+</script>
+</body>
+</html>
