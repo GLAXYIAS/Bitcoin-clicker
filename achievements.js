@@ -12,56 +12,39 @@ const ICONS = {
     crown: `<svg viewBox="0 0 24 24" width="28" height="28" fill="#ffd700"><path d="M5 16h14l-2.1-9.4L14 9l-2-4-2 4-2.9-2.4L5 16zm0 2h14v2H5v-2z"/></svg>`
 };
 
-// ==========================================
-// HELPER FUNCTIONS FOR STAT CHECKS
-// ==========================================
 function getTotalMiners(stats) {
     return Object.values(stats.ownedMiners || {}).reduce((a, b) => a + b, 0);
 }
 
 function getTotalUpgrades(stats) {
-    return Object.values(stats.upgradeLevels || {}).reduce((a, b) => a + b, 0);
+    var levels = Object.values(stats.upgradeLevels || {}).reduce((a, b) => a + b, 0);
+    var bought = Object.keys(stats.boughtUpgrades || {}).filter(function (k) { return stats.boughtUpgrades[k]; }).length;
+    return levels + bought;
 }
 
-// ==========================================
-// ACHIEVEMENTS CONFIGURATION
-// ==========================================
 const ACHIEVEMENTS = [
-    // --- CLICKING ACHIEVEMENTS ---
     { id: "click_1", title: "Genesis Block", desc: "Click the Bitcoin for the first time.", icon: ICONS.cursor, check: (stats) => stats.totalClicks >= 1 },
     { id: "click_100", title: "Carpal Tunnel Warning", desc: "Click the Bitcoin 100 times.", icon: ICONS.cursor, check: (stats) => stats.totalClicks >= 100 },
     { id: "click_1000", title: "Autoclicker Suspect", desc: "Click the Bitcoin 1,000 times.", icon: ICONS.cursor, check: (stats) => stats.totalClicks >= 1000 },
     { id: "click_10000", title: "Matrix Breaker", desc: "Click the Bitcoin 10,000 times.", icon: ICONS.cursor, check: (stats) => stats.totalClicks >= 10000 },
-
-    // --- WEALTH ACHIEVEMENTS ---
     { id: "btc_1k", title: "Stacking Sats", desc: "Mine a total of 1,000 BTC.", icon: ICONS.wealth, check: (stats) => stats.totalMined >= 1000 },
     { id: "btc_1m", title: "Millionaire Club", desc: "Mine a total of 1,000,000 BTC.", icon: ICONS.wealth, check: (stats) => stats.totalMined >= 1000000 },
     { id: "btc_1b", title: "Whale Alert", desc: "Mine a total of 1 Billion BTC.", icon: ICONS.wealth, check: (stats) => stats.totalMined >= 1e9 },
     { id: "btc_1t", title: "Global Economy", desc: "Mine a total of 1 Trillion BTC.", icon: ICONS.wealth, check: (stats) => stats.totalMined >= 1e12 },
     { id: "btc_1q", title: "Singularity Nears", desc: "Mine a total of 1 Quintillion BTC.", icon: ICONS.crown, check: (stats) => stats.totalMined >= 1e18 },
-
-    // --- HARDWARE ACHIEVEMENTS ---
     { id: "hard_1", title: "Booting Up", desc: "Purchase your first hardware miner.", icon: ICONS.hardware, check: (stats) => getTotalMiners(stats) >= 1 },
     { id: "hard_50", title: "Server Farm", desc: "Own a total of 50 hardware miners.", icon: ICONS.hardware, check: (stats) => getTotalMiners(stats) >= 50 },
     { id: "hard_200", title: "Data Center", desc: "Own a total of 200 hardware miners.", icon: ICONS.hardware, check: (stats) => getTotalMiners(stats) >= 200 },
     { id: "hard_500", title: "Global Network", desc: "Own a total of 500 hardware miners.", icon: ICONS.hardware, check: (stats) => getTotalMiners(stats) >= 500 },
-    { id: "hard_quantum", title: "Quantum Supremacy", desc: "Purchase the final Quantum storage cluster.", icon: ICONS.hardware, check: (stats) => (stats.ownedMiners['miner_15'] || 0) >= 1 },
-
-    // --- UPGRADE ACHIEVEMENTS ---
+    { id: "hard_quantum", title: "Quantum Supremacy", desc: "Purchase a late-tier quantum-class miner.", icon: ICONS.hardware, check: (stats) => (stats.ownedMiners['miner_15'] || 0) >= 1 || (stats.ownedMiners['miner_31'] || 0) >= 1 },
     { id: "upg_1", title: "Script Kiddie", desc: "Purchase your first upgrade.", icon: ICONS.upgrade, check: (stats) => getTotalUpgrades(stats) >= 1 },
     { id: "upg_25", title: "Sysadmin", desc: "Purchase 25 total upgrades.", icon: ICONS.upgrade, check: (stats) => getTotalUpgrades(stats) >= 25 },
     { id: "upg_100", title: "Overclocked Network", desc: "Purchase 100 total upgrades.", icon: ICONS.upgrade, check: (stats) => getTotalUpgrades(stats) >= 100 },
-    { id: "upg_liquid", title: "Absolute Zero", desc: "Buy the Liquid Nitrogen Cooling upgrade.", icon: ICONS.upgrade, check: (stats) => (stats.upgradeLevels['u5'] || 0) >= 1 },
-
-    // --- REBIRTH ACHIEVEMENTS ---
     { id: "rebirth_1", title: "Time Traveler", desc: "Perform your first Rebirth.", icon: ICONS.rebirth, check: (stats) => stats.rebirths >= 1 },
     { id: "rebirth_5", title: "Multiverse Explorer", desc: "Perform 5 Rebirths.", icon: ICONS.rebirth, check: (stats) => stats.rebirths >= 5 },
     { id: "rebirth_10", title: "Timeline Master", desc: "Perform 10 Rebirths.", icon: ICONS.crown, check: (stats) => stats.rebirths >= 10 },
-
-    // --- SKILL TREE ACHIEVEMENTS ---
     { id: "skill_1", title: "Neural Link", desc: "Unlock your first Rebirth Skill.", icon: ICONS.skill, check: (stats) => Object.values(stats.skillTreeLevels || {}).some(lvl => lvl > 0) },
     { id: "skill_max", title: "Specialized Node", desc: "Max out a node in the Skill Tree.", icon: ICONS.skill, check: (stats) => {
-        // Checks if any skill has reached level 5 (or level 10 for crit)
         return Object.entries(stats.skillTreeLevels || {}).some(([key, lvl]) => {
             if (key === 'node_crit_chance' && lvl >= 10) return true;
             if (key !== 'node_crit_chance' && key !== 'node_start' && lvl >= 5) return true;
@@ -71,10 +54,6 @@ const ACHIEVEMENTS = [
     { id: "skill_mastery", title: "Ascended Mind", desc: "Spend a total of 15 Rebirth Points in the Skill Tree.", icon: ICONS.crown, check: (stats) => Object.values(stats.skillTreeLevels || {}).reduce((a, b) => a + b, 0) >= 15 }
 ];
 
-// ==========================================
-// CORE LOGIC 
-// ==========================================
-
 function loadAchievements() {
     if (!window.gameData.unlockedAchievements) {
         window.gameData.unlockedAchievements = [];
@@ -83,11 +62,13 @@ function loadAchievements() {
 
 function checkAchievements(stats) {
     if (!stats) return;
-    
     ACHIEVEMENTS.forEach(ach => {
         if (!stats.unlockedAchievements.includes(ach.id) && ach.check(stats)) {
             stats.unlockedAchievements.push(ach.id);
             showAchievementToast(ach);
+            if (typeof window.renderUpgrades === 'function') {
+                try { window.renderUpgrades(); } catch (e) {}
+            }
         }
     });
 }
@@ -104,11 +85,7 @@ function showAchievementToast(ach) {
         </div>
     `;
     document.body.appendChild(toast);
-
-    // Slide in
     setTimeout(() => toast.classList.add('show'), 100);
-    
-    // Slide out and remove
     setTimeout(() => {
         toast.classList.remove('show');
         setTimeout(() => toast.remove(), 400);
