@@ -12,6 +12,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    color: #ffd700;
     animation: floatAirdrop 3s ease-in-out infinite, pulseGlow 1.5s infinite alternate;
     transition: transform 0.1s;
 }
@@ -20,11 +21,10 @@
     transform: scale(0.9);
 }
 
-/* Sizing and styling the custom SVG */
 .crypto-airdrop svg {
     width: 65%;
     height: 65%;
-    filter: drop-shadow(0px 0px 6px rgba(255, 215, 0, 0.8));
+    filter: drop-shadow(0px 0px 6px currentColor);
 }
 
 @keyframes floatAirdrop {
@@ -37,7 +37,66 @@
     to { box-shadow: 0 0 40px #ffd700, 0 0 15px #fff; }
 }
 
-/* The Reward Notification Banner */
+/* ---- HOLIDAY AIRDROP THEMES ---- */
+.crypto-airdrop.holiday-halloween {
+    border-color: #ff6b00;
+    color: #ff6b00;
+    box-shadow: 0 0 20px rgba(255, 107, 0, 0.7);
+    animation: floatAirdrop 3s ease-in-out infinite, pulseHalloween 1.2s infinite alternate;
+}
+@keyframes pulseHalloween {
+    from { box-shadow: 0 0 10px rgba(255, 107, 0, 0.5); }
+    to { box-shadow: 0 0 35px #ff6b00, 0 0 12px #ffcc00; }
+}
+
+.crypto-airdrop.holiday-thanksgiving {
+    border-color: #c45c26;
+    color: #e8a05c;
+    box-shadow: 0 0 20px rgba(196, 92, 38, 0.7);
+}
+
+.crypto-airdrop.holiday-christmas {
+    border-color: #e82525;
+    color: #4caf50;
+    box-shadow: 0 0 20px rgba(232, 37, 37, 0.6), 0 0 10px rgba(76, 175, 80, 0.4);
+    animation: floatAirdrop 3s ease-in-out infinite, pulseChristmas 1.4s infinite alternate;
+}
+@keyframes pulseChristmas {
+    from { box-shadow: 0 0 12px rgba(232, 37, 37, 0.5); }
+    to { box-shadow: 0 0 30px #e82525, 0 0 15px #4caf50; }
+}
+
+.crypto-airdrop.holiday-newyear {
+    border-color: #ffd700;
+    color: #ffffff;
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.8);
+}
+
+.crypto-airdrop.holiday-valentine {
+    border-color: #ff4d6d;
+    color: #ff4d6d;
+    box-shadow: 0 0 20px rgba(255, 77, 109, 0.7);
+    border-radius: 50%;
+}
+
+.crypto-airdrop.holiday-patrick {
+    border-color: #00c853;
+    color: #00c853;
+    box-shadow: 0 0 20px rgba(0, 200, 83, 0.7);
+}
+
+.crypto-airdrop.holiday-easter {
+    border-color: #b388ff;
+    color: #ea80fc;
+    box-shadow: 0 0 20px rgba(179, 136, 255, 0.7);
+}
+
+.crypto-airdrop.holiday-july4 {
+    border-color: #1565c0;
+    color: #e82525;
+    box-shadow: 0 0 20px rgba(21, 101, 192, 0.6), 0 0 10px rgba(232, 37, 37, 0.4);
+}
+
 .event-notification {
     position: fixed;
     top: 20px;
@@ -49,17 +108,73 @@
     padding: 15px 30px;
     border-radius: 8px;
     font-family: 'Press Start 2P', monospace;
-    font-size: 0.6em;
+    font-size: 0.55em;
     z-index: 10000;
     text-align: center;
     pointer-events: none;
     box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
-    animation: slideDownFade 4s forwards;
+    animation: slideDownFade 4.5s forwards;
+    white-space: pre-line;
+    line-height: 1.5;
+    max-width: 90vw;
 }
 
 @keyframes slideDownFade {
     0% { top: -50px; opacity: 0; }
     10% { top: 20px; opacity: 1; }
-    90% { top: 20px; opacity: 1; }
+    88% { top: 20px; opacity: 1; }
     100% { top: -50px; opacity: 0; }
 }
+
+.holiday-banner {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 2100;
+    background: rgba(10, 5, 20, 0.92);
+    border: 2px solid #ffd700;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-family: 'Press Start 2P', monospace;
+    pointer-events: none;
+    max-width: 280px;
+    box-shadow: 0 0 18px rgba(0, 0, 0, 0.6);
+}
+
+.holiday-banner-title {
+    display: block;
+    font-size: 0.5em;
+    color: #ffd700;
+    margin-bottom: 4px;
+    letter-spacing: 1px;
+}
+
+.holiday-banner-sub {
+    display: block;
+    font-size: 0.35em;
+    color: #ccc;
+    line-height: 1.4;
+}
+
+.holiday-banner.holiday-halloween { border-color: #ff6b00; }
+.holiday-banner.holiday-halloween .holiday-banner-title { color: #ff6b00; }
+
+.holiday-banner.holiday-thanksgiving { border-color: #c45c26; }
+.holiday-banner.holiday-thanksgiving .holiday-banner-title { color: #e8a05c; }
+
+.holiday-banner.holiday-christmas { border-color: #e82525; }
+.holiday-banner.holiday-christmas .holiday-banner-title { color: #4caf50; }
+
+.holiday-banner.holiday-newyear { border-color: #ffd700; }
+
+.holiday-banner.holiday-valentine { border-color: #ff4d6d; }
+.holiday-banner.holiday-valentine .holiday-banner-title { color: #ff4d6d; }
+
+.holiday-banner.holiday-patrick { border-color: #00c853; }
+.holiday-banner.holiday-patrick .holiday-banner-title { color: #00c853; }
+
+.holiday-banner.holiday-easter { border-color: #b388ff; }
+.holiday-banner.holiday-easter .holiday-banner-title { color: #ea80fc; }
+
+.holiday-banner.holiday-july4 { border-color: #1565c0; }
+.holiday-banner.holiday-july4 .holiday-banner-title { color: #e82525; }
