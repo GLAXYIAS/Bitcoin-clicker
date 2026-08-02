@@ -8,6 +8,13 @@ window.eventMultiplier = 1;
 window.clickEventMultiplier = 1;
 let clickBoostActive = false;
 
+// Track when active boosts expire so the HUD can show a live countdown
+let bpsBoostEndsAt = 0;
+let clickBoostEndsAt = 0;
+let bpsBoostLabel = '';
+let clickBoostLabel = '';
+let boostHudInterval = null;
+
 // ---------- HOLIDAY WINDOWS (month is 0-indexed) ----------
 function getActiveHoliday() {
     const now = new Date();
@@ -27,7 +34,7 @@ function getActiveHoliday() {
                 'CRYPTID RUMOR: Something is mining in the dark corners of the chain...'
             ],
             rewards: [
-                { type: 'btc', minutes: 25, label: 'TRICK OR TREAT!\n\nA haunted airdrop yields ' },
+                { type: 'btc', minutes: 8, label: 'TRICK OR TREAT!\n\nA haunted airdrop yields ' },
                 { type: 'bps', mult: 4, duration: 90, label: 'GHOST PROTOCOL!\n\nMining 4x for 90 seconds!' },
                 { type: 'click', mult: 5, duration: 60, label: 'CANDY RUSH!\n\nClicks 5x for 60 seconds!' }
             ]
@@ -47,9 +54,9 @@ function getActiveHoliday() {
                 'HARVEST UPDATE: Record yields reported from farm-to-chain operations.'
             ],
             rewards: [
-                { type: 'btc', minutes: 30, label: 'FEAST SECURED!\n\nA generous spread grants ' },
+                { type: 'btc', minutes: 10, label: 'FEAST SECURED!\n\nA generous spread grants ' },
                 { type: 'bps', mult: 3.5, duration: 120, label: 'HARVEST BOOM!\n\nProduction 3.5x for 2 minutes!' },
-                { type: 'btc', minutes: 45, label: 'LEFTOVERS BONANZA!\n\nExtra helpings of ' }
+                { type: 'btc', minutes: 12, label: 'LEFTOVERS BONANZA!\n\nExtra helpings of ' }
             ]
         };
     }
@@ -67,7 +74,7 @@ function getActiveHoliday() {
                 'NORTH POLE NODE: Extreme cold is supercooling mining ASICs worldwide.'
             ],
             rewards: [
-                { type: 'btc', minutes: 40, label: 'GIFT UNWRAPPED!\n\nSanta left you ' },
+                { type: 'btc', minutes: 12, label: 'GIFT UNWRAPPED!\n\nSanta left you ' },
                 { type: 'bps', mult: 5, duration: 90, label: "SANTA'S BLESSING!\n\nProduction 5x for 90 seconds!" },
                 { type: 'click', mult: 4, duration: 75, label: 'STOCKING STUFFER!\n\nClicks 4x for 75 seconds!' }
             ]
@@ -87,7 +94,7 @@ function getActiveHoliday() {
                 'FIREWORKS: Celebratory hash bursts lighting up every block explorer.'
             ],
             rewards: [
-                { type: 'btc', minutes: 35, label: 'NEW YEAR BONUS!\n\nFresh year, fresh coins: ' },
+                { type: 'btc', minutes: 10, label: 'NEW YEAR BONUS!\n\nFresh year, fresh coins: ' },
                 { type: 'bps', mult: 4, duration: 100, label: 'RESOLUTION BOOST!\n\nProduction 4x for 100 seconds!' },
                 { type: 'click', mult: 6, duration: 45, label: 'MIDNIGHT STRIKE!\n\nClicks 6x for 45 seconds!' }
             ]
@@ -107,7 +114,7 @@ function getActiveHoliday() {
                 'CUPID NODE: Mystery packets of affection flooding the mempool.'
             ],
             rewards: [
-                { type: 'btc', minutes: 20, label: 'SWEET DROP!\n\nA love letter contains ' },
+                { type: 'btc', minutes: 6, label: 'SWEET DROP!\n\nA love letter contains ' },
                 { type: 'bps', mult: 3, duration: 90, label: 'HEART PROTOCOL!\n\nProduction 3x for 90 seconds!' },
                 { type: 'click', mult: 5, duration: 60, label: 'CUPID CLICKS!\n\nClicks 5x for 60 seconds!' }
             ]
@@ -127,7 +134,7 @@ function getActiveHoliday() {
                 'CLOVER NODE: Triple-lucky hashrates reported in Irish data centers.'
             ],
             rewards: [
-                { type: 'btc', minutes: 28, label: 'POT OF GOLD!\n\nYou found ' },
+                { type: 'btc', minutes: 8, label: 'POT OF GOLD!\n\nYou found ' },
                 { type: 'bps', mult: 3.5, duration: 80, label: 'LUCKY STREAK!\n\nProduction 3.5x for 80 seconds!' },
                 { type: 'click', mult: 4, duration: 70, label: 'SHAMROCK CLICKS!\n\nClicks 4x for 70 seconds!' }
             ]
@@ -147,7 +154,7 @@ function getActiveHoliday() {
                 'BUNNY NODE: Rapid-fire blocks hopping into the chain.'
             ],
             rewards: [
-                { type: 'btc', minutes: 22, label: 'GOLDEN EGG!\n\nInside you find ' },
+                { type: 'btc', minutes: 7, label: 'GOLDEN EGG!\n\nInside you find ' },
                 { type: 'bps', mult: 3, duration: 100, label: 'SPRING SURGE!\n\nProduction 3x for 100 seconds!' },
                 { type: 'click', mult: 5, duration: 55, label: 'HOPPING CLICKS!\n\nClicks 5x for 55 seconds!' }
             ]
@@ -167,7 +174,7 @@ function getActiveHoliday() {
                 'STARS & BLOCKS: Patriotic miners pushing record throughput.'
             ],
             rewards: [
-                { type: 'btc', minutes: 30, label: 'FIREWORK PAYOUT!\n\nA spectacular yield of ' },
+                { type: 'btc', minutes: 10, label: 'FIREWORK PAYOUT!\n\nA spectacular yield of ' },
                 { type: 'bps', mult: 4, duration: 90, label: 'LIBERTY BOOST!\n\nProduction 4x for 90 seconds!' },
                 { type: 'click', mult: 5, duration: 60, label: 'ROCKET CLICKS!\n\nClicks 5x for 60 seconds!' }
             ]
@@ -178,10 +185,10 @@ function getActiveHoliday() {
 }
 
 const REGULAR_REWARDS = [
-    { type: 'btc', minutes: 15, weight: 40, label: 'AIRDROP SECURED!\n\n+' },
+    { type: 'btc', minutes: 4, weight: 40, label: 'AIRDROP SECURED!\n\n+' },
     { type: 'bps', mult: 3, duration: 60, weight: 25, label: 'BULL MARKET!\n\nProduction 3x for 60 seconds!' },
     { type: 'click', mult: 4, duration: 45, weight: 20, label: 'CLICK FRENZY!\n\nClicks 4x for 45 seconds!' },
-    { type: 'btc', minutes: 8, weight: 10, label: 'WHALE ALERT!\n\nA friendly whale sent you ' },
+    { type: 'btc', minutes: 2.5, weight: 10, label: 'WHALE ALERT!\n\nA friendly whale sent you ' },
     { type: 'bps', mult: 2, duration: 120, weight: 5, label: 'STEADY RALLY!\n\nProduction 2x for 2 minutes!' }
 ];
 
@@ -195,12 +202,73 @@ function pickWeighted(list) {
     return list[0];
 }
 
+function formatBoostTime(msLeft) {
+    const s = Math.max(0, Math.ceil(msLeft / 1000));
+    const m = Math.floor(s / 60);
+    const r = s % 60;
+    return m > 0 ? (m + ':' + String(r).padStart(2, '0')) : (s + 's');
+}
+
+function updateBoostHUD() {
+    const hud = document.getElementById('active-effects-hud');
+    if (!hud) return;
+
+    const now = Date.now();
+    let html = '';
+
+    if (eventBoostActive && bpsBoostEndsAt > now) {
+        const left = bpsBoostEndsAt - now;
+        const name = bpsBoostLabel || ('PRODUCTION ' + window.eventMultiplier + 'x');
+        html += '<div class="active-effect-chip bps">' +
+            '<span class="active-effect-name">' + name + '</span>' +
+            '<span class="active-effect-timer">' + formatBoostTime(left) + '</span>' +
+            '</div>';
+    } else if (eventBoostActive && bpsBoostEndsAt <= now) {
+        window.eventMultiplier = 1;
+        eventBoostActive = false;
+        bpsBoostEndsAt = 0;
+    }
+
+    if (clickBoostActive && clickBoostEndsAt > now) {
+        const left = clickBoostEndsAt - now;
+        const name = clickBoostLabel || ('CLICKS ' + window.clickEventMultiplier + 'x');
+        html += '<div class="active-effect-chip click">' +
+            '<span class="active-effect-name">' + name + '</span>' +
+            '<span class="active-effect-timer">' + formatBoostTime(left) + '</span>' +
+            '</div>';
+    } else if (clickBoostActive && clickBoostEndsAt <= now) {
+        window.clickEventMultiplier = 1;
+        clickBoostActive = false;
+        clickBoostEndsAt = 0;
+    }
+
+    hud.innerHTML = html;
+}
+
+function ensureBoostHudTicker() {
+    if (boostHudInterval) return;
+    boostHudInterval = setInterval(() => {
+        updateBoostHUD();
+        if (!eventBoostActive && !clickBoostActive) {
+            clearInterval(boostHudInterval);
+            boostHudInterval = null;
+            updateBoostHUD();
+        }
+    }, 250);
+}
+
 function applyReward(reward, holiday) {
     let message = '';
 
     if (reward.type === 'btc') {
-        const currentBPS = typeof calculateCurrentBPS === 'function' ? calculateCurrentBPS() : 1;
-        const amount = Math.max(50, currentBPS * 60 * (reward.minutes || 10));
+        let currentBPS = 1;
+        if (typeof calculateCurrentBPS === 'function') {
+            const raw = calculateCurrentBPS();
+            const mult = (typeof window.eventMultiplier === 'number' && window.eventMultiplier > 0) ? window.eventMultiplier : 1;
+            currentBPS = raw / mult;
+        }
+        const minutes = reward.minutes || 3;
+        const amount = Math.max(25, currentBPS * 60 * minutes);
         window.gameData.bitcoin += amount;
         window.gameData.totalMined += amount;
         const prefix = reward.label || 'REWARD!\n\n+';
@@ -210,15 +278,27 @@ function applyReward(reward, holiday) {
         if (!eventBoostActive) {
             eventBoostActive = true;
             window.eventMultiplier = reward.mult || 3;
+            const dur = (reward.duration || 60) * 1000;
+            bpsBoostEndsAt = Date.now() + dur;
+            bpsBoostLabel = ('MINING ' + window.eventMultiplier + 'x').toUpperCase();
             message = reward.label || ('BOOST!\n\nProduction ' + window.eventMultiplier + 'x!');
+            ensureBoostHudTicker();
+            updateBoostHUD();
             setTimeout(() => {
                 window.eventMultiplier = 1;
                 eventBoostActive = false;
+                bpsBoostEndsAt = 0;
+                updateBoostHUD();
                 showEventNotification('Boost ended. Production normalized.');
-            }, (reward.duration || 60) * 1000);
+            }, dur);
         } else {
-            const currentBPS = typeof calculateCurrentBPS === 'function' ? calculateCurrentBPS() : 1;
-            const amount = Math.max(100, currentBPS * 60 * 10);
+            let currentBPS = 1;
+            if (typeof calculateCurrentBPS === 'function') {
+                const raw = calculateCurrentBPS();
+                const mult = (typeof window.eventMultiplier === 'number' && window.eventMultiplier > 0) ? window.eventMultiplier : 1;
+                currentBPS = raw / mult;
+            }
+            const amount = Math.max(40, currentBPS * 60 * 3);
             window.gameData.bitcoin += amount;
             window.gameData.totalMined += amount;
             message = 'STACKED LUCK!\n\n+' + (typeof formatNum === 'function' ? formatNum(amount) : amount) + ' BTC';
@@ -227,15 +307,27 @@ function applyReward(reward, holiday) {
         if (!clickBoostActive) {
             clickBoostActive = true;
             window.clickEventMultiplier = reward.mult || 3;
+            const dur = (reward.duration || 45) * 1000;
+            clickBoostEndsAt = Date.now() + dur;
+            clickBoostLabel = ('CLICKS ' + window.clickEventMultiplier + 'x').toUpperCase();
             message = reward.label || ('CLICK BOOST!\n\nClicks ' + window.clickEventMultiplier + 'x!');
+            ensureBoostHudTicker();
+            updateBoostHUD();
             setTimeout(() => {
                 window.clickEventMultiplier = 1;
                 clickBoostActive = false;
+                clickBoostEndsAt = 0;
+                updateBoostHUD();
                 showEventNotification('Click boost ended.');
-            }, (reward.duration || 45) * 1000);
+            }, dur);
         } else {
-            const currentBPS = typeof calculateCurrentBPS === 'function' ? calculateCurrentBPS() : 1;
-            const amount = Math.max(100, currentBPS * 60 * 8);
+            let currentBPS = 1;
+            if (typeof calculateCurrentBPS === 'function') {
+                const raw = calculateCurrentBPS();
+                const mult = (typeof window.eventMultiplier === 'number' && window.eventMultiplier > 0) ? window.eventMultiplier : 1;
+                currentBPS = raw / mult;
+            }
+            const amount = Math.max(40, currentBPS * 60 * 2.5);
             window.gameData.bitcoin += amount;
             window.gameData.totalMined += amount;
             message = 'DOUBLE DIP!\n\n+' + (typeof formatNum === 'function' ? formatNum(amount) : amount) + ' BTC';
@@ -357,4 +449,12 @@ function startEventLoop() {
         ];
         applyReward(passive[Math.floor(Math.random() * passive.length)], null);
     }, 180000);
+
+    // Load HUD host + rebirth/click wiring
+    if (!document.querySelector('script[data-boost-ui]')) {
+        const s = document.createElement('script');
+        s.src = 'boost-ui.js';
+        s.dataset.boostUi = '1';
+        document.body.appendChild(s);
+    }
 }
