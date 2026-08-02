@@ -28,9 +28,6 @@
             height: 100vh;
         }
 
-        /* ========================================= */
-        /* CINEMATIC LOGO INTRO OVERLAY STYLES       */
-        /* ========================================= */
         #intro-overlay {
             position: fixed;
             top: 0;
@@ -158,9 +155,6 @@
             100% { box-shadow: 0 0 45px rgba(212, 122, 85, 0.45), inset 0 0 25px rgba(212, 122, 85, 0.3); border-color: #e59371; transform: translateY(-3px); }
         }
 
-        /* ========================================= */
-        /* MAIN CLICKER GAME INTERFACE STYLES        */
-        /* ========================================= */
         .modal-overlay {
             display: none; 
             position: fixed; 
@@ -218,7 +212,6 @@
             font-weight: bold; 
         }
 
-        /* DEV MENU */
         #dev-trigger-btn { 
             display: none; 
             position: absolute; 
@@ -254,7 +247,6 @@
         .dev-btn:hover { background: #d466ff; }
         .dev-close-btn { width: 100%; margin-top: 15px; background: #444; color: #fff; }
 
-        /* LAYOUT */
         .game-container { display: flex; height: 100vh; width: 100vw; }
         
         .left-panel { 
@@ -334,7 +326,6 @@
         .rebirth-btn:not(:disabled):hover { background: #ff4d4d; color: #000; }
         .rebirth-btn:disabled { opacity: 0.25; cursor: not-allowed; border-color: #444; color: #444; }
 
-        /* GAMBLE STYLES */
         .gamble-btn {
             margin-top: 18px;
             width: 100%;
@@ -522,7 +513,6 @@
     </div>
 </div>
 
-<!-- GAMBLE MODAL -->
 <div id="gamble-modal">
     <h2 style="color: #ff4d4d; font-size: 0.65em; margin-bottom: 12px; text-align: center;">CRYPTO CASINO</h2>
     <div style="text-align: center; font-size: 0.45em; color: #ccc; margin-bottom: 14px;">
@@ -628,7 +618,6 @@
         quantum: `<svg viewBox="0 0 24 24"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zm0-2a8 8 0 1 1 0-16 8 8 0 0 1 0 16z"/></svg>`
     };
 
-    // Make gameData available globally so achievements.js and skillTree.js can access it
     window.gameData = {
         bitcoin: 0,
         totalMined: 0,
@@ -714,7 +703,6 @@
         }
     }
 
-    // --- GAMBLE FUNCTIONS ---
     function toggleGamble(open) {
         document.getElementById('modal-bg').style.display = open ? 'block' : 'none';
         document.getElementById('gamble-modal').style.display = open ? 'block' : 'none';
@@ -791,7 +779,6 @@
         }
     }
 
-    // --- DEV MENU FUNCTIONS ---
     function devAddFunds() { 
         window.gameData.bitcoin += parseFloat(document.getElementById("dev-add-funds-input").value) || 0; 
         syncStatePostDevCheat(); 
@@ -1105,9 +1092,17 @@
         txt.style.animation = `ticker ${Math.max(12, msg.length * 0.22)}s linear infinite`;
     }
 
+    const SAVE_KEY = 'btcMinerySaveData';
+    const SAVE_VERSION = 2;
+
     function saveGame() {
-        window.gameData.lastSaveTime = Date.now();
-        localStorage.setItem('btcMinerySaveData', JSON.stringify(window.gameData));
+        try {
+            window.gameData.lastSaveTime = Date.now();
+            window.gameData.saveVersion = SAVE_VERSION;
+            localStorage.setItem(SAVE_KEY, JSON.stringify(window.gameData));
+        } catch (e) {
+            console.error('Save failed (storage full or blocked):', e);
+        }
     }
 
     function applyOfflineProgress() {
@@ -1116,16 +1111,13 @@
         const now = Date.now();
         let secondsOffline = (now - window.gameData.lastSaveTime) / 1000;
 
-        // Ignore very short absences (tab switches, etc.)
         if (secondsOffline < 30) return;
 
-        // Cap at 24 hours so long absences don't explode the economy
         const MAX_OFFLINE_SECONDS = 24 * 60 * 60;
         const wasCapped = secondsOffline > MAX_OFFLINE_SECONDS;
         const cappedSeconds = Math.min(secondsOffline, MAX_OFFLINE_SECONDS);
 
         const onlineBPS = calculateCurrentBPS();
-        // 10% efficiency while offline
         const offlineRate = onlineBPS * 0.10;
         const earned = offlineRate * cappedSeconds;
 
@@ -1141,7 +1133,6 @@
         timeStr += mins + "m";
         if (wasCapped) timeStr += " (capped at 24h)";
 
-        // Show after the intro overlay fades
         setTimeout(() => {
             alert(
                 "While you were away (" + timeStr + ")...\n\n" +
@@ -1154,19 +1145,33 @@
     }
 
     function loadGame() {
-        const saved = localStorage.getItem('btcMinerySaveData');
+        // NEVER wipe or ignore a valid save when code changes.
+        // Always merge saved fields on top of defaults so new features
+        // get defaults while existing progress is preserved.
+        const saved = localStorage.getItem(SAVE_KEY);
         if (saved) {
             try {
                 const parsed = JSON.parse(saved);
-                if (!parsed.unlockedAchievements) parsed.unlockedAchievements = [];
-                if (!parsed.skillTreeLevels) parsed.skillTreeLevels = {};
-                if (!parsed.rebirthPoints) parsed.rebirthPoints = 0;
-                window.gameData = Object.assign({}, window.gameData, parsed);
-            } catch(e) { 
-                console.error("Could not parse save data file."); 
+                if (parsed && typeof parsed === 'object') {
+                    if (!Array.isArray(parsed.unlockedAchievements)) parsed.unlockedAchievements = [];
+                    if (!parsed.skillTreeLevels || typeof parsed.skillTreeLevels !== 'object') parsed.skillTreeLevels = {};
+                    if (typeof parsed.rebirthPoints !== 'number') parsed.rebirthPoints = 0;
+                    if (!parsed.ownedMiners || typeof parsed.ownedMiners !== 'object') parsed.ownedMiners = {};
+                    if (!parsed.upgradeLevels || typeof parsed.upgradeLevels !== 'object') parsed.upgradeLevels = {};
+                    if (typeof parsed.bitcoin !== 'number') parsed.bitcoin = 0;
+                    if (typeof parsed.totalMined !== 'number') parsed.totalMined = 0;
+                    if (typeof parsed.totalClicks !== 'number') parsed.totalClicks = 0;
+                    if (typeof parsed.rebirths !== 'number') parsed.rebirths = 0;
+                    if (typeof parsed.clickValue !== 'number') parsed.clickValue = 0.5;
+                    if (typeof parsed.devMenuUnlocked !== 'boolean') parsed.devMenuUnlocked = false;
+                    if (!parsed.mineryName) parsed.mineryName = "Bitcoin's Minery";
+                    window.gameData = Object.assign({}, window.gameData, parsed);
+                }
+            } catch (e) {
+                console.error("Could not parse save data; keeping raw save intact.", e);
             }
         }
-        document.getElementById("minery-title").innerText = window.gameData.mineryName.toUpperCase();
+        document.getElementById("minery-title").innerText = (window.gameData.mineryName || "Bitcoin's Minery").toUpperCase();
         evaluateDevTriggerVisibility();
         applyOfflineProgress();
         updateDisplay();
@@ -1174,14 +1179,21 @@
 
     function resetGame() {
         if (confirm("WARNING: Are you sure you want to completely erase all of your progress and start fresh?")) {
-            localStorage.removeItem('btcMinerySaveData');
+            localStorage.removeItem(SAVE_KEY);
             window.location.reload();
         }
     }
 
-    // =======================================================
-    // GAME LOOP START
-    // =======================================================
+    // Force-save on tab close / refresh / hide so code edits & reloads never lose progress
+    window.addEventListener('beforeunload', function () {
+        saveGame();
+    });
+    document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'hidden') {
+            saveGame();
+        }
+    });
+
     loadGame();
     renderMiners();
     renderUpgrades();
@@ -1209,7 +1221,7 @@
         }
     }, 100); 
 
-    setInterval(saveGame, 20000); 
+    setInterval(saveGame, 5000);
     setInterval(updateNews, 14000);
 </script>
 </body>
