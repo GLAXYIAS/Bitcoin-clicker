@@ -33,6 +33,7 @@
     load('dense-ui-patch.js', 'data-dense-ui');
     load('casino.js', 'data-casino');
     load('ui-fix.js', 'data-ui-fix');
+    load('custom-modals.js', 'data-custom-modals');
     patchUnlock();
     setTimeout(function () {
       if (typeof window.renderUpgrades === 'function') try { window.renderUpgrades(); } catch (e) {}
