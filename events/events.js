@@ -177,7 +177,6 @@ function startEventLoop() {
       holiday.news.forEach(n=>{ if (newsMessages.indexOf(n)===-1) newsMessages.push(n); });
     showEventNotification(holiday.name+' EVENT LIVE!\n\n'+holiday.tagline, holiday.color);
   }
-  // 45.972% every 10 minutes
   const spawnChance = 0.45972;
   setInterval(()=>{ if (Math.random()<spawnChance) spawnAirdrop(); }, 600000);
   setTimeout(()=>{ if (Math.random()<spawnChance) spawnAirdrop(); }, 120000);
@@ -194,9 +193,10 @@ function startEventLoop() {
   loadOnce('boost-ui.js','data-boost-ui');
   const gd = loadOnce('game-data.js','data-game-data');
   if (gd) {
-    gd.onload = function(){ loadOnce('game-engine-patch.js','data-engine-patch'); loadOnce('runtime-fixes.js','data-runtime-fixes'); };
+    gd.onload = function(){ loadOnce('game-engine-patch.js','data-engine-patch'); loadOnce('runtime-fixes.js','data-runtime-fixes'); loadOnce('feature-boot.js','data-feature-boot'); };
   } else {
     loadOnce('game-engine-patch.js','data-engine-patch');
     loadOnce('runtime-fixes.js','data-runtime-fixes');
+    loadOnce('feature-boot.js','data-feature-boot');
   }
 }
