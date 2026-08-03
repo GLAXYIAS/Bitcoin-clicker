@@ -6,7 +6,7 @@ This software, including all source code, assets, and compiled distributions, is
 
 Permissions:
 
-You may embed this game on your own website using an <iframe> that directly loads the official hosted version at [your game’s URL].
+You may embed this game on your own website using an <iframe> that directly loads the official hosted version at [glaxyias.github.io].
 Restrictions:
 
 You may not copy, fork, clone, modify, redistribute, or create derivative works based on this project or any part of it.
