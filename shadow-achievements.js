@@ -27,6 +27,8 @@
   }
 
   var SHADOWS = [
+    { id: 'shadow_1b_5m', title: 'Five Minute Billion', desc: 'Reach 1,000,000,000 BTC in under 5 minutes this session (must cross from below 1B).', icon: SHADOW_ICON, shadow: true,
+      check: function (s) { trackBankCross(s); return minutesTo1B() <= 5; } },
     { id: 'shadow_1b_15m', title: 'Fifteen Minute Billion', desc: 'Reach 1,000,000,000 BTC in under 15 minutes this session (must cross from below 1B).', icon: SHADOW_ICON, shadow: true,
       check: function (s) { trackBankCross(s); return minutesTo1B() <= 15; } },
     { id: 'shadow_1b_30m', title: 'Half Hour Billion', desc: 'Reach 1,000,000,000 BTC in under 30 minutes this session (must cross from below 1B).', icon: SHADOW_ICON, shadow: true,
@@ -39,10 +41,16 @@
       check: function (s) { return !!(s && s._shadowOpenedAdmin); } },
     { id: 'shadow_click_billion', title: 'Finger Of The Gods', desc: 'Click the Bitcoin 1,000,000,000 times.', icon: I.cursor || SHADOW_ICON, shadow: true,
       check: function (s) { return (s.totalClicks || 0) >= 1e9; } },
+    { id: 'shadow_click_trillion', title: 'Finger Apocalypse', desc: 'Click the Bitcoin 1,000,000,000,000 times.', icon: I.cursor || SHADOW_ICON, shadow: true,
+      check: function (s) { return (s.totalClicks || 0) >= 1e12; } },
     { id: 'shadow_bank_googol', title: 'Googol Bank', desc: 'Hold 1e100 BTC at once.', icon: I.wealth || SHADOW_ICON, shadow: true,
       check: function (s) { return (s.bitcoin || 0) >= 1e100; } },
+    { id: 'shadow_hold_1e150', title: 'Eternal Vault', desc: 'Hold 1e150 BTC at once.', icon: I.wealth || SHADOW_ICON, shadow: true,
+      check: function (s) { return (s.bitcoin || 0) >= 1e150; } },
     { id: 'shadow_hardware_million', title: 'One Million Rigs', desc: 'Own 1,000,000 total hardware units.', icon: I.hardware || SHADOW_ICON, shadow: true,
       check: function (s) { return tm(s) >= 1e6; } },
+    { id: 'shadow_hardware_10m', title: 'Ten Million Rigs', desc: 'Own 10,000,000 total hardware units.', icon: I.hardware || SHADOW_ICON, shadow: true,
+      check: function (s) { return tm(s) >= 1e7; } },
     { id: 'shadow_rebirth_1000', title: 'Thousand Timelines', desc: 'Rebirth 1,000 times.', icon: I.rebirth || SHADOW_ICON, shadow: true,
       check: function (s) { return (s.rebirths || 0) >= 1000; } },
     { id: 'shadow_zero_bps_rich', title: 'Idle Paradox', desc: 'Hold 1e12 BTC while current production is exactly 0 BPS.', icon: SHADOW_ICON, shadow: true,
@@ -58,6 +66,17 @@
         for (var i = 0; i < ACHIEVEMENTS.length; i++) {
           var a = ACHIEVEMENTS[i];
           if (a.shadow || a.id === 'shadow_all_normal') continue;
+          if (unlocked.indexOf(a.id) === -1) return false;
+        }
+        return true;
+      } },
+    { id: 'shadow_all_shadows', title: 'Shadowmaster', desc: 'Unlock every shadow achievement.', icon: SHADOW_ICON, shadow: true,
+      check: function (s) {
+        if (typeof ACHIEVEMENTS === 'undefined') return false;
+        var unlocked = s.unlockedAchievements || [];
+        for (var i = 0; i < ACHIEVEMENTS.length; i++) {
+          var a = ACHIEVEMENTS[i];
+          if (!a.shadow || a.id === 'shadow_all_shadows') continue;
           if (unlocked.indexOf(a.id) === -1) return false;
         }
         return true;
@@ -120,11 +139,14 @@
     return String(str || '').replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>');
   }
   function cardHtml(ach, on, isShadow) {
-    var tip = (ach.desc || '').replace(/"/g, '"');
-    return '<div class="ach-card ' + (on ? 'unlocked' : 'locked') + (isShadow ? ' shadow-ach' : '') + '" title="' + tip + '">' +
+    // For shadow achievements that are still locked, hide the hint/desc/title.
+    var showInfo = on || !isShadow;
+    var tip = showInfo ? (ach.desc || '').replace(/"/g, '"') : '';
+    return '<div class="ach-card ' + (on ? 'unlocked' : 'locked') + (isShadow ? ' shadow-ach' : '') + '"' +
+      (tip ? ' title="' + tip + '"' : '') + '>' +
       '<div class="ach-icon">' + (ach.icon || '') + '</div>' +
       '<div class="ach-title">' + escapeHtml(ach.title) + '</div>' +
-      '<div class="ach-desc">' + escapeHtml(ach.desc) + '</div>' +
+      '<div class="ach-desc">' + (showInfo ? escapeHtml(ach.desc) : '') + '</div>' +
       '<div class="ach-status">' + (on ? 'Unlocked' : 'Locked') + '</div></div>';
   }
 
@@ -169,7 +191,7 @@
     var s = document.createElement('style');
     s.id = 'shadow-ach-css';
     s.textContent = [
-      '.shadow-ach-header{margin:22px 0 6px;font-size:0.55em;color:#9b59b6;letter-spacing:0.12em;text-transform:uppercase;border-top:2px solid #4a2060;padding-top:14px;text-shadow:0 0 8px rgba(155,89,182,0.5);}',
+      '.shadow-ach-header{margin:22px 0 6px;font-size:0.55em;color:#9b59b6;letter-spacing:0.12em;text-transform:uppercase;border-top:2px solid #4a2060;padding-top:14px;text-shadow:0 0 8px rgba(15,8,20,0.5);} ',
       '.shadow-ach-sub{font-size:0.35em;color:#666;margin-bottom:10px;}',
       '.ach-card.shadow-ach{border-color:#4a2060;background:#12081a;}',
       '.ach-card.shadow-ach.unlocked{border-color:#9b59b6;box-shadow:0 0 12px rgba(155,89,182,0.45);}',
