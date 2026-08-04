@@ -31,17 +31,28 @@
       src = HOLIDAY_IMAGES[holiday.id];
     }
 
-    // Avoid reloading the same image repeatedly
     var current = img.getAttribute('src') || '';
-    if (current.indexOf(src) !== -1 || current.endsWith(src.split('/').pop())) return;
+    var same = current.indexOf(src) !== -1 || current.endsWith(src.split('/').pop());
+    if (!same) {
+      img.setAttribute('src', src);
+      img.setAttribute('alt', holiday ? (holiday.name + ' Bitcoin') : 'Bitcoin');
+    }
 
-    img.setAttribute('src', src);
-    img.setAttribute('alt', holiday ? (holiday.name + ' Bitcoin') : 'Bitcoin');
+    // Always match normal Bitcoin footprint (250x250)
+    img.style.width = '250px';
+    img.style.height = '250px';
+    img.style.objectFit = 'contain';
+    img.style.objectPosition = 'center';
+    img.setAttribute('width', '250');
+    img.setAttribute('height', '250');
+    var host = document.getElementById('bitcoin');
+    if (host) host.classList.toggle('holiday-active', !!(holiday && HOLIDAY_IMAGES[holiday.id]));
+
     img.onerror = function () {
-      // Fallback to default if a holiday asset is missing
       if (img.getAttribute('src') !== DEFAULT_SRC) {
         img.setAttribute('src', DEFAULT_SRC);
         img.onerror = null;
+        if (host) host.classList.remove('holiday-active');
       }
     };
   }
@@ -50,7 +61,6 @@
 
   function boot() {
     applyHolidayBitcoin();
-    // Re-check periodically in case the page stays open across midnight
     setInterval(applyHolidayBitcoin, 60 * 1000);
   }
 
@@ -59,7 +69,6 @@
   } else {
     setTimeout(boot, 200);
   }
-  // Events may load a bit later
   setTimeout(applyHolidayBitcoin, 800);
   setTimeout(applyHolidayBitcoin, 2000);
 })();

@@ -35,6 +35,7 @@
     load('ui-fix.js', 'data-ui-fix');
     load('custom-modals.js', 'data-custom-modals');
     load('holiday-bitcoin.js', 'data-holiday-bitcoin');
+    load('holiday-power.js', 'data-holiday-power');
     load('admin-events.js', 'data-admin-events');
     patchUnlock();
     setTimeout(function () {
