@@ -22,6 +22,7 @@
     };
   }
   function afterData() {
+    load('wipe-save-fix.js', 'data-wipe-save');
     load('extra-miners.js', 'data-extra-miners');
     load('extra-achievements.js', 'data-extra-ach');
     load('mass-achievements-a.js', 'data-mass-ach-a');
