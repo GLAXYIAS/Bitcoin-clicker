@@ -27,6 +27,7 @@
     load('mass-achievements-a.js', 'data-mass-ach-a');
     load('mass-achievements-b.js', 'data-mass-ach-b');
     load('shadow-achievements.js', 'data-shadow-ach');
+    load('achievement-ui.js', 'data-ach-ui');
     load('click-power-upgrades.js', 'data-click-power');
     load('achievement-upgrades.js', 'data-ach-upgrades');
     load('game-engine-patch.js', 'data-engine-patch');
