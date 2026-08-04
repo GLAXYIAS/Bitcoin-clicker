@@ -24,6 +24,8 @@
   function afterData() {
     load('extra-miners.js', 'data-extra-miners');
     load('extra-achievements.js', 'data-extra-ach');
+    load('mass-achievements-a.js', 'data-mass-ach-a');
+    load('mass-achievements-b.js', 'data-mass-ach-b');
     load('click-power-upgrades.js', 'data-click-power');
     load('achievement-upgrades.js', 'data-ach-upgrades');
     load('game-engine-patch.js', 'data-engine-patch');
