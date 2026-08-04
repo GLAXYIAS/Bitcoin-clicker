@@ -1,7 +1,10 @@
-// Custom modals: minery name, miner buy/info, upgrade buy/info
+// Custom modals: minery name, miner buy/info (bulk), upgrade buy/info
 (function () {
   if (window.__customModalsLoaded) return;
   window.__customModalsLoaded = true;
+
+  if (window.__minerBuyQty == null) window.__minerBuyQty = 1;
+  if (!window.__minerBuyQtyMode) window.__minerBuyQtyMode = 'n';
 
   function fmt(n) {
     return typeof formatNum === 'function' ? formatNum(n) : String(n);
@@ -17,12 +20,32 @@
     var mult = typeof window.getMinerProductionMult === 'function' ? window.getMinerProductionMult(m.id) : 1;
     return base * mult;
   }
-  function minerCost(m) {
+  function minerCost(m, ownedOverride) {
+    var owned = typeof ownedOverride === 'number' ? ownedOverride : ((window.gameData && window.gameData.ownedMiners[m.id]) || 0);
+    var mult = (typeof window.holidayCostMult === 'number' && window.holidayCostMult > 0) ? window.holidayCostMult : 1;
+    return Math.floor(m.baseCost * Math.pow(1.42, owned) * discount() * mult);
+  }
+  function minerBulkCost(m, qty) {
     var owned = (window.gameData && window.gameData.ownedMiners[m.id]) || 0;
-    return Math.floor(m.baseCost * Math.pow(1.42, owned) * discount());
+    var total = 0;
+    for (var i = 0; i < qty; i++) total += minerCost(m, owned + i);
+    return total;
+  }
+  function minerMaxAffordable(m) {
+    var bank = (window.gameData && window.gameData.bitcoin) || 0;
+    var owned = (window.gameData && window.gameData.ownedMiners[m.id]) || 0;
+    var total = 0;
+    var n = 0;
+    while (n < 10000) {
+      var c = minerCost(m, owned + n);
+      if (total + c > bank) break;
+      total += c;
+      n++;
+    }
+    return n;
   }
   function upgradeCost(u) {
-    return Math.floor(u.baseCost * discount());
+    return Math.floor(u.baseCost * discount() * ((typeof window.holidayCostMult === 'number' && window.holidayCostMult > 0) ? window.holidayCostMult : 1));
   }
 
   function injectCss() {
@@ -52,7 +75,12 @@
       '#cm-modal .cm-btn-buy{background:#00ff9d;color:#000;border-color:#00ff9d;}',
       '#cm-modal .cm-btn-buy:disabled{opacity:0.35;cursor:not-allowed;}',
       '#cm-modal .cm-btn-save{background:#ffd700;color:#000;border-color:#ffd700;}',
-      '#cm-modal .cm-btn-cancel{background:#222;color:#ccc;border-color:#555;}'
+      '#cm-modal .cm-btn-cancel{background:#222;color:#ccc;border-color:#555;}',
+      '#cm-modal .cm-qty-row{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 8px;}',
+      '#cm-modal .cm-qty-btn{flex:1;min-width:52px;padding:8px 6px;font-family:inherit;font-size:0.38em;background:#1a1a26;color:#aaa;border:2px solid #444;cursor:pointer;text-align:center;}',
+      '#cm-modal .cm-qty-btn:hover{border-color:#00ff9d;color:#00ff9d;}',
+      '#cm-modal .cm-qty-btn.active{background:#0a2a1a;border-color:#00ff9d;color:#00ff9d;box-shadow:0 0 8px rgba(0,255,157,0.35);}',
+      '#cm-modal .cm-qty-cost{font-size:0.4em;color:#ffd700;text-align:center;margin-bottom:6px;}'
     ].join('');
     document.head.appendChild(s);
   }
@@ -110,7 +138,7 @@
       'NAME YOUR MINERY',
       '<label class="cm-label">Minery name</label>' +
         '<input class="cm-input" id="cm-name-input" type="text" maxlength="40" value="' +
-        String(current).replace(/"/g, '"') + '" />',
+        String(current).replace(/"/g, '&quot;') + '" />',
       [
         { label: 'CANCEL', className: 'cm-btn-cancel', onClick: closeModal },
         {
@@ -139,29 +167,64 @@
     }, 30);
   };
 
-  window.openMinerModal = function (minerId) {
+  window.openMinerModal = function (minerId, presetQty) {
     if (!window.gameData || !window.miners) return;
     var m = null;
     for (var i = 0; i < window.miners.length; i++) {
       if (window.miners[i].id === minerId) { m = window.miners[i]; break; }
     }
     if (!m) return;
+
     var owned = window.gameData.ownedMiners[m.id] || 0;
-    var cost = minerCost(m);
     var prod = minerProd(m);
-    var can = window.gameData.bitcoin >= cost;
     var minery = window.gameData.mineryName || "Bitcoin's Minery";
+    var maxN = minerMaxAffordable(m);
+
+    if (presetQty === 'max' || window.__minerBuyQtyMode === 'max') {
+      window.__minerBuyQtyMode = 'max';
+      window.__minerBuyQty = Math.max(1, maxN);
+    } else if (typeof presetQty === 'number') {
+      window.__minerBuyQtyMode = 'n';
+      window.__minerBuyQty = presetQty;
+    } else if (!window.__minerBuyQty) {
+      window.__minerBuyQtyMode = 'n';
+      window.__minerBuyQty = 1;
+    }
+
+    var qty = window.__minerBuyQtyMode === 'max' ? Math.max(1, maxN) : (parseInt(window.__minerBuyQty, 10) || 1);
+    if (qty < 1) qty = 1;
+    var bulkCost = minerBulkCost(m, qty);
+    var can = qty >= 1 && maxN >= qty && window.gameData.bitcoin >= bulkCost;
+
+    function qtyBtn(label, val) {
+      var active = false;
+      if (val === 'max') active = window.__minerBuyQtyMode === 'max';
+      else active = window.__minerBuyQtyMode !== 'max' && qty === val;
+      return '<button type="button" class="cm-qty-btn' + (active ? ' active' : '') + '" data-qty="' + val + '">' + label + '</button>';
+    }
+
+    var body =
+      '<div class="cm-row"><span>Owned</span><span>' + owned + '</span></div>' +
+      '<div class="cm-row"><span>Produces</span><span>' + fmt(prod) + ' BTC/s each</span></div>' +
+      '<div class="cm-row"><span>Your total from these</span><span>' + fmt(prod * owned) + ' BTC/s</span></div>' +
+      '<div class="cm-row"><span>Max you can afford</span><span>' + maxN + '</span></div>' +
+      '<label class="cm-label">Buy amount</label>' +
+      '<div class="cm-qty-row" id="cm-qty-row">' +
+        qtyBtn('x1', 1) +
+        qtyBtn('x10', 10) +
+        qtyBtn('x50', 50) +
+        qtyBtn('x100', 100) +
+        qtyBtn('MAX', 'max') +
+      '</div>' +
+      '<div class="cm-qty-cost" id="cm-qty-cost">Cost for ' + qty + ': ' + fmt(bulkCost) + ' BTC</div>' +
+      '<label class="cm-label">Minery name</label>' +
+      '<input class="cm-input" id="cm-miner-name-input" type="text" maxlength="40" value="' +
+      String(minery).replace(/"/g, '&quot;') + '" />';
 
     openModal(
       'cm-miner',
       m.name,
-      '<div class="cm-row"><span>Owned</span><span>' + owned + '</span></div>' +
-        '<div class="cm-row"><span>Cost</span><span>' + fmt(cost) + ' BTC</span></div>' +
-        '<div class="cm-row"><span>Produces</span><span>' + fmt(prod) + ' BTC/s each</span></div>' +
-        '<div class="cm-row"><span>Your total from these</span><span>' + fmt(prod * owned) + ' BTC/s</span></div>' +
-        '<label class="cm-label">Minery name</label>' +
-        '<input class="cm-input" id="cm-miner-name-input" type="text" maxlength="40" value="' +
-        String(minery).replace(/"/g, '"') + '" />',
+      body,
       [
         {
           label: 'CLOSE',
@@ -179,7 +242,7 @@
           }
         },
         {
-          label: can ? 'BUY 1' : "CAN'T AFFORD",
+          label: can ? ('BUY ' + qty) : "CAN'T AFFORD",
           className: 'cm-btn-buy',
           disabled: !can,
           onClick: function () {
@@ -190,20 +253,41 @@
               var title = document.getElementById('minery-title');
               if (title) title.innerText = val.toUpperCase();
             }
-            var c = minerCost(m);
-            if (window.gameData.bitcoin >= c) {
-              window.gameData.bitcoin -= c;
-              window.gameData.ownedMiners[m.id] = (window.gameData.ownedMiners[m.id] || 0) + 1;
+            var buyQty = window.__minerBuyQtyMode === 'max' ? minerMaxAffordable(m) : (parseInt(window.__minerBuyQty, 10) || 1);
+            if (buyQty < 1) return;
+            var total = minerBulkCost(m, buyQty);
+            if (window.gameData.bitcoin >= total) {
+              window.gameData.bitcoin -= total;
+              window.gameData.ownedMiners[m.id] = (window.gameData.ownedMiners[m.id] || 0) + buyQty;
               if (typeof window.renderMiners === 'function') window.renderMiners();
               if (typeof window.renderUpgrades === 'function') window.renderUpgrades();
               if (typeof updateDisplay === 'function') updateDisplay();
               if (typeof saveGame === 'function') saveGame();
-              window.openMinerModal(minerId);
+              if (typeof window.refreshAffordGlow === 'function') window.refreshAffordGlow();
+              window.openMinerModal(minerId, window.__minerBuyQtyMode === 'max' ? 'max' : buyQty);
             }
           }
         }
       ]
     );
+
+    setTimeout(function () {
+      var row = document.getElementById('cm-qty-row');
+      if (!row) return;
+      row.querySelectorAll('.cm-qty-btn').forEach(function (btn) {
+        btn.onclick = function () {
+          var v = btn.getAttribute('data-qty');
+          if (v === 'max') {
+            window.__minerBuyQtyMode = 'max';
+            window.openMinerModal(minerId, 'max');
+          } else {
+            window.__minerBuyQtyMode = 'n';
+            window.__minerBuyQty = parseInt(v, 10) || 1;
+            window.openMinerModal(minerId, window.__minerBuyQty);
+          }
+        };
+      });
+    }, 0);
   };
 
   window.openUpgradeModal = function (upgradeId) {
@@ -221,7 +305,7 @@
       u.name,
       '<div class="cm-desc">' + (u.desc || '') + '</div>' +
         '<div class="cm-row"><span>Cost</span><span>' + fmt(cost) + ' BTC</span></div>' +
-        (u.effect ? '<div class="cm-row"><span>Effect</span><span>' + u.effect + (u.mult ? ' ×' + u.mult : '') + '</span></div>' : ''),
+        (u.effect ? '<div class="cm-row"><span>Effect</span><span>' + u.effect + (u.mult ? ' x' + u.mult : '') + '</span></div>' : ''),
       [
         { label: 'CLOSE', className: 'cm-btn-cancel', onClick: closeModal },
         {
