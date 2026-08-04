@@ -34,10 +34,12 @@
     load('casino.js', 'data-casino');
     load('ui-fix.js', 'data-ui-fix');
     load('custom-modals.js', 'data-custom-modals');
+    load('holiday-bitcoin.js', 'data-holiday-bitcoin');
     patchUnlock();
     setTimeout(function () {
       if (typeof window.renderUpgrades === 'function') try { window.renderUpgrades(); } catch (e) {}
       if (typeof window.renderMiners === 'function') try { window.renderMiners(); } catch (e) {}
+      if (typeof window.applyHolidayBitcoin === 'function') try { window.applyHolidayBitcoin(); } catch (e) {}
     }, 900);
   }
   function boot() {
