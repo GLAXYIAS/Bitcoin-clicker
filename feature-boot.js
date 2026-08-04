@@ -35,11 +35,13 @@
     load('ui-fix.js', 'data-ui-fix');
     load('custom-modals.js', 'data-custom-modals');
     load('holiday-bitcoin.js', 'data-holiday-bitcoin');
+    load('admin-events.js', 'data-admin-events');
     patchUnlock();
     setTimeout(function () {
       if (typeof window.renderUpgrades === 'function') try { window.renderUpgrades(); } catch (e) {}
       if (typeof window.renderMiners === 'function') try { window.renderMiners(); } catch (e) {}
       if (typeof window.applyHolidayBitcoin === 'function') try { window.applyHolidayBitcoin(); } catch (e) {}
+      if (typeof window.refreshAffordGlow === 'function') try { window.refreshAffordGlow(); } catch (e) {}
     }, 900);
   }
   function boot() {
