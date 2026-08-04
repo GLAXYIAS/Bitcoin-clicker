@@ -82,7 +82,11 @@
         return true;
       } },
     { id: 'shadow_name_doge', title: 'Such Minery', desc: 'Name your minery exactly: dogecoin', icon: SHADOW_ICON, shadow: true,
-      check: function (s) { return !!(s.mineryName && String(s.mineryName).toLowerCase().trim() === 'dogecoin'); } }
+      check: function (s) { return !!(s.mineryName && String(s.mineryName).toLowerCase().trim() === 'dogecoin'); } },
+
+    // New console-triggered shadow achievement. To trigger: open the Dev tab and type /Iwantachievement in the browser console.
+    { id: 'shadow_console_trigger', title: 'Cheater\'s Praise', desc: 'Open the Dev tab and enter /Iwantachievement in the console while the Dev tab is active.', icon: SHADOW_ICON, shadow: true,
+      check: function (s) { return !!(s && s._shadowConsole); } }
   ];
 
   function register() {
@@ -120,8 +124,44 @@
         if (typeof checkAchievements === 'function') checkAchievements(window.gameData);
         if (typeof saveGame === 'function') saveGame();
       }
+      // Ensure the console hook is active whenever admin is patched/opened
+      try { patchConsoleHook(); } catch (e) {}
       return result;
     };
+  }
+
+  // Install a lightweight RegExp constructor wrapper that watches for the literal /Iwantachievement
+  // When a RegExp with that exact source is created (e.g. typing /Iwantachievement in the console),
+  // grant the shadow achievement flag on the save and trigger checks/save — but only if the Dev tab is active.
+  function patchConsoleHook() {
+    if (window.__shadowConsolePatched) return;
+    try {
+      var OrigRegExp = window.RegExp;
+      if (!OrigRegExp) return;
+      function WrappedRegExp(pattern, flags) {
+        // Determine source string for patterns passed as RegExp objects or strings
+        var src = pattern && pattern.source ? pattern.source : String(pattern || '');
+        try {
+          if (src === 'Iwantachievement') {
+            // require the Dev tab to be active (center panel sets window.__centerTab = 'dev' when showing Dev)
+            if (window.gameData && window.__centerTab === 'dev') {
+              window.gameData._shadowConsole = true;
+              if (typeof checkAchievements === 'function') checkAchievements(window.gameData);
+              if (typeof saveGame === 'function') saveGame();
+            }
+          }
+        } catch (e) {}
+        // Construct a real RegExp to return
+        return new OrigRegExp(pattern, flags);
+      }
+      // Preserve prototype so instanceof checks still work
+      WrappedRegExp.prototype = OrigRegExp.prototype;
+      WrappedRegExp.toString = function () { return OrigRegExp.toString(); };
+      window.RegExp = WrappedRegExp;
+      window.__shadowConsolePatched = true;
+    } catch (e) {
+      // best-effort; do nothing on failure
+    }
   }
 
   function patchCheck() {
@@ -191,7 +231,7 @@
     var s = document.createElement('style');
     s.id = 'shadow-ach-css';
     s.textContent = [
-      '.shadow-ach-header{margin:22px 0 6px;font-size:0.55em;color:#9b59b6;letter-spacing:0.12em;text-transform:uppercase;border-top:2px solid #4a2060;padding-top:14px;text-shadow:0 0 8px rgba(15,8,20,0.5);} ',
+      '.shadow-ach-header{margin:22px 0 6px;font-size:0.55em;color:#9b59b6;letter-spacing:0.12em;text-transform:uppercase;border-top:2px solid #4a2060;padding-top:14px;text-shadow:0 0 8px rgba(15',
       '.shadow-ach-sub{font-size:0.35em;color:#666;margin-bottom:10px;}',
       '.ach-card.shadow-ach{border-color:#4a2060;background:#12081a;}',
       '.ach-card.shadow-ach.unlocked{border-color:#9b59b6;box-shadow:0 0 12px rgba(155,89,182,0.45);}',
@@ -204,6 +244,8 @@
   function boot() {
     injectCss();
     register();
+    // Ensure console hook is installed early so typing the literal in console can be caught
+    try { patchConsoleHook(); } catch (e) {}
     patchAdmin();
     patchCheck();
     patchRender();
